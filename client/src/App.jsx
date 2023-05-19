@@ -1,6 +1,13 @@
 import { Route, Routes, Link } from "react-router-dom";
 import "./App.module.scss";
-import { BookList, Home, Book, NewBook, NotFound } from "@/components";
+import {
+  BookList,
+  Home,
+  Book,
+  NewBook,
+  NotFound,
+  BooksLayout,
+} from "@/components";
 
 export default function App() {
   return (
@@ -17,9 +24,11 @@ export default function App() {
       </nav>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/books" element={<BookList />} />
-        <Route path="/books/new" element={<NewBook />} />
-        <Route path="/books/:id" element={<Book />} />
+        <Route path="/books" element={<BooksLayout />}>
+          <Route index element={<BookList />} />
+          <Route path="new" element={<NewBook />} />
+          <Route path=":id" element={<Book />} />
+        </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>
