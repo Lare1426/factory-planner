@@ -11,7 +11,11 @@ const __dirname = path.dirname(__filename);
 const server = express();
 
 if (process.env.NODE_ENV === "production") {
-  server.use(express.static(path.join(__dirname, "../client")));
+  server.use(express.static(path.join(__dirname, "../client/dist")));
+
+  server.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "../client/dist/index.html"));
+  });
 }
 
 server.listen(PORT, IP, () => {
