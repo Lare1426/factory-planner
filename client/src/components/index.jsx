@@ -4,5 +4,6 @@ import Book from "./Book";
 import NewBook from "./NewBook";
 import NotFound from "./NotFound";
 import BooksLayout from "./BooksLayout";
+import Navigation from "./Navigation";
 
-export { BookList, Home, Book, NewBook, NotFound, BooksLayout };
+export { BookList, Home, Book, NewBook, NotFound, BooksLayout, Navigation };

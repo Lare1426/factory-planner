@@ -1,4 +1,4 @@
-import { Route, Routes, Link } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import "./App.module.scss";
 import {
   BookList,
@@ -7,27 +7,20 @@ import {
   NewBook,
   NotFound,
   BooksLayout,
+  Navigation,
 } from "@/components";
 
 export default function App() {
   return (
     <>
-      <nav>
-        <ul>
-          <li>
-            <Link to="/">Home</Link>
-          </li>
-          <li>
-            <Link to="/books">Books</Link>
-          </li>
-        </ul>
-      </nav>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/books" element={<BooksLayout />}>
-          <Route index element={<BookList />} />
-          <Route path="new" element={<NewBook />} />
-          <Route path=":id" element={<Book />} />
+        <Route element={<Navigation />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/books" element={<BooksLayout />}>
+            <Route index element={<BookList />} />
+            <Route path="new" element={<NewBook />} />
+            <Route path=":id" element={<Book />} />
+          </Route>
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
