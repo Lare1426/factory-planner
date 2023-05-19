@@ -16,7 +16,7 @@ export default function BooksLayout() {
           </li>
         </ul>
       </nav>
-      <Outlet />
+      <Outlet context={{ hello: "world" }} />
     </>
   );
 }
