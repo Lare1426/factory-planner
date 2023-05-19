@@ -1,6 +1,6 @@
 import { Route, Routes, Link } from "react-router-dom";
 import "./App.module.scss";
-import { BookList, Home, Book, NewBook } from "@/components";
+import { BookList, Home, Book, NewBook, NotFound } from "@/components";
 
 export default function App() {
   return (
@@ -20,6 +20,7 @@ export default function App() {
         <Route path="/books" element={<BookList />} />
         <Route path="/books/new" element={<NewBook />} />
         <Route path="/books/:id" element={<Book />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </>
   );
