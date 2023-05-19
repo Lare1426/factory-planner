@@ -1,4 +1,5 @@
 import BookList from "./BookList";
 import Home from "./Home";
+import Book from "./Book";
 
-export { BookList, Home };
+export { BookList, Home, Book };

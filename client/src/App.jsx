@@ -1,6 +1,6 @@
 import { Route, Routes, Link } from "react-router-dom";
 import "./App.module.scss";
-import { BookList, Home } from "@/components";
+import { BookList, Home, Book } from "@/components";
 
 export default function App() {
   return (
@@ -18,6 +18,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/books" element={<BookList />} />
+        <Route path="/books/:id" element={<Book />} />
       </Routes>
     </>
   );
