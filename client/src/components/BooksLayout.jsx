@@ -12,7 +12,9 @@ export default function BooksLayout() {
             <Link to="/books/2">Book 2</Link>
           </li>
           <li>
-            <Link to="/books/new">New Book</Link>
+            <Link to="/books/new" replace={true}>
+              New Book
+            </Link>
           </li>
         </ul>
       </nav>
