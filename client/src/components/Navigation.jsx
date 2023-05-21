@@ -1,15 +1,26 @@
-import { Link, Outlet } from "react-router-dom";
+import { NavLink, Outlet } from "react-router-dom";
+import styles from "./Navigation.module.scss";
 
 export default function Navigation() {
   return (
     <>
-      <nav>
+      <nav className={styles.navigation}>
         <ul>
           <li>
-            <Link to="/">Home</Link>
+            <NavLink
+              to="/"
+              className={({ isActive }) => (isActive ? styles.active : "")}
+            >
+              Home
+            </NavLink>
           </li>
           <li>
-            <Link to="/books">Books</Link>
+            <NavLink
+              to="/books"
+              className={({ isActive }) => (isActive ? styles.active : "")}
+            >
+              Books
+            </NavLink>
           </li>
         </ul>
       </nav>
