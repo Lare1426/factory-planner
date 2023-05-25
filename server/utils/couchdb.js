@@ -1,11 +1,12 @@
 const baseUrl = "https://couchdb-lare.alwaysdata.net:6984/lare_factory-planner";
+const authHeaders = {
+  Authorization: `Basic ${process.env.ENCODED_DB_CREDENTIALS}`,
+};
 
 export const getDocument = async (id) => {
   const response = await fetch(`${baseUrl}/${id}`, {
     method: "GET",
-    headers: {
-      Authorization: `Basic ${process.env.ENCODED_DB_CREDENTIALS}`,
-    },
+    headers: authHeaders,
   });
   return response.json();
 };
@@ -14,12 +15,13 @@ export const updateDocument = async (id, rev, document) => {
   const response = await fetch(`${baseUrl}/${id}`, {
     method: "PUT",
     headers: {
-      Authorization: `Basic ${process.env.ENCODED_DB_CREDENTIALS}`,
+      "Content-Type": "application/json",
+      ...authHeaders,
     },
-    body: {
-      rev,
+    body: JSON.stringify({
+      _rev: rev,
       ...document,
-    },
+    }),
   });
   return response.json();
 };
@@ -28,9 +30,10 @@ export const createDocument = async (id, document) => {
   const response = await fetch(`${baseUrl}/${id}`, {
     method: "PUT",
     headers: {
-      Authorization: `Basic ${process.env.ENCODED_DB_CREDENTIALS}`,
+      "Content-Type": "application/json",
+      ...authHeaders,
     },
-    body: document,
+    body: JSON.stringify(document),
   });
   return response.json();
 };
@@ -38,9 +41,7 @@ export const createDocument = async (id, document) => {
 export const deleteDocument = async (id, rev) => {
   const response = await fetch(`${baseUrl}/${id}?rev=${rev}`, {
     method: "DELETE",
-    headers: {
-      Authorization: `Basic ${process.env.ENCODED_DB_CREDENTIALS}`,
-    },
+    headers: authHeaders,
   });
   return response.json();
 };
