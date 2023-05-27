@@ -32,11 +32,19 @@ server.put("/doc/:id", async (req, res) => {
 
   let result;
   if (rev) {
-    result = await updateDocument(id, rev, document);
+    result = await updateDocument(id, document, rev);
   } else {
     result = await createDocument(id, document);
   }
 
+  res.json(result);
+});
+
+server.put("/doc/update/:id", async (req, res) => {
+  const { id } = req.params;
+  const document = req.body;
+
+  const result = await updateDocument(id, document);
   res.json(result);
 });
 

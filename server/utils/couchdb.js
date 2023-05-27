@@ -11,7 +11,9 @@ export const getDocument = async (id) => {
   return response.json();
 };
 
-export const updateDocument = async (id, rev, document) => {
+export const updateDocument = async (id, document, rev = null) => {
+  rev ?? ({ _rev: rev } = await getDocument(id));
+
   const response = await fetch(`${baseUrl}/${id}`, {
     method: "PUT",
     headers: {
