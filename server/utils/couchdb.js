@@ -40,7 +40,9 @@ export const createDocument = async (id, document) => {
   return response.json();
 };
 
-export const deleteDocument = async (id, rev) => {
+export const deleteDocument = async (id, rev = null) => {
+  rev ?? ({ _rev: rev } = await getDocument(id));
+
   const response = await fetch(`${baseUrl}/${id}?rev=${rev}`, {
     method: "DELETE",
     headers: authHeaders,
