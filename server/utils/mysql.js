@@ -1,47 +1,45 @@
 import "dotenv/config";
 import mysql from "mysql2/promise";
 
-const connect = async () => {
-  return mysql.createConnection({
-    database: "lare_factory-planner",
-    host: "mysql-lare.alwaysdata.net",
-    user: process.env.DB_USERNAME,
-    password: process.env.DB_PASSWORD,
-  });
+const connectionConfig = {
+  database: "lare_factory-planner",
+  host: "mysql-lare.alwaysdata.net",
+  user: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
 };
 
-const selectPerson = async (id) => {
-  const connection = await connect();
-  const [rows] = await connection.execute(
-    "SELECT * FROM people WHERE id = ?;",
-    [id]
-  );
+const executeQuery = async (queryString, queryParams) => {
+  const connection = await mysql.createConnection(connectionConfig);
+  const result = await connection.execute(queryString, queryParams);
+  connection.end();
+  return result;
+};
+
+export const selectPerson = async (id) => {
+  const [rows] = await executeQuery("SELECT * FROM people WHERE id = ?;", [id]);
   return rows;
 };
 
-const selectPeople = async () => {
-  const connection = await connect();
-  const [rows] = await connection.query("SELECT * FROM people;");
+export const selectPeople = async () => {
+  const [rows] = await executeQuery("SELECT * FROM people;");
   return rows;
 };
 
-const insertPerson = async (name, age) => {
-  const connection = await connect();
-  const [result] = await connection.execute(
+export const insertPerson = async (name, age) => {
+  const [result] = await executeQuery(
     "INSERT INTO people (name, age) VALUES (?, ?);",
     [name, age]
   );
   return result;
 };
 
-const insertPeople = async (people) => {
+export const insertPeople = async (people) => {
   const flatPeople = people.reduce(
     (acc, person) => [...acc, person.name, person.age],
     []
   );
 
-  const connection = await connect();
-  const [result] = await connection.execute(
+  const [result] = await executeQuery(
     `INSERT INTO people (name, age) VALUES ${people
       .map(() => "(?, ?)")
       .join(",")}`,
@@ -50,24 +48,19 @@ const insertPeople = async (people) => {
   return result;
 };
 
-const updatePerson = async (values, id) => {
+export const updatePerson = async (values, id) => {
   const updateFields = Object.keys(values)
     .reduce((acc, key) => [...acc, `${key} = ?`], [])
     .join(",");
 
-  const connection = await connect();
-  const [result] = await connection.execute(
+  const [result] = await executeQuery(
     `UPDATE people SET ${updateFields} WHERE id = ?;`,
     [...Object.values(values), id]
   );
   return result;
 };
 
-const deletePerson = async (id) => {
-  const connection = await connect();
-  const [result] = await connection.execute(
-    "DELETE FROM people WHERE id = ?;",
-    [id]
-  );
+export const deletePerson = async (id) => {
+  const [result] = await executeQuery("DELETE FROM people WHERE id = ?;", [id]);
   return result;
 };
