@@ -1,4 +1,3 @@
-import "dotenv/config";
 import mysql from "mysql2/promise";
 
 const connectionConfig = {
@@ -16,8 +15,10 @@ const executeQuery = async (queryString, queryParams) => {
 };
 
 export const selectPerson = async (id) => {
-  const [rows] = await executeQuery("SELECT * FROM people WHERE id = ?;", [id]);
-  return rows;
+  const [[person]] = await executeQuery("SELECT * FROM people WHERE id = ?;", [
+    id,
+  ]);
+  return person;
 };
 
 export const selectPeople = async () => {
