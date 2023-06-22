@@ -10,9 +10,18 @@ const connect = async () => {
   });
 };
 
+const selectPerson = async (id) => {
+  const connection = await connect();
+  const [rows] = await connection.execute(
+    "SELECT * FROM people WHERE id = ?;",
+    [id]
+  );
+  return rows;
+};
+
 const selectPeople = async () => {
   const connection = await connect();
-  [rows] = await connection.query("SELECT * FROM people;");
+  const [rows] = await connection.query("SELECT * FROM people;");
   return rows;
 };
 
@@ -26,34 +35,39 @@ const insertPerson = async (name, age) => {
 };
 
 const insertPeople = async (people) => {
-  people.map((person) => {
-    if (person.length === 1) {
-      if (typeof person[0] === "string") {
-        return;
-      }
-    }
-  });
+  const flatPeople = people.reduce(
+    (acc, person) => [...acc, person.name, person.age],
+    []
+  );
+
   const connection = await connect();
   const [result] = await connection.execute(
     `INSERT INTO people (name, age) VALUES ${people
       .map(() => "(?, ?)")
       .join(",")}`,
-    people.flat()
+    flatPeople
   );
   return result;
 };
 
-const updatePeople = async (values, condition) => {
+const updatePerson = async (values, id) => {
+  const updateFields = Object.keys(values)
+    .reduce((acc, key) => [...acc, `${key} = ?`], [])
+    .join(",");
+
   const connection = await connect();
-  [rows] = await connection.execute("UPDATE people SET ? WHERE ?;", [
-    values,
-    condition,
-  ]);
-  return rows;
+  const [result] = await connection.execute(
+    `UPDATE people SET ${updateFields} WHERE id = ?;`,
+    [...Object.values(values), id]
+  );
+  return result;
 };
 
-const deletePeople = async (condition) => {
+const deletePerson = async (id) => {
   const connection = await connect();
-  [rows] = await connection.execute("DELETE FROM people WHERE ?;", condition);
-  return rows;
+  const [result] = await connection.execute(
+    "DELETE FROM people WHERE id = ?;",
+    [id]
+  );
+  return result;
 };
