@@ -26,17 +26,17 @@ export const selectPeople = async () => {
   return rows;
 };
 
-export const insertPerson = async (name, age) => {
+export const insertPerson = async (person) => {
   const [result] = await executeQuery(
     "INSERT INTO people (name, age) VALUES (?, ?);",
-    [name, age]
+    [person.name ?? null, person.age ?? null]
   );
   return result;
 };
 
 export const insertPeople = async (people) => {
   const flatPeople = people.reduce(
-    (acc, person) => [...acc, person.name, person.age],
+    (acc, person) => [...acc, person.name ?? null, person.age ?? null],
     []
   );
 
