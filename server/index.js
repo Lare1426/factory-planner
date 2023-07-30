@@ -30,11 +30,11 @@ server.get("/people", async (req, res) => {
   res.json(await selectPeople());
 });
 
-server.put("/person", async (req, res) => {
+server.post("/person", async (req, res) => {
   res.json(await insertPerson(req.body));
 });
 
-server.put("/people", async (req, res) => {
+server.post("/people", async (req, res) => {
   res.json(await insertPeople(req.body));
 });
 

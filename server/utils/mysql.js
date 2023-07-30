@@ -50,13 +50,19 @@ export const insertPeople = async (people) => {
 };
 
 export const updatePerson = async (values, id) => {
-  const updateFields = Object.keys(values)
-    .reduce((acc, key) => [...acc, `${key} = ?`], [])
-    .join(",");
+  const updateFields = [];
+  const updateValues = [];
+
+  for (const key of ["name", "age"]) {
+    if (values[key]) {
+      updateFields.push(`${key} = ?`);
+      updateValues.push(values.key);
+    }
+  }
 
   const [result] = await executeQuery(
-    `UPDATE people SET ${updateFields} WHERE id = ?;`,
-    [...Object.values(values), id]
+    `UPDATE people SET ${updateFields.join(",")} WHERE id = ?;`,
+    [...updateValues, id]
   );
   return result;
 };
