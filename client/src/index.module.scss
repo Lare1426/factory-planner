@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter&display=swap");
+
 :root {
   --primary: #e6f056;
   --secondary: #eeefda;
@@ -5,7 +7,7 @@
   --accent: #46954b;
   --text: #000000;
 
-  font-family: Arial;
+  font-family: "Inter", sans-serif;
 
   color: var(--text);
   background-color: var(--tertiary);
