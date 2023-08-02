@@ -40,8 +40,8 @@ export default function Create() {
           </Button>
         </div>
         <div className={styles.productSelection}>
-          {products.map((product) => (
-            <div className={styles.buttonContainer}>
+          {products.map((product, index) => (
+            <div className={styles.buttonContainer} key={`${product}${index}`}>
               <Button
                 size="small"
                 color={finalProduct === product ? "primary" : "tertiary"}
