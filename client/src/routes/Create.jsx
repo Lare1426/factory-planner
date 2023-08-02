@@ -5,9 +5,9 @@ import { Input, Button } from "@/components";
 const products = Array(19).fill("Electromagnetic control rod");
 
 export default function Create() {
-  const [product, setProduct] = useState("");
+  const [finalProduct, setFinalProduct] = useState("");
   const [amount, setAmount] = useState("");
-  let isGeneratePlanDisabled = !(product && amount);
+  let isGeneratePlanDisabled = !(finalProduct && amount);
 
   return (
     <main className={styles.create}>
@@ -18,8 +18,8 @@ export default function Create() {
             size="large"
             type="text"
             placeholder="Enter a product"
-            value={product}
-            setValue={setProduct}
+            value={finalProduct}
+            setValue={setFinalProduct}
           />
           <label>Enter the desired production amount</label>
           <Input
@@ -42,7 +42,13 @@ export default function Create() {
         <div className={styles.productSelection}>
           {products.map((product) => (
             <div className={styles.buttonContainer}>
-              <Button size="small" color="tertiary">
+              <Button
+                size="small"
+                color={finalProduct === product ? "primary" : "tertiary"}
+                onClick={() => {
+                  setFinalProduct(product);
+                }}
+              >
                 {product}
               </Button>
             </div>
