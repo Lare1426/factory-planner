@@ -21,16 +21,6 @@
       }
     }
 
-    .productTable {
-      width: 100%;
-      margin: 20px 0;
-
-      td {
-        width: 20%;
-        height: 50px;
-      }
-    }
-
     .product-selection {
       width: 100%;
       display: flex;
@@ -42,24 +32,6 @@
         display: flex;
         align-items: center;
         margin: 0 15px;
-      }
-    }
-
-    .product-grid {
-      display: grid;
-      grid-template-columns: repeat(5, 20%);
-      grid-template-rows: repeat(10, 60px);
-
-      @for $i from 1 through 5 {
-        .column#{$i} {
-          grid-column: $i;
-        }
-      }
-
-      @for $i from 1 through 10 {
-        .row#{$i} {
-          grid-row: $i;
-        }
       }
     }
   }

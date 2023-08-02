@@ -2,12 +2,7 @@ import { useState } from "react";
 import styles from "./Create.module.scss";
 import { Input, Button } from "@/components";
 
-const products = Array(7).fill("Electromagnetic control rod");
-const productSets = [];
-
-for (let i = 0; i < products.length; i += 5) {
-  productSets.push(products.slice(i, i + 5));
-}
+const products = Array(19).fill("Electromagnetic control rod");
 
 export default function Create() {
   const [product, setProduct] = useState("");
@@ -44,27 +39,6 @@ export default function Create() {
             Generate plan
           </Button>
         </div>
-
-        <hr />
-
-        <table className={styles.productTable}>
-          <tbody>
-            {productSets.map((products) => (
-              <tr>
-                {products.map((product) => (
-                  <td>
-                    <Button size="small" color="tertiary">
-                      {product}
-                    </Button>
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        <hr />
-
         <div className={styles.productSelection}>
           {products.map((product) => (
             <div className={styles.buttonContainer}>
@@ -73,24 +47,6 @@ export default function Create() {
               </Button>
             </div>
           ))}
-        </div>
-
-        <hr />
-
-        <div className={styles.productGrid}>
-          {productSets.map((products, rowIndex) =>
-            products.map((product, columnIndex) => (
-              <div
-                className={`${styles[`column${columnIndex + 1}`]} ${
-                  styles[`row${rowIndex + 1}`]
-                }`}
-              >
-                <Button size="small" color="tertiary">
-                  {product}
-                </Button>
-              </div>
-            ))
-          )}
         </div>
       </div>
     </main>
