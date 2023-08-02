@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import styles from "./Home.module.scss";
 import { Button, Input } from "@/components";
 
@@ -18,9 +19,11 @@ export default function Home() {
           <Button size="large" color="primary" shadow="drop">
             View
           </Button>
-          <Button size="large" color="primary" shadow="drop">
-            Create
-          </Button>
+          <Link to="/create">
+            <Button size="large" color="primary" shadow="drop">
+              Create
+            </Button>
+          </Link>
         </div>
         <div className={styles.quickCreate}>
           <h2>Quick create</h2>

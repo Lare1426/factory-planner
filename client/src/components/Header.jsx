@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, Link } from "react-router-dom";
 import { logoPng } from "@/assets";
 import styles from "./Header.module.scss";
 import { Button, Input } from "@/components";
@@ -11,7 +11,9 @@ export default function Header() {
     <>
       <header>
         <div className={styles.leftContainer}>
-          <img src={logoPng} className={styles.logo} />
+          <Link to="/">
+            <img src={logoPng} className={styles.logo} />
+          </Link>
         </div>
         <div className={styles.rightContainer}>
           <Input
