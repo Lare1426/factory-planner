@@ -20,5 +20,30 @@
         text-underline-offset: 0.25em;
       }
     }
+
+    .productTable {
+      width: 100%;
+      margin: 20px 0;
+
+      tr {
+        td {
+          width: 20%;
+          height: 50px;
+        }
+      }
+    }
+
+    .product-selection {
+      width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+
+      .button-container {
+        width: 20%;
+        height: 60px;
+        display: flex;
+        align-items: center;
+      }
+    }
   }
 }
