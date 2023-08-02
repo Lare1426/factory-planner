@@ -3,7 +3,7 @@
 
   .main-container {
     width: 95%;
-    height: 850px;
+    height: 820px;
     background-color: var(--secondary);
     border-radius: 20px;
     margin: 20px auto;
@@ -25,11 +25,9 @@
       width: 100%;
       margin: 20px 0;
 
-      tr {
-        td {
-          width: 20%;
-          height: 50px;
-        }
+      td {
+        width: 20%;
+        height: 50px;
       }
     }
 
@@ -37,12 +35,31 @@
       width: 100%;
       display: flex;
       flex-wrap: wrap;
+      justify-content: center;
 
       .button-container {
-        width: 20%;
         height: 60px;
         display: flex;
         align-items: center;
+        margin: 0 15px;
+      }
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 20%);
+      grid-template-rows: repeat(10, 60px);
+
+      @for $i from 1 through 5 {
+        .column#{$i} {
+          grid-column: $i;
+        }
+      }
+
+      @for $i from 1 through 10 {
+        .row#{$i} {
+          grid-row: $i;
+        }
       }
     }
   }
