@@ -1,0 +1,16 @@
+:root {
+  --primary: #e6f056;
+  --secondary: #eeefda;
+  --tertiary: #fcfdfc;
+  --accent: #46954b;
+  --text: #000000;
+
+  font-family: Arial;
+
+  color: var(--text);
+  background-color: var(--tertiary);
+}
+
+body {
+  margin: 0;
+}

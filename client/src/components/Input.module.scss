@@ -1,0 +1,23 @@
+.custom-input {
+  border: none;
+  border-radius: 50px;
+  background-color: var(--tertiary);
+
+  &.large {
+    width: 350px;
+    height: 40px;
+    padding: 0 15px;
+    font-size: 22px;
+  }
+
+  &.small {
+    width: 100px;
+    height: 30px;
+    padding: 0 10px;
+    font-size: 20px;
+  }
+
+  &:focus {
+    outline: 2px solid var(--accent);
+  }
+}
