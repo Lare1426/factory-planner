@@ -12,8 +12,12 @@ header {
     height: 100%;
 
     &.left-container {
-      .logo {
+      a {
         height: 100%;
+
+        .logo {
+          height: 100%;
+        }
       }
     }
 
