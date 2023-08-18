@@ -4,15 +4,29 @@
   --primary: #e6f056;
   --secondary: #eeefda;
   --tertiary: #fcfdfc;
+  --background: #ffffff;
   --accent: #46954b;
   --text: #000000;
+  --drop-shadow: #a0a0a0;
 
   font-family: "Inter", sans-serif;
 
   color: var(--text);
-  background-color: var(--tertiary);
+  background-color: var(--background);
 }
 
 body {
   margin: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --primary: #165a5a;
+    --secondary: #081522;
+    --tertiary: #434343;
+    --background: #2c2c2c;
+    --accent: #2fbc75;
+    --text: #fbefef;
+    --drop-shadow: #0f0f0f;
+  }
 }
