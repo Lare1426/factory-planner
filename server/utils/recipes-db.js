@@ -24,4 +24,12 @@ const put = async (id, document) => {
   return response.json();
 };
 
-export default { get, put };
+const map = async () => {
+  const response = await fetch(`${baseUrl}/_design/viewsCopy/_view/products`, {
+    method: "GET",
+    headers: authHeaders,
+  });
+  return response.json();
+};
+
+export default { get, put, map };
