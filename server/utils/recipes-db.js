@@ -25,7 +25,7 @@ const put = async (id, document) => {
 };
 
 const map = async () => {
-  const response = await fetch(`${baseUrl}/_design/viewsCopy/_view/products`, {
+  const response = await fetch(`${baseUrl}/_design/views/_view/products`, {
     method: "GET",
     headers: authHeaders,
   });
