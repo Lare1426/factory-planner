@@ -49,15 +49,14 @@ const findDesiredProduct = (recipeProducts, productName) => {
 const generate = async (productName, amount, recipeName) => {
   const products = await getProducts();
 
-  recipeName ??= products[productName].base;
-  const recipe = await recipesDB.get(recipeName);
+  const generateRecipe = async (productName, amount, recipeName) => {
+    recipeName ??= products[productName].base;
+    const recipe = await recipesDB.get(recipeName);
 
-  const recipeAmount =
-    amount / findDesiredProduct(recipe.products, productName).amount;
-  const plan = {
-    product: productName,
-    amount,
-    recipe: {
+    const recipeAmount =
+      amount / findDesiredProduct(recipe.products, productName).amount;
+
+    return {
       name: recipeName,
       ingredients: await Promise.all(
         recipe.ingredients.map(async (ingredient) => {
@@ -69,25 +68,24 @@ const generate = async (productName, amount, recipeName) => {
             };
           }
 
-          const recipeName = products[productName].base;
-          const recipe = await recipesDB.get(recipeName);
-
           return {
             name: ingredient.item,
             amount: ingredient.amount * recipeAmount,
-            recipe: {
-              name: recipeName,
-              ingredients: recipe.ingredients.map((ingredient) => ({
-                name: ingredient.item,
-                amount: ingredient.amount * recipeAmount,
-              })),
-            },
+            recipe: await generateRecipe(
+              productName,
+              ingredient.amount * recipeAmount
+            ),
           };
         })
       ),
-    },
+    };
   };
-  return plan;
+
+  return {
+    product: productName,
+    amount,
+    recipe: await generateRecipe(productName, amount, recipeName),
+  };
 };
 
 const plan = {
