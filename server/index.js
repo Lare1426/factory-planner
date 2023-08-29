@@ -13,13 +13,11 @@ const __dirname = path.dirname(__filename);
 const server = express();
 const apiRouter = express.Router();
 
-// apiRouter.get("/plan/new/:product/:recipe?amount", async (req, res) => {
-//   const { product, recipe } = req.params;
-//   const { amount } = req.query;
-// });
+apiRouter.get("/plan/new/:product/:recipe?", async (req, res) => {
+  const { product, recipe } = req.params;
+  const { amount } = req.query;
 
-apiRouter.get("/plan/new/getProducts", async (req, res) => {
-  res.json(await generatePlan.getProducts());
+  res.json(await generatePlan.generate(product, amount, recipe));
 });
 
 server.use("/api", apiRouter);

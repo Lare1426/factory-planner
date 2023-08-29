@@ -38,14 +38,56 @@ const getProducts = async () => {
   return products;
 };
 
-const generate = async (product, amount, recipe) => {
-  const recipeData = await recipesDB.get(recipe);
+const findDesiredProduct = (recipeProducts, productName) => {
+  for (const product of recipeProducts) {
+    if (product.item === productName) {
+      return product;
+    }
+  }
+};
 
+const generate = async (productName, amount, recipeName) => {
+  const products = await getProducts();
+
+  recipeName ??= products[productName].base;
+  const recipe = await recipesDB.get(recipeName);
+
+  const recipeAmount =
+    amount / findDesiredProduct(recipe.products, productName).amount;
   const plan = {
-    product: product,
+    product: productName,
     amount,
-    recipe: recipe,
+    recipe: {
+      name: recipeName,
+      ingredients: await Promise.all(
+        recipe.ingredients.map(async (ingredient) => {
+          const productName = ingredient.item;
+          if (ores.includes(ingredient.item)) {
+            return {
+              name: ingredient.item,
+              amount: ingredient.amount * recipeAmount,
+            };
+          }
+
+          const recipeName = products[productName].base;
+          const recipe = await recipesDB.get(recipeName);
+
+          return {
+            name: ingredient.item,
+            amount: ingredient.amount * recipeAmount,
+            recipe: {
+              name: recipeName,
+              ingredients: recipe.ingredients.map((ingredient) => ({
+                name: ingredient.item,
+                amount: ingredient.amount * recipeAmount,
+              })),
+            },
+          };
+        })
+      ),
+    },
   };
+  return plan;
 };
 
 const plan = {
