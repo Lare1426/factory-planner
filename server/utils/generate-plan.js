@@ -13,21 +13,30 @@ const ores = [
   "Water",
 ];
 
-const productsReduce = async () => {
+const getProducts = async () => {
   const recipesMap = await recipesDB.map();
-  const products = recipesMap.rows.reduce((acc, product) => {
-    if (acc[product.key]) {
-      acc[product.key].push(product.value);
+
+  const products = recipesMap.rows.reduce((acc, partialProduct) => {
+    const { key: productName, value: recipeName } = partialProduct;
+    const product = acc[productName] ?? { base: "", alternate: [] };
+
+    if (ores.includes(productName)) {
+      product.base = productName;
+      product.alternate.push(recipeName);
     } else {
-      acc[product.key] = [product.value];
+      if (recipeName.includes("Alternate: ") || product.base) {
+        product.alternate.push(recipeName);
+      } else {
+        product.base = recipeName;
+      }
     }
+
+    acc[productName] = product;
     return acc;
   }, {});
 
   return products;
 };
-
-const products = await productsReduce();
 
 const generate = async (product, amount, recipe) => {
   const recipeData = await recipesDB.get(recipe);
@@ -48,36 +57,4 @@ const plan = {
   ingredients: [{}, {}],
 };
 
-const sortRecipes = async (product) => {
-  const recipes = products[product];
-
-  let sortedRecipes = {};
-
-  if (ores.includes(product)) {
-    sortedRecipes = { base: [], alternate: [] };
-    sortedRecipes.base.push(product);
-    sortedRecipes.alternate = recipes;
-  }
-
-  if (!sortedRecipes.base) {
-    sortedRecipes = recipes.reduce(
-      (acc, recipe) => {
-        if (recipe.includes("Alternate: ")) {
-          acc.alternate.push(recipe);
-        } else {
-          acc.base.push(recipe);
-        }
-        return acc;
-      },
-      { base: [], alternate: [] }
-    );
-
-    if (sortedRecipes.base.length > 1) {
-      sortedRecipes.alternate.push(...sortedRecipes.base.slice(1));
-      sortedRecipes.base = [sortedRecipes.base[0]];
-    }
-  }
-  return sortedRecipes;
-};
-
-export default { generate, sortRecipes, productsReduce };
+export default { generate, getProducts };

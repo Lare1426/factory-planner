@@ -18,15 +18,8 @@ const apiRouter = express.Router();
 //   const { amount } = req.query;
 // });
 
-apiRouter.get("/plan/new/:product", async (req, res) => {
-  const { product } = req.params;
-
-  res.json(await generatePlan.sortRecipes(product));
-});
-
-apiRouter.get("/products", async (req, res) => {
-  const products = await generatePlan.productsReduce();
-  res.json(Object.keys(products));
+apiRouter.get("/plan/new/getProducts", async (req, res) => {
+  res.json(await generatePlan.getProducts());
 });
 
 server.use("/api", apiRouter);
