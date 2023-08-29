@@ -89,7 +89,9 @@ const generate = async ({ item, amount }, recipeToUse = null) => {
       ingredients.push(
         await generate({
           item: ingredient.item,
-          amount: buildings * ingredient.amount,
+          // amount: (amount * ingredient.amount) / recipeProductionAmount, // works
+          amount: amount / (recipeProductionAmount / ingredient.amount), // works
+          // amount: amount / recipeProductionAmount / ingredient.amount, // doesn't work
         })
       );
     }
