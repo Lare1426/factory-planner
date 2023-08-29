@@ -11,6 +11,7 @@ const ores = [
   "Sulfur",
   "Uranium",
   "Water",
+  "Nitrogen Gas",
 ];
 
 const getProducts = async () => {
@@ -38,23 +39,71 @@ const getProducts = async () => {
   return products;
 };
 
-const generate = async (product, amount, recipe) => {
+const productsWithRecipes = await getProducts();
+
+const generate = async ({ item, amount }, recipeToUse = null) => {
+  console.log(item);
+  let recipe;
+  let alternateRecipes;
+
+  if (productsWithRecipes[item]) {
+    const { base, alternate } = productsWithRecipes[item];
+    recipe = base;
+    alternateRecipes = alternate;
+  } else {
+    recipe = item;
+    alternateRecipes = [];
+  }
+
+  if (recipeToUse) {
+    recipe = recipeToUse;
+    const allRecipes = [recipe, ...alternateRecipes];
+    alternateRecipes = allRecipes.reduce((acc, oneRecipe) => {
+      if (!oneRecipe === recipeToUse) {
+        acc.push(recipe);
+      }
+      return acc;
+    });
+  }
+
   const recipeData = await recipesDB.get(recipe);
 
-  const plan = {
-    product: product,
-    amount,
-    recipe: recipe,
-  };
-};
+  let buildings;
+  let ingredients;
+  let producedIn;
+  if (!recipeData.error) {
+    producedIn = recipeData.producedIn;
 
-const plan = {
-  product: "AI Limiter",
-  amount: 100,
-  Recipe: "AI Limiter",
-  alternateRecipes: [],
-  buildings: 20,
-  ingredients: [{}, {}],
+    const recipeProductionAmount = recipeData.products.reduce(
+      (acc, product) => {
+        return product.item === item ? product.amount : acc;
+      },
+      0
+    );
+    const recipeProductsPerMinute =
+      (60 / recipeData.time) * recipeProductionAmount;
+    buildings = amount / recipeProductsPerMinute;
+
+    ingredients = [];
+    for (const ingredient of recipeData.ingredients) {
+      ingredients.push(
+        await generate({
+          item: ingredient.item,
+          amount: buildings * ingredient.amount,
+        })
+      );
+    }
+  }
+
+  return {
+    item,
+    amount,
+    buildings,
+    producedIn,
+    recipe,
+    alternateRecipes,
+    ingredients,
+  };
 };
 
 export default { generate, getProducts };
