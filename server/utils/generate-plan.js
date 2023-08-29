@@ -46,6 +46,8 @@ const findDesiredProduct = (recipeProducts, productName) => {
   }
 };
 
+const roundTo2DP = (num) => Math.round((num + Number.EPSILON) * 100) / 100;
+
 const generate = async (productName, amount, recipeName) => {
   const products = await getProducts();
 
@@ -64,13 +66,13 @@ const generate = async (productName, amount, recipeName) => {
           if (ores.includes(ingredient.item)) {
             return {
               name: ingredient.item,
-              amount: ingredient.amount * recipeAmount,
+              amount: roundTo2DP(ingredient.amount * recipeAmount),
             };
           }
 
           return {
             name: ingredient.item,
-            amount: ingredient.amount * recipeAmount,
+            amount: roundTo2DP(ingredient.amount * recipeAmount),
             recipe: await generateRecipe(
               productName,
               ingredient.amount * recipeAmount
