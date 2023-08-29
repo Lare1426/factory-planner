@@ -11,6 +11,7 @@ const ores = [
   "Sulfur",
   "Uranium",
   "Water",
+  "Nitrogen Gas",
 ];
 
 const getProducts = async () => {
@@ -51,19 +52,27 @@ const roundTo2DP = (num) => Math.round((num + Number.EPSILON) * 100) / 100;
 const generate = async (productName, amount, recipeName) => {
   const products = await getProducts();
 
-  const generateRecipe = async (productName, amount, recipeName) => {
-    recipeName ??= products[productName].base;
+  const generateRecipe = async (productName, amount, depth) => {
+    console.log(productName, depth);
+    const recipeName = products[productName].base;
     const recipe = await recipesDB.get(recipeName);
 
     const recipeAmount =
       amount / findDesiredProduct(recipe.products, productName).amount;
 
+    let trace = 1;
+
     return {
       name: recipeName,
       ingredients: await Promise.all(
         recipe.ingredients.map(async (ingredient) => {
+          trace++;
           const productName = ingredient.item;
           if (ores.includes(ingredient.item)) {
+            console.log(
+              productName,
+              depth + "-" + trace + " Done ###############"
+            );
             return {
               name: ingredient.item,
               amount: roundTo2DP(ingredient.amount * recipeAmount),
@@ -75,7 +84,8 @@ const generate = async (productName, amount, recipeName) => {
             amount: roundTo2DP(ingredient.amount * recipeAmount),
             recipe: await generateRecipe(
               productName,
-              ingredient.amount * recipeAmount
+              ingredient.amount * recipeAmount,
+              depth + "-" + trace
             ),
           };
         })
@@ -86,7 +96,7 @@ const generate = async (productName, amount, recipeName) => {
   return {
     product: productName,
     amount,
-    recipe: await generateRecipe(productName, amount, recipeName),
+    recipe: await generateRecipe(productName, amount, "1"),
   };
 };
 
