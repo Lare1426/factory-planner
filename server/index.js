@@ -2,7 +2,7 @@ import "dotenv/config";
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
-import productsReduce from "./utils/products-reduce.js";
+import generatePlan from "./utils/generate-plan.js";
 
 const PORT = process.env.PORT ?? 3000;
 const IP = process.env.IP;
@@ -13,13 +13,20 @@ const __dirname = path.dirname(__filename);
 const server = express();
 const apiRouter = express.Router();
 
-apiRouter.get("/plan/new/:product/:recipe?amount", async (req, res) => {
-  const { product, recipe } = req.params;
-  const { amount } = req.query;
+// apiRouter.get("/plan/new/:product/:recipe?amount", async (req, res) => {
+//   const { product, recipe } = req.params;
+//   const { amount } = req.query;
+// });
+
+apiRouter.get("/plan/new/:product", async (req, res) => {
+  const { product } = req.params;
+
+  res.json(await generatePlan.sortRecipes(product));
 });
 
 apiRouter.get("/products", async (req, res) => {
-  res.json(await productsReduce());
+  const products = await generatePlan.productsReduce();
+  res.json(Object.keys(products));
 });
 
 server.use("/api", apiRouter);

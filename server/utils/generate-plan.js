@@ -1,7 +1,33 @@
 import recipesDB from "./recipes-db.js";
-import productsReduce from "./products-reduce.js";
 
-const products = productsReduce();
+const ores = [
+  "Bauxite",
+  "Caterium Ore",
+  "Coal",
+  "Copper Ore",
+  "Iron Ore",
+  "Limestone",
+  "Raw Quartz",
+  "Sulfur",
+  "Uranium",
+  "Water",
+];
+
+const productsReduce = async () => {
+  const recipesMap = await recipesDB.map();
+  const products = recipesMap.rows.reduce((acc, product) => {
+    if (acc[product.key]) {
+      acc[product.key].push(product.value);
+    } else {
+      acc[product.key] = [product.value];
+    }
+    return acc;
+  }, {});
+
+  return products;
+};
+
+const products = await productsReduce();
 
 const generate = async (product, amount, recipe) => {
   const recipeData = await recipesDB.get(recipe);
@@ -27,33 +53,16 @@ const sortRecipes = async (product) => {
 
   let sortedRecipes = {};
 
-  if (
-    [
-      "Bauxite",
-      "Caterium Ore",
-      "Coal",
-      "Copper Ore",
-      "Iron Ore",
-      "Limestone",
-      "Raw Quartz",
-      "Sulfur",
-      "Uranium",
-      "Water",
-    ].includes(product)
-  ) {
-    sortedRecipes = {
-      base: [],
-      alternate: [],
-    };
+  if (ores.includes(product)) {
+    sortedRecipes = { base: [], alternate: [] };
     sortedRecipes.base.push(product);
     sortedRecipes.alternate = recipes;
   }
 
   if (!sortedRecipes.base) {
-    console.log("yes");
     sortedRecipes = recipes.reduce(
       (acc, recipe) => {
-        if (recipe.includes("Alternate")) {
+        if (recipe.includes("Alternate: ")) {
           acc.alternate.push(recipe);
         } else {
           acc.base.push(recipe);
@@ -62,6 +71,7 @@ const sortRecipes = async (product) => {
       },
       { base: [], alternate: [] }
     );
+
     if (sortedRecipes.base.length > 1) {
       sortedRecipes.alternate.push(...sortedRecipes.base.slice(1));
       sortedRecipes.base = [sortedRecipes.base[0]];
@@ -70,4 +80,4 @@ const sortRecipes = async (product) => {
   return sortedRecipes;
 };
 
-export default { generate, sortRecipes };
+export default { generate, sortRecipes, productsReduce };
