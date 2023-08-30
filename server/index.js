@@ -19,7 +19,7 @@ apiRouter.get("/plan/new/:product/:recipe", async (req, res) => {
   res.json(await generatePlan.generate({ item: product, amount: 100 }, recipe));
 });
 
-apiRouter.get("/plan/new/getProducts", async (req, res) => {
+apiRouter.get("/getProducts", async (req, res) => {
   res.json(await generatePlan.getProducts());
 });
 

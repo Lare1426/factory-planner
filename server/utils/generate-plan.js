@@ -26,7 +26,12 @@ const getProducts = async () => {
       product.alternate.push(recipeName);
     } else {
       if (recipeName.includes("Alternate: ") || product.base) {
-        product.alternate.push(recipeName);
+        if (recipeName === productName) {
+          product.alternate.push(product.base);
+          product.base = recipeName;
+        } else {
+          product.alternate.push(recipeName);
+        }
       } else {
         product.base = recipeName;
       }
