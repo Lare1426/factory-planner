@@ -41,6 +41,16 @@ const getProducts = async () => {
 
 const productsWithRecipes = await getProducts();
 
+const roundTo4DP = (num) => Math.round(num * 10000) / 10000;
+
+const findDesiredProduct = (products, desiredProduct) => {
+  for (const product of products) {
+    if (product.item === desiredProduct) {
+      return product;
+    }
+  }
+};
+
 const generate = async ({ item, amount }, recipeToUse = null) => {
   console.log(item);
   let recipe;
@@ -74,15 +84,12 @@ const generate = async ({ item, amount }, recipeToUse = null) => {
   if (!recipeData.error) {
     producedIn = recipeData.producedIn;
 
-    const recipeProductionAmount = recipeData.products.reduce(
-      (acc, product) => {
-        return product.item === item ? product.amount : acc;
-      },
-      0
-    );
+    const desiredProduct = findDesiredProduct(recipeData.products, item);
+    const recipeProductionAmount = desiredProduct.amount;
+
     const recipeProductsPerMinute =
       (60 / recipeData.time) * recipeProductionAmount;
-    buildings = amount / recipeProductsPerMinute;
+    buildings = roundTo4DP(amount / recipeProductsPerMinute);
 
     ingredients = [];
     for (const ingredient of recipeData.ingredients) {
@@ -90,7 +97,7 @@ const generate = async ({ item, amount }, recipeToUse = null) => {
       ingredients.push(
         await generate({
           item: ingredient.item,
-          amount: amount * recipeAmount,
+          amount: roundTo4DP(amount * recipeAmount),
         })
       );
     }
