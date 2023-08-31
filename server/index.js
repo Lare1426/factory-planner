@@ -16,12 +16,7 @@ const apiRouter = express.Router();
 apiRouter.get("/plan/new/:product/:recipe?", async (req, res) => {
   const { product, recipe } = req.params;
   const { amount } = req.query;
-  res.json(
-    await generatePlan.generate(
-      { item: product, amount: Number(amount) },
-      recipe
-    )
-  );
+  res.json(await generatePlan.generate(product, Number(amount), recipe));
 });
 
 apiRouter.get("/getProducts", async (req, res) => {

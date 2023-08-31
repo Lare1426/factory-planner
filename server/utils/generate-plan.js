@@ -28,10 +28,7 @@ const getProducts = async () => {
     } else {
       if (!product.base) {
         product.base = recipeName;
-      } else if (
-        recipeName === productName ||
-        product.base.includes("Alternate: ")
-      ) {
+      } else if (recipeName === productName) {
         product.alternate.push(product.base);
         product.base = recipeName;
       } else {
@@ -48,7 +45,7 @@ const getProducts = async () => {
 
 const productsWithRecipes = await getProducts();
 
-const roundTo4DP = (num) => Math.round(num * 10000) / 10000;
+const roundTo4DP = (num) => Math.round((num + Number.EPSILON) * 10000) / 10000;
 
 const findDesiredProduct = (products, desiredProduct) => {
   for (const product of products) {
@@ -58,57 +55,55 @@ const findDesiredProduct = (products, desiredProduct) => {
   }
 };
 
-const generate = async ({ item, amount }, recipeToUse = null) => {
-  console.log(item);
+const generate = async (item, amount, recipeToUse = null) => {
   let recipe;
   let alternateRecipes;
 
   if (productsWithRecipes[item]) {
-    const { base, alternate } = productsWithRecipes[item];
-    recipe = base;
-    alternateRecipes = alternate;
+    ({ base: recipe, alternate: alternateRecipes } = productsWithRecipes[item]);
+
+    if (ores.includes(recipe) && recipeToUse === item) {
+      // raw material can be made as byproduct
+      return {
+        item,
+        amount,
+        recipe,
+        alternateRecipes,
+      };
+    }
   } else {
-    recipe = item;
-    alternateRecipes = [];
+    // item doesn't have a recipe defined it is an raw material
+    return {
+      item,
+      amount,
+    };
   }
 
   if (recipeToUse) {
-    const allRecipes = [recipe, ...alternateRecipes];
+    alternateRecipes = [recipe, ...alternateRecipes].filter(
+      (oneRecipe) => oneRecipe !== recipeToUse
+    );
     recipe = recipeToUse;
-    alternateRecipes = allRecipes.reduce((acc, oneRecipe) => {
-      if (oneRecipe !== recipeToUse) {
-        acc.push(oneRecipe);
-      }
-      return acc;
-    }, []);
   }
 
   const recipeData = await recipesDB.get(recipe);
 
-  let buildings;
-  let ingredients;
-  let producedIn;
-  if (!recipeData.error) {
-    producedIn = recipeData.producedIn;
+  const producedIn = recipeData.producedIn;
 
-    const desiredProduct = findDesiredProduct(recipeData.products, item);
-    const recipeProductionAmount = desiredProduct.amount;
+  const desiredProduct = findDesiredProduct(recipeData.products, item);
+  const recipeProductionAmount = desiredProduct.amount;
 
-    const recipeProductsPerMinute =
-      (60 / recipeData.time) * recipeProductionAmount;
-    buildings = roundTo4DP(amount / recipeProductsPerMinute);
+  const recipeProductsPerMinute =
+    (60 / recipeData.time) * recipeProductionAmount;
+  const buildings = roundTo4DP(amount / recipeProductsPerMinute);
 
-    ingredients = [];
-    for (const ingredient of recipeData.ingredients) {
+  const ingredients = await Promise.all(
+    recipeData.ingredients.map((ingredient) => {
       const recipeAmount = ingredient.amount / recipeProductionAmount;
-      ingredients.push(
-        await generate({
-          item: ingredient.item,
-          amount: roundTo4DP(amount * recipeAmount),
-        })
-      );
-    }
-  }
+      const ingredientAmount = roundTo4DP(amount * recipeAmount);
+      return generate(ingredient.item, ingredientAmount);
+    })
+  );
 
   return {
     item,
