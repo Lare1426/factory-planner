@@ -62,8 +62,8 @@ const generate = async (item, amount, recipeToUse = null) => {
   if (productsWithRecipes[item]) {
     ({ base: recipe, alternate: alternateRecipes } = productsWithRecipes[item]);
 
-    if (ores.includes(recipe) && recipeToUse === item) {
-      // raw material can be made as byproduct
+    if (ores.includes(item) && (recipeToUse ?? recipe) === item) {
+      // raw material can be made as byproduct but not right now
       return {
         item,
         amount,
