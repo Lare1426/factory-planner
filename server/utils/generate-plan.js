@@ -12,6 +12,7 @@ const ores = [
   "Uranium",
   "Water",
   "Nitrogen Gas",
+  "Crude Oil",
 ];
 
 const getProducts = async () => {
@@ -72,14 +73,14 @@ const generate = async ({ item, amount }, recipeToUse = null) => {
   }
 
   if (recipeToUse) {
-    recipe = recipeToUse;
     const allRecipes = [recipe, ...alternateRecipes];
+    recipe = recipeToUse;
     alternateRecipes = allRecipes.reduce((acc, oneRecipe) => {
-      if (!oneRecipe === recipeToUse) {
-        acc.push(recipe);
+      if (oneRecipe !== recipeToUse) {
+        acc.push(oneRecipe);
       }
       return acc;
-    });
+    }, []);
   }
 
   const recipeData = await recipesDB.get(recipe);
