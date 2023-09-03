@@ -25,6 +25,11 @@
     background-color: var(--primary);
   }
 
+  &.color-red {
+    background-color: #ff0000;
+    color: #ffffff;
+  }
+
   &.drop-shadow {
     filter: drop-shadow(3px 5px 3px var(--drop-shadow));
 

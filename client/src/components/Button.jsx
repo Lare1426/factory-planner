@@ -14,7 +14,7 @@ export default function Button({
     classNames += ` ${styles[size]}`;
   }
 
-  if (["primary", "tertiary"].includes(color)) {
+  if (["primary", "tertiary", "red"].includes(color)) {
     classNames += ` ${styles[`color-${color}`]}`;
   }
 

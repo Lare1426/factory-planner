@@ -37,7 +37,7 @@ export default function Plan() {
           <Button size="small" color="primary">
             Share
           </Button>
-          <Button size="small" color="primary">
+          <Button size="small" color="red">
             Delete
           </Button>
         </div>
