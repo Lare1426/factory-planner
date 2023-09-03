@@ -1,0 +1,45 @@
+.plan {
+  width: 100%;
+
+  .side-panel {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    height: 900px;
+    width: 380px;
+    background-color: var(--secondary);
+
+    div {
+      display: flex;
+      flex-direction: column;
+      margin-top: 40px;
+    }
+
+    label {
+      font-size: 22px;
+      margin-left: 15px;
+    }
+
+    textarea {
+      resize: none;
+      border: none;
+      background-color: var(--tertiary);
+      color: var(--text);
+      font-size: 22px;
+      border-radius: 20px;
+      padding: 5px 10px;
+
+      &:focus {
+        outline: 2px solid var(--accent);
+      }
+    }
+
+    .buttons {
+      height: 300px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+    }
+  }
+}
