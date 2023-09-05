@@ -1,11 +1,14 @@
 .plan {
   width: 100%;
+  height: calc(100% - var(--header-height));
 
   .side-panel {
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
     padding: 10px;
-    width: 380px;
+    width: min-content;
+    height: 100%;
     background-color: var(--secondary);
 
     div {
@@ -16,7 +19,7 @@
 
     label {
       font-size: 22px;
-      margin-left: 15px;
+      color: gray;
     }
 
     textarea {

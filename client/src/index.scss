@@ -9,14 +9,23 @@
   --text: #000000;
   --drop-shadow: #a0a0a0;
 
+  --header-height: 70px;
+
   font-family: "Inter", sans-serif;
 
   color: var(--text);
   background-color: var(--background);
+
+  height: 100%;
 }
 
 body {
   margin: 0;
+  height: 100%;
+}
+
+#root {
+  height: 100%;
 }
 
 @media (prefers-color-scheme: dark) {
