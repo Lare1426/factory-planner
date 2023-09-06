@@ -2,8 +2,33 @@ import { useEffect, useState } from "react";
 import styles from "./Plan.module.scss";
 import { Button, Input } from "@/components";
 
+function PlanSection({ plan }) {
+  if (plan) {
+    if (plan.ingredients) {
+      return (
+        <section className={styles.planSection}>
+          <div>{plan.item}</div>
+          <div>Recipe: {plan.recipe}</div>
+          <div>Buildings: {plan.buildings}</div>
+          <div>Amount: {plan.amount}/min</div>
+          {plan.ingredients.map((ingredient, index) => (
+            <PlanSection plan={ingredient} key={`${index}${ingredient.item}`} />
+          ))}
+        </section>
+      );
+    }
+    return (
+      <section className={styles.planSection}>
+        <div>{plan.item}</div>
+        {plan.recipe && <div>Recipe: {plan.recipe}</div>}
+        <div>Amount: {plan.amount}/min</div>
+      </section>
+    );
+  }
+}
+
 export default function Plan() {
-  const [plan, setPlan] = useState({});
+  const [plan, setPlan] = useState();
 
   useEffect(() => {
     (async () => {
@@ -15,7 +40,7 @@ export default function Plan() {
 
   return (
     <main className={styles.plan}>
-      <div className={styles.sidePanel}>
+      <aside className={styles.sidePanel}>
         <Input size="large" type="text" placeholder="Plan name" />
         <div>
           <label>Description</label>
@@ -52,6 +77,9 @@ export default function Plan() {
             Delete
           </Button>
         </div>
+      </aside>
+      <div className={styles.planView}>
+        <PlanSection plan={plan} />
       </div>
     </main>
   );

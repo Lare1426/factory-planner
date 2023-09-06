@@ -1,6 +1,8 @@
 .plan {
   width: 100%;
   height: calc(100% - var(--header-height));
+  display: grid;
+  grid-template-columns: min-content 1fr;
 
   .side-panel {
     box-sizing: border-box;
@@ -42,6 +44,17 @@
       flex-direction: column;
       align-items: center;
       justify-content: space-between;
+    }
+  }
+
+  .plan-view {
+    .plan-section {
+      width: max-content;
+      height: min-content;
+      padding: 10px 15px;
+      border-radius: 20px;
+      margin: 20px;
+      background-color: var(--secondary);
     }
   }
 }
