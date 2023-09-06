@@ -1,7 +1,18 @@
+import { useEffect, useState } from "react";
 import styles from "./Plan.module.scss";
 import { Button, Input } from "@/components";
 
 export default function Plan() {
+  const [plan, setPlan] = useState({});
+
+  useEffect(() => {
+    (async () => {
+      const response = await fetch("/api/plan/new/Wire/Wire?amount=100");
+      const resJson = await response.json();
+      setPlan(resJson);
+    })();
+  }, []);
+
   return (
     <main className={styles.plan}>
       <div className={styles.sidePanel}>
