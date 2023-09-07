@@ -54,7 +54,46 @@
       padding: 10px 15px;
       border-radius: 20px;
       margin: 20px;
-      background-color: var(--secondary);
+
+      &.layer0 {
+        background-color: #006699;
+      }
+
+      &.layer1 {
+        background-color: #339933;
+      }
+
+      &.layer2 {
+        background-color: #666699;
+      }
+
+      &.layer3 {
+        background-color: #669900;
+      }
+
+      &.layer4 {
+        background-color: #cc6600;
+      }
+
+      &.layer5 {
+        background-color: #339966;
+      }
+
+      &.layer6 {
+        background-color: #993399;
+      }
+
+      &.layer7 {
+        background-color: #004d99;
+      }
+
+      &.layer8 {
+        background-color: #669999;
+      }
+
+      &.layer9 {
+        background-color: #993333;
+      }
     }
   }
 }

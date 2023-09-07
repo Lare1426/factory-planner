@@ -2,23 +2,30 @@ import { useEffect, useState } from "react";
 import styles from "./Plan.module.scss";
 import { Button, Input } from "@/components";
 
-function PlanSection({ plan }) {
+const layers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+function PlanSection({ plan, layer }) {
   if (plan) {
+    const layerColor = `layer${layer}`;
     if (plan.ingredients) {
       return (
-        <section className={styles.planSection}>
+        <section className={`${styles.planSection} ${styles[layerColor]}`}>
           <div>{plan.item}</div>
           <div>Recipe: {plan.recipe}</div>
           <div>Buildings: {plan.buildings}</div>
           <div>Amount: {plan.amount}/min</div>
           {plan.ingredients.map((ingredient, index) => (
-            <PlanSection plan={ingredient} key={`${index}${ingredient.item}`} />
+            <PlanSection
+              plan={ingredient}
+              key={`${index}${ingredient.item}`}
+              layer={layers[layers.indexOf(layer) + 1]}
+            />
           ))}
         </section>
       );
     }
     return (
-      <section className={styles.planSection}>
+      <section className={`${styles.planSection} ${styles[layerColor]}`}>
         <div>{plan.item}</div>
         {plan.recipe && <div>Recipe: {plan.recipe}</div>}
         <div>Amount: {plan.amount}/min</div>
@@ -32,7 +39,9 @@ export default function Plan() {
 
   useEffect(() => {
     (async () => {
-      const response = await fetch("/api/plan/new/Wire/Wire?amount=100");
+      const response = await fetch(
+        "/api/plan/new/Thermal Propulsion Rocket/Thermal Propulsion Rocket?amount=100"
+      );
       const resJson = await response.json();
       setPlan(resJson);
     })();
@@ -79,7 +88,7 @@ export default function Plan() {
         </div>
       </aside>
       <div className={styles.planView}>
-        <PlanSection plan={plan} />
+        <PlanSection plan={plan} layer={layers[0]} />
       </div>
     </main>
   );
