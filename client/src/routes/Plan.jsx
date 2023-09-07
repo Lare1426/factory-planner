@@ -36,16 +36,28 @@ function PlanSection({ plan, layer }) {
 
 export default function Plan() {
   const [plan, setPlan] = useState();
+  const [finalProduct, setFinalProduct] = useState("");
+  const [finalAmount, setFinalAmount] = useState(0);
 
   useEffect(() => {
     (async () => {
-      const response = await fetch(
-        "/api/plan/new/Thermal Propulsion Rocket/Thermal Propulsion Rocket?amount=100"
-      );
-      const resJson = await response.json();
-      setPlan(resJson);
+      setFinalProduct("Thermal Propulsion Rocket");
+      setFinalAmount(100);
     })();
   }, []);
+
+  useEffect(() => {
+    // if (finalProduct !== plan.item || finalAmount !== plan.amount) {
+    if (!plan && finalProduct && finalAmount) {
+      (async () => {
+        const response = await fetch(
+          `/api/plan/new/${finalProduct}?amount=${finalAmount}`
+        );
+        const resJson = await response.json();
+        setPlan(resJson);
+      })();
+    }
+  }, [finalProduct, finalAmount]);
 
   return (
     <main className={styles.plan}>
@@ -57,7 +69,12 @@ export default function Plan() {
         </div>
         <div>
           <label>Product</label>
-          <Input size="large" type="text" />
+          <Input
+            size="large"
+            type="text"
+            value={finalProduct}
+            setValue={setFinalProduct}
+          />
         </div>
         <div>
           <label>Production amount</label>
@@ -67,6 +84,8 @@ export default function Plan() {
             placeholder="0"
             min={0}
             max={20000}
+            value={finalAmount}
+            setValue={setFinalAmount}
           />
         </div>
         <div className={styles.buttons}>
