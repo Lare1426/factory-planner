@@ -55,6 +55,20 @@
       border-radius: 20px;
       margin: 20px;
 
+      select {
+        border: none;
+        background-color: var(--tertiary);
+        color: var(--text);
+        height: 20px;
+        padding-right: 5px;
+        margin-left: 10px;
+        font-size: 16px;
+
+        &:focus {
+          outline: 2px solid var(--accent);
+        }
+      }
+
       &.layer0 {
         background-color: #006699;
       }

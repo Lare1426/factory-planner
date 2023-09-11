@@ -5,13 +5,49 @@ import { Button, Input } from "@/components";
 const layers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
 function PlanSection({ plan, layer }) {
+  const [recipe, setRecipe] = useState(plan.recipe);
+
+  useEffect(() => {
+    console.log(
+      "recipe:",
+      recipe,
+      "plan.recipe:",
+      plan.recipe,
+      recipe === plan.recipe
+    );
+    if (recipe !== plan.recipe) {
+      (async () => {
+        const response = await fetch(
+          `/api/plan/new/${plan.item}/${recipe}?amount=${plan.amount}`
+        );
+        const resJson = await response.json();
+        plan = resJson;
+      })();
+    }
+  }, [recipe]);
+
   if (plan) {
     const layerColor = `layer${layer}`;
     if (plan.ingredients) {
       return (
         <section className={`${styles.planSection} ${styles[layerColor]}`}>
           <div>{plan.item}</div>
-          <div>Recipe: {plan.recipe}</div>
+          <div>
+            Recipe:
+            <select
+              defaultValue={recipe}
+              onChange={(e) => {
+                setRecipe(e.target.value);
+              }}
+            >
+              <option value={recipe}>{recipe}</option>
+              {plan.alternateRecipes.map((alternateRecipe, index) => (
+                <option value={alternateRecipe} key={index}>
+                  {alternateRecipe}
+                </option>
+              ))}
+            </select>
+          </div>
           <div>Buildings: {plan.buildings}</div>
           <div>Amount: {plan.amount}/min</div>
           {plan.ingredients.map((ingredient, index) => (
@@ -40,14 +76,11 @@ export default function Plan() {
   const [finalAmount, setFinalAmount] = useState(0);
 
   useEffect(() => {
-    (async () => {
-      setFinalProduct("Thermal Propulsion Rocket");
-      setFinalAmount(100);
-    })();
+    setFinalProduct("Thermal Propulsion Rocket");
+    setFinalAmount(100);
   }, []);
 
   useEffect(() => {
-    // if (finalProduct !== plan.item || finalAmount !== plan.amount) {
     if (!plan && finalProduct && finalAmount) {
       (async () => {
         const response = await fetch(
@@ -107,7 +140,7 @@ export default function Plan() {
         </div>
       </aside>
       <div className={styles.planView}>
-        <PlanSection plan={plan} layer={layers[0]} />
+        {plan && <PlanSection plan={plan} layer={layers[0]} />}
       </div>
     </main>
   );
