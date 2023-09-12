@@ -2,72 +2,49 @@ import { useEffect, useState } from "react";
 import styles from "./Plan.module.scss";
 import { Button, Input } from "@/components";
 
-const layers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+function PlanSection({ plan: originalPlan, layer }) {
+  const [plan, setPlan] = useState(originalPlan);
 
-function PlanSection({ plan, layer }) {
-  const [recipe, setRecipe] = useState(plan.recipe);
+  const layerColor = `layer${layer}`;
 
-  useEffect(() => {
-    console.log(
-      "recipe:",
-      recipe,
-      "plan.recipe:",
-      plan.recipe,
-      recipe === plan.recipe
-    );
+  const onChange = async (e) => {
+    const recipe = e.target.value;
     if (recipe !== plan.recipe) {
-      (async () => {
-        const response = await fetch(
-          `/api/plan/new/${plan.item}/${recipe}?amount=${plan.amount}`
-        );
-        const resJson = await response.json();
-        plan = resJson;
-      })();
-    }
-  }, [recipe]);
-
-  if (plan) {
-    const layerColor = `layer${layer}`;
-    if (plan.ingredients) {
-      return (
-        <section className={`${styles.planSection} ${styles[layerColor]}`}>
-          <div>{plan.item}</div>
-          <div>
-            Recipe:
-            <select
-              defaultValue={recipe}
-              onChange={(e) => {
-                setRecipe(e.target.value);
-              }}
-            >
-              <option value={recipe}>{recipe}</option>
-              {plan.alternateRecipes.map((alternateRecipe, index) => (
-                <option value={alternateRecipe} key={index}>
-                  {alternateRecipe}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>Buildings: {plan.buildings}</div>
-          <div>Amount: {plan.amount}/min</div>
-          {plan.ingredients.map((ingredient, index) => (
-            <PlanSection
-              plan={ingredient}
-              key={`${index}${ingredient.item}`}
-              layer={layers[layers.indexOf(layer) + 1]}
-            />
-          ))}
-        </section>
+      const response = await fetch(
+        `/api/plan/new/${plan.item}/${recipe}?amount=${plan.amount}`
       );
+      const resJson = await response.json();
+      setPlan(resJson);
     }
-    return (
-      <section className={`${styles.planSection} ${styles[layerColor]}`}>
-        <div>{plan.item}</div>
-        {plan.recipe && <div>Recipe: {plan.recipe}</div>}
-        <div>Amount: {plan.amount}/min</div>
-      </section>
-    );
-  }
+  };
+
+  return (
+    <section className={`${styles.planSection} ${styles[layerColor]}`}>
+      <div>{plan.item}</div>
+      {plan.recipe && (
+        <div>
+          Recipe:
+          <select defaultValue={plan.recipe} onChange={onChange}>
+            <option value={plan.recipe}>{plan.recipe}</option>
+            {plan.alternateRecipes.map((alternateRecipe, index) => (
+              <option value={alternateRecipe} key={index}>
+                {alternateRecipe}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+      {plan.buildings && <div>Buildings: {plan.buildings}</div>}
+      <div>Amount: {plan.amount}/min</div>
+      {plan.ingredients?.map((ingredient, index) => (
+        <PlanSection
+          plan={ingredient}
+          key={`${index}${ingredient.item}`}
+          layer={layer % 10 === 0 ? 1 : layer + 1}
+        />
+      ))}
+    </section>
+  );
 }
 
 export default function Plan() {
@@ -140,7 +117,7 @@ export default function Plan() {
         </div>
       </aside>
       <div className={styles.planView}>
-        {plan && <PlanSection plan={plan} layer={layers[0]} />}
+        {plan && <PlanSection plan={plan} layer={1} />}
       </div>
     </main>
   );

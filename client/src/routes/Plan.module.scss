@@ -48,6 +48,8 @@
   }
 
   .plan-view {
+    overflow-y: auto;
+
     .plan-section {
       width: max-content;
       height: min-content;
@@ -69,44 +71,22 @@
         }
       }
 
-      &.layer0 {
-        background-color: #006699;
-      }
-
-      &.layer1 {
-        background-color: #339933;
-      }
-
-      &.layer2 {
-        background-color: #666699;
-      }
-
-      &.layer3 {
-        background-color: #669900;
-      }
-
-      &.layer4 {
-        background-color: #cc6600;
-      }
-
-      &.layer5 {
-        background-color: #339966;
-      }
-
-      &.layer6 {
-        background-color: #993399;
-      }
-
-      &.layer7 {
-        background-color: #004d99;
-      }
-
-      &.layer8 {
-        background-color: #669999;
-      }
-
-      &.layer9 {
-        background-color: #993333;
+      $background-colors: (
+        #006699,
+        #339933,
+        #666699,
+        #669900,
+        #cc6600,
+        #339966,
+        #993399,
+        #004d99,
+        #669999,
+        #993333
+      );
+      @for $i from 1 through 10 {
+        &.layer#{$i} {
+          background-color: nth($background-colors, $i);
+        }
       }
     }
   }
