@@ -2,8 +2,35 @@ import { useEffect, useState } from "react";
 import styles from "./Plan.module.scss";
 import { Button, Input } from "@/components";
 
-function PlanSection({ plan: originalPlan, layer }) {
-  const [plan, setPlan] = useState(originalPlan);
+const ores = [
+  "Bauxite",
+  "Caterium Ore",
+  "Coal",
+  "Copper Ore",
+  "Iron Ore",
+  "Limestone",
+  "Raw Quartz",
+  "Sulfur",
+  "Uranium",
+  "Water",
+  "Nitrogen Gas",
+  "Crude Oil",
+];
+
+function PlanSection({ initialPlan, layer, totalOres, setTotalOres }) {
+  const [plan, setPlan] = useState(initialPlan);
+
+  useEffect(() => {
+    if (ores.includes(plan.item)) {
+      if (totalOres[plan.item]) {
+        totalOres[plan.item] += plan.amount;
+      } else {
+        totalOres[plan.item] = plan.amount;
+      }
+      console.log("file: Plan.jsx:31 ~ totalOres:", totalOres);
+      setTotalOres(totalOres);
+    }
+  });
 
   const layerColor = `layer${layer}`;
 
@@ -24,7 +51,7 @@ function PlanSection({ plan: originalPlan, layer }) {
       {plan.recipe && (
         <div>
           Recipe:
-          <select defaultValue={plan.recipe} onChange={onChange}>
+          <select value={plan.recipe} onChange={onChange}>
             <option value={plan.recipe}>{plan.recipe}</option>
             {plan.alternateRecipes.map((alternateRecipe, index) => (
               <option value={alternateRecipe} key={index}>
@@ -38,9 +65,11 @@ function PlanSection({ plan: originalPlan, layer }) {
       <div>Amount: {plan.amount}/min</div>
       {plan.ingredients?.map((ingredient, index) => (
         <PlanSection
-          plan={ingredient}
-          key={`${index}${ingredient.item}`}
+          initialPlan={ingredient}
+          key={`${index}${ingredient.item}${plan.recipe}`}
           layer={layer % 10 === 0 ? 1 : layer + 1}
+          totalOres={totalOres}
+          setTotalOres={setTotalOres}
         />
       ))}
     </section>
@@ -48,27 +77,29 @@ function PlanSection({ plan: originalPlan, layer }) {
 }
 
 export default function Plan() {
-  const [plan, setPlan] = useState();
+  const [initialPlan, setInitialPlan] = useState();
   const [finalProduct, setFinalProduct] = useState("");
   const [finalAmount, setFinalAmount] = useState(0);
+  const [totalOres, setTotalOres] = useState({});
 
   useEffect(() => {
-    setFinalProduct("Thermal Propulsion Rocket");
+    setFinalProduct("Iron Plate");
     setFinalAmount(100);
   }, []);
 
   useEffect(() => {
-    if (!plan && finalProduct && finalAmount) {
+    if (!initialPlan && finalProduct && finalAmount) {
       (async () => {
         const response = await fetch(
           `/api/plan/new/${finalProduct}?amount=${finalAmount}`
         );
         const resJson = await response.json();
-        setPlan(resJson);
+        setInitialPlan(resJson);
       })();
     }
   }, [finalProduct, finalAmount]);
 
+  console.log(totalOres);
   return (
     <main className={styles.plan}>
       <aside className={styles.sidePanel}>
@@ -117,8 +148,25 @@ export default function Plan() {
         </div>
       </aside>
       <div className={styles.planView}>
-        {plan && <PlanSection plan={plan} layer={1} />}
+        {initialPlan && (
+          <PlanSection
+            initialPlan={initialPlan}
+            layer={1}
+            totalOres={totalOres}
+            setTotalOres={setTotalOres}
+          />
+        )}
       </div>
+      <aside className={styles.sidePanel}>
+        <ul>
+          <div className={styles.title}>Total ore amounts:</div>
+          {Object.entries(totalOres).map(([ore, amount], index) => (
+            <li key={`${ore}${index}`}>
+              {ore}: {amount}/min
+            </li>
+          ))}
+        </ul>
+      </aside>
     </main>
   );
 }
