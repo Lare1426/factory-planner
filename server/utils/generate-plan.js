@@ -47,9 +47,9 @@ const productsWithRecipes = await getProducts();
 
 const roundTo4DP = (num) => Math.round((num + Number.EPSILON) * 10000) / 10000;
 
-const findDesiredProduct = (products, desiredProduct) => {
+const findDesiredProduct = (products, desiredProductName) => {
   for (const product of products) {
-    if (product.item === desiredProduct) {
+    if (product.item === desiredProductName) {
       return product;
     }
   }
@@ -64,19 +64,25 @@ const generate = async (item, amount, recipeToUse = null) => {
 
     if (ores.includes(item) && (recipeToUse ?? recipe) === item) {
       // raw material can be made as byproduct but not right now
-      return {
-        item,
+      return [
+        {
+          item,
+          amount,
+          recipe,
+          alternateRecipes,
+        },
         amount,
-        recipe,
-        alternateRecipes,
-      };
+      ];
     }
   } else {
     // item doesn't have a recipe defined it is an raw material
-    return {
-      item,
+    return [
+      {
+        item,
+        amount,
+      },
       amount,
-    };
+    ];
   }
 
   if (recipeToUse) {
@@ -97,23 +103,33 @@ const generate = async (item, amount, recipeToUse = null) => {
     (60 / recipeData.time) * recipeProductionAmount;
   const buildings = roundTo4DP(amount / recipeProductsPerMinute);
 
+  let count = 0;
+
   const ingredients = await Promise.all(
-    recipeData.ingredients.map((ingredient) => {
+    recipeData.ingredients.map(async (ingredient) => {
       const recipeAmount = ingredient.amount / recipeProductionAmount;
       const ingredientAmount = roundTo4DP(amount * recipeAmount);
-      return generate(ingredient.item, ingredientAmount);
+      const [plan, generatedCount] = await generate(
+        ingredient.item,
+        ingredientAmount
+      );
+      count += generatedCount;
+      return plan;
     })
   );
 
-  return {
-    item,
-    amount,
-    buildings,
-    producedIn,
-    recipe,
-    alternateRecipes,
-    ingredients,
-  };
+  return [
+    {
+      item,
+      amount,
+      buildings,
+      producedIn,
+      recipe,
+      alternateRecipes,
+      ingredients,
+    },
+    count,
+  ];
 };
 
 export default { generate, getProducts };

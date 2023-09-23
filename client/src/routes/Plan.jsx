@@ -17,25 +17,22 @@ const ores = [
   "Crude Oil",
 ];
 
-function PlanSection({ initialPlan, layer, totalOres, setTotalOres }) {
-  const [plan, setPlan] = useState(initialPlan);
+const calculateOreAmount = async (plan) => {
+  if (ores.includes(plan.item)) {
+    return plan.amount;
+  }
 
-  useEffect(() => {
-    if (ores.includes(plan.item)) {
-      if (totalOres[plan.item]) {
-        const { [plan.item]: totalOre, ...rest } = totalOres;
-        setTotalOres({
-          [plan.item]: totalOre + plan.amount,
-          ...rest,
-        });
-      } else {
-        setTotalOres({
-          [plan.item]: plan.amount,
-          ...totalOres,
-        });
-      }
-    }
-  }, []);
+  let count = 0;
+
+  for (const ingredient of plan.ingredients) {
+    count += await calculateOreAmount(ingredient);
+  }
+
+  return count;
+};
+
+function PlanSection({ initialPlan, layer, updateTotalOres }) {
+  const [plan, setPlan] = useState(initialPlan);
 
   const layerColor = `layer${layer}`;
 
@@ -45,8 +42,9 @@ function PlanSection({ initialPlan, layer, totalOres, setTotalOres }) {
       const response = await fetch(
         `/api/plan/new/${plan.item}/${recipe}?amount=${plan.amount}`
       );
-      const resJson = await response.json();
-      setPlan(resJson);
+      const [newPlan, ores] = await response.json();
+      setPlan(newPlan);
+      updateTotalOres(plan, ores);
     }
   };
 
@@ -66,15 +64,18 @@ function PlanSection({ initialPlan, layer, totalOres, setTotalOres }) {
           </select>
         </div>
       )}
-      {plan.buildings && <div>Buildings: {plan.buildings}</div>}
+      {plan.buildings && (
+        <div>
+          Buildings: {plan.buildings} {plan.producedIn}
+        </div>
+      )}
       <div>Amount: {plan.amount}/min</div>
       {plan.ingredients?.map((ingredient, index) => (
         <PlanSection
           initialPlan={ingredient}
-          key={`${index}${ingredient.item}${plan.recipe}`}
+          key={`${plan.recipe}-${ingredient.item}-${index}`}
           layer={layer % 10 === 0 ? 1 : layer + 1}
-          totalOres={totalOres}
-          setTotalOres={setTotalOres}
+          updateTotalOres={updateTotalOres}
         />
       ))}
     </section>
@@ -98,11 +99,34 @@ export default function Plan() {
         const response = await fetch(
           `/api/plan/new/${finalProduct}?amount=${finalAmount}`
         );
-        const resJson = await response.json();
-        setInitialPlan(resJson);
+        const [plan, ores] = await response.json();
+        setInitialPlan(plan);
+        setTotalOres({ ores });
       })();
     }
   }, [finalProduct, finalAmount]);
+
+  // const updateTotalOres = (item, amount) => {
+  //   setTotalOres((previousState) => {
+  //     const updatedTotalOres = { ...previousState };
+
+  //     if (updatedTotalOres[item]) {
+  //       updatedTotalOres[item] += amount;
+  //     } else {
+  //       updatedTotalOres[item] = amount;
+  //     }
+  //     return updatedTotalOres;
+  //   });
+  // };
+
+  const updateTotalOres = async (plan, count) => {
+    const previousOreAmount = await calculateOreAmount(plan);
+
+    const updatedTotalOres = { ...totalOres };
+    updatedTotalOres.ores -= previousOreAmount;
+    updatedTotalOres.ores += count;
+    setTotalOres(updatedTotalOres);
+  };
 
   return (
     <main className={styles.plan}>
@@ -156,8 +180,7 @@ export default function Plan() {
           <PlanSection
             initialPlan={initialPlan}
             layer={1}
-            totalOres={totalOres}
-            setTotalOres={setTotalOres}
+            updateTotalOres={updateTotalOres}
           />
         )}
       </div>
