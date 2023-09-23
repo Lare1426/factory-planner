@@ -2,35 +2,6 @@ import { useEffect, useState } from "react";
 import styles from "./Plan.module.scss";
 import { Button, Input } from "@/components";
 
-const ores = [
-  "Bauxite",
-  "Caterium Ore",
-  "Coal",
-  "Copper Ore",
-  "Iron Ore",
-  "Limestone",
-  "Raw Quartz",
-  "Sulfur",
-  "Uranium",
-  "Water",
-  "Nitrogen Gas",
-  "Crude Oil",
-];
-
-const calculateOreAmount = async (plan) => {
-  if (ores.includes(plan.item)) {
-    return plan.amount;
-  }
-
-  let count = 0;
-
-  for (const ingredient of plan.ingredients) {
-    count += await calculateOreAmount(ingredient);
-  }
-
-  return count;
-};
-
 function PlanSection({ initialPlan, layer, updateTotalOres }) {
   const [plan, setPlan] = useState(initialPlan);
 
@@ -42,9 +13,9 @@ function PlanSection({ initialPlan, layer, updateTotalOres }) {
       const response = await fetch(
         `/api/plan/new/${plan.item}/${recipe}?amount=${plan.amount}`
       );
-      const [newPlan, ores] = await response.json();
+      const newPlan = await response.json();
+      updateTotalOres(plan.totalOreCount, newPlan.totalOreCount);
       setPlan(newPlan);
-      updateTotalOres(plan, ores);
     }
   };
 
@@ -99,9 +70,9 @@ export default function Plan() {
         const response = await fetch(
           `/api/plan/new/${finalProduct}?amount=${finalAmount}`
         );
-        const [plan, ores] = await response.json();
+        const plan = await response.json();
         setInitialPlan(plan);
-        setTotalOres({ ores });
+        setTotalOres({ ores: plan.totalOreCount });
       })();
     }
   }, [finalProduct, finalAmount]);
@@ -119,12 +90,10 @@ export default function Plan() {
   //   });
   // };
 
-  const updateTotalOres = async (plan, count) => {
-    const previousOreAmount = await calculateOreAmount(plan);
-
+  const updateTotalOres = async (previousOreCount, ores) => {
     const updatedTotalOres = { ...totalOres };
-    updatedTotalOres.ores -= previousOreAmount;
-    updatedTotalOres.ores += count;
+    updatedTotalOres.ores -= previousOreCount;
+    updatedTotalOres.ores += ores;
     setTotalOres(updatedTotalOres);
   };
 

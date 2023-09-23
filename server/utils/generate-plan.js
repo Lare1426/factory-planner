@@ -64,25 +64,21 @@ const generate = async (item, amount, recipeToUse = null) => {
 
     if (ores.includes(item) && (recipeToUse ?? recipe) === item) {
       // raw material can be made as byproduct but not right now
-      return [
-        {
-          item,
-          amount,
-          recipe,
-          alternateRecipes,
-        },
+      return {
+        item,
         amount,
-      ];
+        recipe,
+        alternateRecipes,
+        totalOreCount: amount,
+      };
     }
   } else {
     // item doesn't have a recipe defined it is an raw material
-    return [
-      {
-        item,
-        amount,
-      },
+    return {
+      item,
       amount,
-    ];
+      totalOreCount: amount,
+    };
   }
 
   if (recipeToUse) {
@@ -103,33 +99,28 @@ const generate = async (item, amount, recipeToUse = null) => {
     (60 / recipeData.time) * recipeProductionAmount;
   const buildings = roundTo4DP(amount / recipeProductsPerMinute);
 
-  let count = 0;
+  let totalOreCount = 0;
 
   const ingredients = await Promise.all(
     recipeData.ingredients.map(async (ingredient) => {
       const recipeAmount = ingredient.amount / recipeProductionAmount;
       const ingredientAmount = roundTo4DP(amount * recipeAmount);
-      const [plan, generatedCount] = await generate(
-        ingredient.item,
-        ingredientAmount
-      );
-      count += generatedCount;
+      const plan = await generate(ingredient.item, ingredientAmount);
+      totalOreCount += plan.totalOreCount;
       return plan;
     })
   );
 
-  return [
-    {
-      item,
-      amount,
-      buildings,
-      producedIn,
-      recipe,
-      alternateRecipes,
-      ingredients,
-    },
-    count,
-  ];
+  return {
+    item,
+    amount,
+    buildings,
+    producedIn,
+    recipe,
+    alternateRecipes,
+    ingredients,
+    totalOreCount,
+  };
 };
 
 export default { generate, getProducts };
