@@ -23,14 +23,19 @@ function PlanSection({ initialPlan, layer, totalOres, setTotalOres }) {
   useEffect(() => {
     if (ores.includes(plan.item)) {
       if (totalOres[plan.item]) {
-        totalOres[plan.item] += plan.amount;
+        const { [plan.item]: totalOre, ...rest } = totalOres;
+        setTotalOres({
+          [plan.item]: totalOre + plan.amount,
+          ...rest,
+        });
       } else {
-        totalOres[plan.item] = plan.amount;
+        setTotalOres({
+          [plan.item]: plan.amount,
+          ...totalOres,
+        });
       }
-      console.log("file: Plan.jsx:31 ~ totalOres:", totalOres);
-      setTotalOres(totalOres);
     }
-  });
+  }, []);
 
   const layerColor = `layer${layer}`;
 
@@ -99,7 +104,6 @@ export default function Plan() {
     }
   }, [finalProduct, finalAmount]);
 
-  console.log(totalOres);
   return (
     <main className={styles.plan}>
       <aside className={styles.sidePanel}>
