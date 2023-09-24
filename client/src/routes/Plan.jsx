@@ -4,7 +4,12 @@ import { Button, Input } from "@/components";
 
 const roundTo4DP = (num) => Math.round((num + Number.EPSILON) * 10000) / 10000;
 
-function PlanSection({ initialPlan, layer, updateTotalOres }) {
+function PlanSection({
+  initialPlan,
+  layer,
+  updateTotalOres,
+  updateAllProducts,
+}) {
   const [plan, setPlan] = useState(initialPlan);
 
   const layerColor = `layer${layer}`;
@@ -17,6 +22,7 @@ function PlanSection({ initialPlan, layer, updateTotalOres }) {
       );
       const newPlan = await response.json();
       updateTotalOres(plan.totalOreCount, newPlan.totalOreCount);
+      updateAllProducts(plan.allProducts, newPlan.allProducts);
       setPlan(newPlan);
     }
   };
@@ -49,6 +55,7 @@ function PlanSection({ initialPlan, layer, updateTotalOres }) {
           key={`${plan.recipe}-${ingredient.item}-${index}`}
           layer={layer % 10 === 0 ? 1 : layer + 1}
           updateTotalOres={updateTotalOres}
+          updateAllProducts={updateAllProducts}
         />
       ))}
     </section>
@@ -60,9 +67,10 @@ export default function Plan() {
   const [finalProduct, setFinalProduct] = useState("");
   const [finalAmount, setFinalAmount] = useState(0);
   const [totalOres, setTotalOres] = useState({});
+  const [allProducts, setAllProducts] = useState({});
 
   useEffect(() => {
-    setFinalProduct("Reinforced Iron Plate");
+    setFinalProduct("Crystal Oscillator");
     setFinalAmount(100);
   }, []);
 
@@ -75,22 +83,10 @@ export default function Plan() {
         const plan = await response.json();
         setInitialPlan(plan);
         setTotalOres(plan.totalOreCount);
+        setAllProducts(plan.allProducts);
       })();
     }
   }, [finalProduct, finalAmount]);
-
-  // const updateTotalOres = (item, amount) => {
-  //   setTotalOres((previousState) => {
-  //     const updatedTotalOres = { ...previousState };
-
-  //     if (updatedTotalOres[item]) {
-  //       updatedTotalOres[item] += amount;
-  //     } else {
-  //       updatedTotalOres[item] = amount;
-  //     }
-  //     return updatedTotalOres;
-  //   });
-  // };
 
   const updateTotalOres = async (previousOreCount, newOreCount) => {
     const updatedTotalOres = { ...totalOres };
@@ -112,6 +108,35 @@ export default function Plan() {
     }
 
     setTotalOres(updatedTotalOres);
+  };
+
+  const updateAllProducts = async (
+    previousProductsAmount,
+    newProductsAmount
+  ) => {
+    const updatedAllProducts = { ...allProducts };
+
+    for (const [item, { amount, count }] of Object.entries(
+      previousProductsAmount
+    )) {
+      if (updatedAllProducts[item].amount - amount === 0) {
+        delete updatedAllProducts[item];
+      } else {
+        updatedAllProducts[item].amount -= amount;
+        updatedAllProducts[item].count -= count;
+      }
+    }
+
+    for (const [item, { amount, count }] of Object.entries(newProductsAmount)) {
+      if (item in updatedAllProducts) {
+        updatedAllProducts[item].amount += amount;
+        updatedAllProducts[item].count += count;
+      } else {
+        updatedAllProducts[item] = { amount, count };
+      }
+    }
+
+    setAllProducts(updatedAllProducts);
   };
 
   return (
@@ -167,6 +192,7 @@ export default function Plan() {
             initialPlan={initialPlan}
             layer={1}
             updateTotalOres={updateTotalOres}
+            updateAllProducts={updateAllProducts}
           />
         )}
       </div>
@@ -178,6 +204,20 @@ export default function Plan() {
               {ore}: {roundTo4DP(amount)}/min
             </li>
           ))}
+        </ul>
+        <ul>
+          <div className={styles.title}>Common product amounts:</div>
+          {Object.entries(allProducts).map(
+            ([item, { amount, count }], index) => {
+              if (count > 1) {
+                return (
+                  <li key={`${item}${index}`}>
+                    {item}: {roundTo4DP(amount)}/min
+                  </li>
+                );
+              }
+            }
+          )}
         </ul>
       </aside>
     </main>
