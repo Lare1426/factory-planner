@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import styles from "./Plan.module.scss";
 import { Button, Input } from "@/components";
 
+const roundTo4DP = (num) => Math.round((num + Number.EPSILON) * 10000) / 10000;
+
 function PlanSection({ initialPlan, layer, updateTotalOres }) {
   const [plan, setPlan] = useState(initialPlan);
 
@@ -60,7 +62,7 @@ export default function Plan() {
   const [totalOres, setTotalOres] = useState({});
 
   useEffect(() => {
-    setFinalProduct("Iron Plate");
+    setFinalProduct("Reinforced Iron Plate");
     setFinalAmount(100);
   }, []);
 
@@ -173,7 +175,7 @@ export default function Plan() {
           <div className={styles.title}>Total ore amounts:</div>
           {Object.entries(totalOres).map(([ore, amount], index) => (
             <li key={`${ore}${index}`}>
-              {ore}: {amount}/min
+              {ore}: {roundTo4DP(amount)}/min
             </li>
           ))}
         </ul>
