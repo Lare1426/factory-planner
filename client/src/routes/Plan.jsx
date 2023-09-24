@@ -72,7 +72,7 @@ export default function Plan() {
         );
         const plan = await response.json();
         setInitialPlan(plan);
-        setTotalOres({ ores: plan.totalOreCount });
+        setTotalOres(plan.totalOreCount);
       })();
     }
   }, [finalProduct, finalAmount]);
@@ -90,10 +90,25 @@ export default function Plan() {
   //   });
   // };
 
-  const updateTotalOres = async (previousOreCount, ores) => {
+  const updateTotalOres = async (previousOreCount, newOreCount) => {
     const updatedTotalOres = { ...totalOres };
-    updatedTotalOres.ores -= previousOreCount;
-    updatedTotalOres.ores += ores;
+
+    for (const [ore, amount] of Object.entries(previousOreCount)) {
+      if (updatedTotalOres[ore] - amount === 0) {
+        delete updatedTotalOres[ore];
+      } else {
+        updatedTotalOres[ore] -= amount;
+      }
+    }
+
+    for (const [ore, amount] of Object.entries(newOreCount)) {
+      if (ore in updatedTotalOres) {
+        updatedTotalOres[ore] += amount;
+      } else {
+        updatedTotalOres[ore] = amount;
+      }
+    }
+
     setTotalOres(updatedTotalOres);
   };
 

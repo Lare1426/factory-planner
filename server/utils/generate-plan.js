@@ -69,7 +69,9 @@ const generate = async (item, amount, recipeToUse = null) => {
         amount,
         recipe,
         alternateRecipes,
-        totalOreCount: amount,
+        totalOreCount: {
+          [item]: amount,
+        },
       };
     }
   } else {
@@ -77,7 +79,9 @@ const generate = async (item, amount, recipeToUse = null) => {
     return {
       item,
       amount,
-      totalOreCount: amount,
+      totalOreCount: {
+        [item]: amount,
+      },
     };
   }
 
@@ -99,14 +103,21 @@ const generate = async (item, amount, recipeToUse = null) => {
     (60 / recipeData.time) * recipeProductionAmount;
   const buildings = roundTo4DP(amount / recipeProductsPerMinute);
 
-  let totalOreCount = 0;
+  let totalOreCount = {};
 
   const ingredients = await Promise.all(
     recipeData.ingredients.map(async (ingredient) => {
       const recipeAmount = ingredient.amount / recipeProductionAmount;
       const ingredientAmount = roundTo4DP(amount * recipeAmount);
       const plan = await generate(ingredient.item, ingredientAmount);
-      totalOreCount += plan.totalOreCount;
+      console.log(plan.totalOreCount);
+      for (const [ore, amount] of Object.entries(plan.totalOreCount)) {
+        if (ore in totalOreCount) {
+          totalOreCount[ore] += amount;
+        } else {
+          totalOreCount[ore] = amount;
+        }
+      }
       return plan;
     })
   );
