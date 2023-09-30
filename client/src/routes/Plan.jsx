@@ -4,14 +4,7 @@ import { Button, Input } from "@/components";
 
 const roundTo4DP = (num) => Math.round((num + Number.EPSILON) * 10000) / 10000;
 
-function PlanSection({
-  initialPlan,
-  layer,
-  updateTotalOres,
-  updateAllProducts,
-}) {
-  const [plan, setPlan] = useState(initialPlan);
-
+function PlanSection({ plan, layer, updatePlan, path = [] }) {
   const layerColor = `layer${layer}`;
 
   const onChange = async (e) => {
@@ -21,9 +14,7 @@ function PlanSection({
         `/api/plan/new/${plan.item}/${recipe}?amount=${plan.amount}`
       );
       const newPlan = await response.json();
-      updateTotalOres(plan.totalOreCount, newPlan.totalOreCount);
-      updateAllProducts(plan.allProducts, newPlan.allProducts);
-      setPlan(newPlan);
+      updatePlan(path, newPlan);
     }
   };
 
@@ -51,11 +42,11 @@ function PlanSection({
       <div>Amount: {plan.amount}/min</div>
       {plan.ingredients?.map((ingredient, index) => (
         <PlanSection
-          initialPlan={ingredient}
-          key={`${plan.recipe}-${ingredient.item}-${index}`}
+          plan={ingredient}
           layer={layer % 10 === 0 ? 1 : layer + 1}
-          updateTotalOres={updateTotalOres}
-          updateAllProducts={updateAllProducts}
+          updatePlan={updatePlan}
+          path={[...path, ingredient.item]}
+          key={`${plan.recipe}-${ingredient.item}-${index}`}
         />
       ))}
     </section>
@@ -63,80 +54,55 @@ function PlanSection({
 }
 
 export default function Plan() {
-  const [initialPlan, setInitialPlan] = useState();
+  const [plan, setPlan] = useState();
   const [finalProduct, setFinalProduct] = useState("");
   const [finalAmount, setFinalAmount] = useState(0);
   const [totalOres, setTotalOres] = useState({});
   const [allProducts, setAllProducts] = useState({});
 
   useEffect(() => {
-    setFinalProduct("Crystal Oscillator");
+    setFinalProduct("Iron Plate");
     setFinalAmount(100);
   }, []);
 
   useEffect(() => {
-    if (!initialPlan && finalProduct && finalAmount) {
+    if (!plan && finalProduct && finalAmount) {
       (async () => {
         const response = await fetch(
           `/api/plan/new/${finalProduct}?amount=${finalAmount}`
         );
         const plan = await response.json();
-        setInitialPlan(plan);
+        setPlan(plan);
         setTotalOres(plan.totalOreCount);
         setAllProducts(plan.allProducts);
       })();
     }
   }, [finalProduct, finalAmount]);
 
-  const updateTotalOres = async (previousOreCount, newOreCount) => {
-    const updatedTotalOres = { ...totalOres };
+  const updatePlan = (path, newNode, parent = null) => {
+    const node = parent ?? { ...plan };
 
-    for (const [ore, amount] of Object.entries(previousOreCount)) {
-      if (updatedTotalOres[ore] - amount === 0) {
-        delete updatedTotalOres[ore];
-      } else {
-        updatedTotalOres[ore] -= amount;
+    if (path.length) {
+      const nextStep = path.shift();
+      for (const [index, child] of node.ingredients.entries()) {
+        if (child.item === nextStep) {
+          if (!path.length) {
+            node.ingredients[index] = newNode;
+          } else {
+            updatePlan(path, newNode, child);
+          }
+
+          if (!parent) {
+            setPlan(node);
+            break;
+          } else {
+            return;
+          }
+        }
       }
+    } else {
+      setPlan(newNode);
     }
-
-    for (const [ore, amount] of Object.entries(newOreCount)) {
-      if (ore in updatedTotalOres) {
-        updatedTotalOres[ore] += amount;
-      } else {
-        updatedTotalOres[ore] = amount;
-      }
-    }
-
-    setTotalOres(updatedTotalOres);
-  };
-
-  const updateAllProducts = async (
-    previousProductsAmount,
-    newProductsAmount
-  ) => {
-    const updatedAllProducts = { ...allProducts };
-
-    for (const [item, { amount, count }] of Object.entries(
-      previousProductsAmount
-    )) {
-      if (updatedAllProducts[item].amount - amount === 0) {
-        delete updatedAllProducts[item];
-      } else {
-        updatedAllProducts[item].amount -= amount;
-        updatedAllProducts[item].count -= count;
-      }
-    }
-
-    for (const [item, { amount, count }] of Object.entries(newProductsAmount)) {
-      if (item in updatedAllProducts) {
-        updatedAllProducts[item].amount += amount;
-        updatedAllProducts[item].count += count;
-      } else {
-        updatedAllProducts[item] = { amount, count };
-      }
-    }
-
-    setAllProducts(updatedAllProducts);
   };
 
   return (
@@ -187,14 +153,7 @@ export default function Plan() {
         </div>
       </aside>
       <div className={styles.planView}>
-        {initialPlan && (
-          <PlanSection
-            initialPlan={initialPlan}
-            layer={1}
-            updateTotalOres={updateTotalOres}
-            updateAllProducts={updateAllProducts}
-          />
-        )}
+        {plan && <PlanSection plan={plan} layer={1} updatePlan={updatePlan} />}
       </div>
       <aside className={styles.sidePanel}>
         <ul>
