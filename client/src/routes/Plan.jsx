@@ -2,6 +2,21 @@ import { useEffect, useState } from "react";
 import styles from "./Plan.module.scss";
 import { Button, Input } from "@/components";
 
+const ores = [
+  "Bauxite",
+  "Caterium Ore",
+  "Coal",
+  "Copper Ore",
+  "Iron Ore",
+  "Limestone",
+  "Raw Quartz",
+  "Sulfur",
+  "Uranium",
+  "Water",
+  "Nitrogen Gas",
+  "Crude Oil",
+];
+
 const roundTo4DP = (num) => Math.round((num + Number.EPSILON) * 10000) / 10000;
 
 function PlanSection({ plan, layer, updatePlan, path = [] }) {
@@ -53,6 +68,42 @@ function PlanSection({ plan, layer, updatePlan, path = [] }) {
   );
 }
 
+const findTotalAmounts = (plan) => {
+  const totalAmounts = {};
+
+  if (plan.item in totalAmounts) {
+    totalAmounts[plan.item].amount += plan.amount;
+    totalAmounts[plan.item].count += 1;
+  } else {
+    totalAmounts[plan.item] = {
+      amount: plan.amount,
+      count: 1,
+    };
+  }
+
+  if (plan.ingredients) {
+    for (const ingredient of plan.ingredients) {
+      const returnedTotalAmounts = findTotalAmounts(ingredient, totalAmounts);
+
+      for (const [item, { amount, count }] of Object.entries(
+        returnedTotalAmounts
+      )) {
+        if (item in totalAmounts) {
+          totalAmounts[item].amount += amount;
+          totalAmounts[item].count += count;
+        } else {
+          totalAmounts[item] = {
+            amount,
+            count,
+          };
+        }
+      }
+    }
+  }
+
+  return totalAmounts;
+};
+
 export default function Plan() {
   const [plan, setPlan] = useState();
   const [finalProduct, setFinalProduct] = useState("");
@@ -73,11 +124,30 @@ export default function Plan() {
         );
         const plan = await response.json();
         setPlan(plan);
-        setTotalOres(plan.totalOreCount);
-        setAllProducts(plan.allProducts);
       })();
     }
   }, [finalProduct, finalAmount]);
+
+  useEffect(() => {
+    if (!plan) {
+      return;
+    }
+    const totalAmounts = findTotalAmounts(plan);
+
+    const preTotalOres = {};
+    const preAllProducts = {};
+
+    for (const [item, { amount, count }] of Object.entries(totalAmounts)) {
+      if (ores.includes(item)) {
+        preTotalOres[item] = amount;
+      } else if (count > 1) {
+        preAllProducts[item] = amount;
+      }
+    }
+
+    setTotalOres(preTotalOres);
+    setAllProducts(preAllProducts);
+  }, [plan]);
 
   const updatePlan = (path, newNode, parent = null) => {
     const node = parent ?? { ...plan };
