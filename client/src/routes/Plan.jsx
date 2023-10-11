@@ -110,14 +110,23 @@ export default function Plan() {
   const [finalAmount, setFinalAmount] = useState(0);
   const [totalOres, setTotalOres] = useState({});
   const [allProducts, setAllProducts] = useState({});
+  const [inputProduct, setInputProduct] = useState("");
+  const [inputAmount, setInputAmount] = useState(0);
+  let isApplyDisabled = !(
+    !(inputProduct === finalProduct) || !(inputAmount === finalAmount)
+  );
 
   useEffect(() => {
-    setFinalProduct("Crystal Oscillator");
-    setFinalAmount(100);
+    const item = "Crystal Oscillator";
+    const amount = 100;
+    setFinalProduct(item);
+    setInputProduct(item);
+    setFinalAmount(amount);
+    setInputAmount(amount);
   }, []);
 
   useEffect(() => {
-    if (!plan && finalProduct && finalAmount) {
+    if (finalProduct && finalAmount) {
       (async () => {
         const response = await fetch(
           `/api/plan/new/${finalProduct}?amount=${finalAmount}`
@@ -175,6 +184,14 @@ export default function Plan() {
     }
   };
 
+  const updateFinalValues = (product, amount) => {
+    if (plan.item !== product) {
+      setFinalProduct(product);
+    } else if (plan.amount !== amount) {
+      setFinalAmount(amount);
+    }
+  };
+
   return (
     <main className={styles.plan}>
       <aside className={styles.sidePanel}>
@@ -188,8 +205,8 @@ export default function Plan() {
           <Input
             size="large"
             type="text"
-            value={finalProduct}
-            setValue={setFinalProduct}
+            value={inputProduct}
+            setValue={setInputProduct}
           />
         </div>
         <div>
@@ -200,11 +217,21 @@ export default function Plan() {
             placeholder="0"
             min={0}
             max={20000}
-            value={finalAmount}
-            setValue={setFinalAmount}
+            value={inputAmount}
+            setValue={setInputAmount}
           />
         </div>
         <div className={styles.buttons}>
+          <Button
+            size="small"
+            color="primary"
+            disabled={isApplyDisabled}
+            onClick={() => {
+              updateFinalValues(inputProduct, inputAmount);
+            }}
+          >
+            Apply
+          </Button>
           <Button size="small" color="primary">
             Export
           </Button>
