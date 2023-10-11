@@ -112,7 +112,7 @@ export default function Plan() {
   const [allProducts, setAllProducts] = useState({});
 
   useEffect(() => {
-    setFinalProduct("Iron Plate");
+    setFinalProduct("Crystal Oscillator");
     setFinalAmount(100);
   }, []);
 
@@ -236,17 +236,13 @@ export default function Plan() {
         </ul>
         <ul>
           <div className={styles.title}>Common product amounts:</div>
-          {Object.entries(allProducts).map(
-            ([item, { amount, count }], index) => {
-              if (count > 1) {
-                return (
-                  <li key={`${item}${index}`}>
-                    {item}: {roundTo4DP(amount)}/min
-                  </li>
-                );
-              }
-            }
-          )}
+          {Object.entries(allProducts).map(([item, amount], index) => {
+            return (
+              <li key={`${item}${index}`}>
+                {item}: {roundTo4DP(amount)}/min
+              </li>
+            );
+          })}
         </ul>
       </aside>
     </main>
