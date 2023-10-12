@@ -69,21 +69,16 @@ function PlanSection({ plan, layer, updatePlan, path = [] }) {
 }
 
 const findTotalAmounts = (plan) => {
-  const totalAmounts = {};
-
-  if (plan.item in totalAmounts) {
-    totalAmounts[plan.item].amount += plan.amount;
-    totalAmounts[plan.item].count += 1;
-  } else {
-    totalAmounts[plan.item] = {
+  const totalAmounts = {
+    [plan.item]: {
       amount: plan.amount,
       count: 1,
-    };
-  }
+    },
+  };
 
   if (plan.ingredients) {
     for (const ingredient of plan.ingredients) {
-      const returnedTotalAmounts = findTotalAmounts(ingredient, totalAmounts);
+      const returnedTotalAmounts = findTotalAmounts(ingredient);
 
       for (const [item, { amount, count }] of Object.entries(
         returnedTotalAmounts
@@ -112,8 +107,9 @@ export default function Plan() {
   const [allProducts, setAllProducts] = useState({});
   const [inputProduct, setInputProduct] = useState("");
   const [inputAmount, setInputAmount] = useState(0);
+
   let isApplyDisabled = !(
-    !(inputProduct === finalProduct) || !(inputAmount === finalAmount)
+    inputProduct !== finalProduct || inputAmount !== finalAmount
   );
 
   useEffect(() => {
@@ -184,11 +180,11 @@ export default function Plan() {
     }
   };
 
-  const updateFinalValues = (product, amount) => {
-    if (plan.item !== product) {
-      setFinalProduct(product);
-    } else if (plan.amount !== amount) {
-      setFinalAmount(amount);
+  const updateFinalValues = () => {
+    if (plan.item !== inputProduct) {
+      setFinalProduct(inputProduct);
+    } else if (plan.amount !== inputAmount) {
+      setFinalAmount(inputAmount);
     }
   };
 
@@ -218,7 +214,7 @@ export default function Plan() {
             min={0}
             max={20000}
             value={inputAmount}
-            setValue={setInputAmount}
+            setValue={(value) => setInputAmount(parseInt(value))}
           />
         </div>
         <div className={styles.buttons}>
@@ -226,9 +222,7 @@ export default function Plan() {
             size="small"
             color="primary"
             disabled={isApplyDisabled}
-            onClick={() => {
-              updateFinalValues(inputProduct, inputAmount);
-            }}
+            onClick={updateFinalValues}
           >
             Apply
           </Button>
@@ -263,13 +257,11 @@ export default function Plan() {
         </ul>
         <ul>
           <div className={styles.title}>Common product amounts:</div>
-          {Object.entries(allProducts).map(([item, amount], index) => {
-            return (
-              <li key={`${item}${index}`}>
-                {item}: {roundTo4DP(amount)}/min
-              </li>
-            );
-          })}
+          {Object.entries(allProducts).map(([item, amount], index) => (
+            <li key={`${item}${index}`}>
+              {item}: {roundTo4DP(amount)}/min
+            </li>
+          ))}
         </ul>
       </aside>
     </main>
