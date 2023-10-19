@@ -19,6 +19,78 @@ const ores = [
 
 const roundTo4DP = (num) => Math.round((num + Number.EPSILON) * 10000) / 10000;
 
+function LeftSidePanel({ finalProduct, finalAmount, updateFinalValues }) {
+  const [inputProduct, setInputProduct] = useState(finalProduct);
+  const [inputAmount, setInputAmount] = useState(finalAmount);
+
+  useEffect(() => {
+    finalProduct !== inputProduct && setInputProduct(finalProduct);
+    finalAmount !== inputAmount && setInputAmount(finalAmount);
+  }, [finalProduct, finalAmount]);
+
+  let isApplyDisabled = !(
+    inputProduct !== finalProduct || inputAmount !== finalAmount
+  );
+
+  return (
+    <aside className={styles.sidePanel}>
+      <Input size="large" type="text" placeholder="Plan name" />
+      <div>
+        <label>Description</label>
+        <textarea rows="5" cols="27"></textarea>
+      </div>
+      <div>
+        <label>Product</label>
+        <Input
+          size="large"
+          type="text"
+          value={inputProduct}
+          setValue={setInputProduct}
+        />
+      </div>
+      <div>
+        <label>Production amount</label>
+        <Input
+          size="small"
+          type="number"
+          placeholder="0"
+          min={0}
+          max={20000}
+          value={inputAmount}
+          setValue={(value) => setInputAmount(parseInt(value))}
+        />
+      </div>
+      <div className={styles.buttons}>
+        <Button
+          size="small"
+          color="primary"
+          disabled={isApplyDisabled}
+          onClick={() => {
+            updateFinalValues(inputProduct, inputAmount);
+          }}
+        >
+          Apply
+        </Button>
+        <Button size="small" color="primary">
+          Export
+        </Button>
+        <Button size="small" color="primary">
+          Save
+        </Button>
+        <Button size="small" color="primary">
+          Favourite
+        </Button>
+        <Button size="small" color="primary">
+          Share
+        </Button>
+        <Button size="small" color="red">
+          Delete
+        </Button>
+      </div>
+    </aside>
+  );
+}
+
 function PlanSection({ plan, layer, updatePlan, path = [] }) {
   const layerColor = `layer${layer}`;
 
@@ -99,26 +171,39 @@ const findTotalAmounts = (plan) => {
   return totalAmounts;
 };
 
+function RightSidePanel({ totalOres, allProducts }) {
+  return (
+    <aside className={styles.sidePanel}>
+      <ul>
+        <div className={styles.title}>Total ore amounts:</div>
+        {Object.entries(totalOres).map(([ore, amount], index) => (
+          <li key={`${ore}${index}`}>
+            {ore}: {roundTo4DP(amount)}/min
+          </li>
+        ))}
+      </ul>
+      <ul>
+        <div className={styles.title}>Common product amounts:</div>
+        {Object.entries(allProducts).map(([item, amount], index) => (
+          <li key={`${item}${index}`}>
+            {item}: {roundTo4DP(amount)}/min
+          </li>
+        ))}
+      </ul>
+    </aside>
+  );
+}
+
 export default function Plan() {
   const [plan, setPlan] = useState();
   const [finalProduct, setFinalProduct] = useState("");
   const [finalAmount, setFinalAmount] = useState(0);
   const [totalOres, setTotalOres] = useState({});
   const [allProducts, setAllProducts] = useState({});
-  const [inputProduct, setInputProduct] = useState("");
-  const [inputAmount, setInputAmount] = useState(0);
-
-  let isApplyDisabled = !(
-    inputProduct !== finalProduct || inputAmount !== finalAmount
-  );
 
   useEffect(() => {
-    const item = "Crystal Oscillator";
-    const amount = 100;
-    setFinalProduct(item);
-    setInputProduct(item);
-    setFinalAmount(amount);
-    setInputAmount(amount);
+    setFinalProduct("Crystal Oscillator");
+    setFinalAmount(100);
   }, []);
 
   useEffect(() => {
@@ -180,90 +265,25 @@ export default function Plan() {
     }
   };
 
-  const updateFinalValues = () => {
-    if (plan.item !== inputProduct) {
-      setFinalProduct(inputProduct);
-    } else if (plan.amount !== inputAmount) {
-      setFinalAmount(inputAmount);
+  const updateFinalValues = (product, amount) => {
+    if (plan.item !== product) {
+      setFinalProduct(product);
+    } else if (plan.amount !== amount) {
+      setFinalAmount(amount);
     }
   };
 
   return (
     <main className={styles.plan}>
-      <aside className={styles.sidePanel}>
-        <Input size="large" type="text" placeholder="Plan name" />
-        <div>
-          <label>Description</label>
-          <textarea rows="5" cols="27"></textarea>
-        </div>
-        <div>
-          <label>Product</label>
-          <Input
-            size="large"
-            type="text"
-            value={inputProduct}
-            setValue={setInputProduct}
-          />
-        </div>
-        <div>
-          <label>Production amount</label>
-          <Input
-            size="small"
-            type="number"
-            placeholder="0"
-            min={0}
-            max={20000}
-            value={inputAmount}
-            setValue={(value) => setInputAmount(parseInt(value))}
-          />
-        </div>
-        <div className={styles.buttons}>
-          <Button
-            size="small"
-            color="primary"
-            disabled={isApplyDisabled}
-            onClick={updateFinalValues}
-          >
-            Apply
-          </Button>
-          <Button size="small" color="primary">
-            Export
-          </Button>
-          <Button size="small" color="primary">
-            Save
-          </Button>
-          <Button size="small" color="primary">
-            Favourite
-          </Button>
-          <Button size="small" color="primary">
-            Share
-          </Button>
-          <Button size="small" color="red">
-            Delete
-          </Button>
-        </div>
-      </aside>
+      <LeftSidePanel
+        finalProduct={finalProduct}
+        finalAmount={finalAmount}
+        updateFinalValues={updateFinalValues}
+      />
       <div className={styles.planView}>
         {plan && <PlanSection plan={plan} layer={1} updatePlan={updatePlan} />}
       </div>
-      <aside className={styles.sidePanel}>
-        <ul>
-          <div className={styles.title}>Total ore amounts:</div>
-          {Object.entries(totalOres).map(([ore, amount], index) => (
-            <li key={`${ore}${index}`}>
-              {ore}: {roundTo4DP(amount)}/min
-            </li>
-          ))}
-        </ul>
-        <ul>
-          <div className={styles.title}>Common product amounts:</div>
-          {Object.entries(allProducts).map(([item, amount], index) => (
-            <li key={`${item}${index}`}>
-              {item}: {roundTo4DP(amount)}/min
-            </li>
-          ))}
-        </ul>
-      </aside>
+      <RightSidePanel totalOres={totalOres} allProducts={allProducts} />
     </main>
   );
 }
