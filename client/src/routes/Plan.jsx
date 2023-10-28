@@ -189,9 +189,6 @@ const RightSidePanel = memo(function RightSidePanel({ plan }) {
   const [allProducts, setAllProducts] = useState({});
 
   useEffect(() => {
-    if (!plan) {
-      return;
-    }
     const totalAmounts = findTotalAmounts(plan);
 
     const preTotalOres = {};
@@ -286,7 +283,7 @@ export default function Plan() {
       <div className={styles.planView}>
         {plan && <PlanSection plan={plan} layer={1} updatePlan={updatePlan} />}
       </div>
-      <RightSidePanel plan={plan} />
+      {plan && <RightSidePanel plan={plan} />}
     </main>
   );
 }
