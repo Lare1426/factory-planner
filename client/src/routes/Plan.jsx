@@ -175,10 +175,31 @@ const findTotalAmounts = (plan) => {
   return totalAmounts;
 };
 
-const RightSidePanel = memo(function RightSidePanel({
-  totalOres,
-  allProducts,
-}) {
+const RightSidePanel = memo(function RightSidePanel({ plan }) {
+  const [totalOres, setTotalOres] = useState({});
+  const [allProducts, setAllProducts] = useState({});
+
+  useEffect(() => {
+    if (!plan) {
+      return;
+    }
+    const totalAmounts = findTotalAmounts(plan);
+
+    const preTotalOres = {};
+    const preAllProducts = {};
+
+    for (const [item, { amount, count }] of Object.entries(totalAmounts)) {
+      if (ores.includes(item)) {
+        preTotalOres[item] = amount;
+      } else if (count > 1) {
+        preAllProducts[item] = amount;
+      }
+    }
+
+    setTotalOres(preTotalOres);
+    setAllProducts(preAllProducts);
+  }, [plan]);
+
   return (
     <aside className={styles.sidePanel}>
       <ul>
@@ -205,8 +226,6 @@ export default function Plan() {
   const [plan, setPlan] = useState();
   const [finalProduct, setFinalProduct] = useState("");
   const [finalAmount, setFinalAmount] = useState(0);
-  const [totalOres, setTotalOres] = useState({});
-  const [allProducts, setAllProducts] = useState({});
 
   useEffect(() => {
     setFinalProduct("Crystal Oscillator");
@@ -224,27 +243,6 @@ export default function Plan() {
       })();
     }
   }, [finalProduct, finalAmount]);
-
-  useEffect(() => {
-    if (!plan) {
-      return;
-    }
-    const totalAmounts = findTotalAmounts(plan);
-
-    const preTotalOres = {};
-    const preAllProducts = {};
-
-    for (const [item, { amount, count }] of Object.entries(totalAmounts)) {
-      if (ores.includes(item)) {
-        preTotalOres[item] = amount;
-      } else if (count > 1) {
-        preAllProducts[item] = amount;
-      }
-    }
-
-    setTotalOres(preTotalOres);
-    setAllProducts(preAllProducts);
-  }, [plan]);
 
   const updateFinalValues = useCallback(
     (product, amount) => {
@@ -293,7 +291,7 @@ export default function Plan() {
       <div className={styles.planView}>
         {plan && <PlanSection plan={plan} layer={1} updatePlan={updatePlan} />}
       </div>
-      <RightSidePanel totalOres={totalOres} allProducts={allProducts} />
+      <RightSidePanel plan={plan} />
     </main>
   );
 }
