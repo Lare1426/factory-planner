@@ -19,30 +19,16 @@ const ores = [
 
 const roundTo4DP = (num) => Math.round((num + Number.EPSILON) * 10000) / 10000;
 
-const LeftSidePanel = memo(function LeftSidePanel({
-  finalProduct,
-  finalAmount,
-  updateFinalValues,
-}) {
+function InputsAndButtons({ fetchPlan, finalProduct, finalAmount }) {
   const [inputProduct, setInputProduct] = useState(finalProduct);
   const [inputAmount, setInputAmount] = useState(finalAmount);
 
-  useEffect(() => {
-    finalProduct !== inputProduct && setInputProduct(finalProduct);
-    finalAmount !== inputAmount && setInputAmount(finalAmount);
-  }, [finalProduct, finalAmount]);
-
-  let isApplyDisabled = !(
+  const isApplyDisabled = !(
     inputProduct !== finalProduct || inputAmount !== finalAmount
   );
 
   return (
-    <aside className={styles.sidePanel}>
-      <Input size="large" type="text" placeholder="Plan name" />
-      <div>
-        <label>Description</label>
-        <textarea rows="5" cols="27"></textarea>
-      </div>
+    <>
       <div>
         <label>Product</label>
         <Input
@@ -70,7 +56,7 @@ const LeftSidePanel = memo(function LeftSidePanel({
           color="primary"
           disabled={isApplyDisabled}
           onClick={() => {
-            updateFinalValues(inputProduct, inputAmount);
+            fetchPlan(inputProduct, inputAmount);
           }}
         >
           Apply
@@ -91,6 +77,29 @@ const LeftSidePanel = memo(function LeftSidePanel({
           Delete
         </Button>
       </div>
+    </>
+  );
+}
+
+const LeftSidePanel = memo(function LeftSidePanel({
+  finalProduct,
+  finalAmount,
+  fetchPlan,
+}) {
+  return (
+    <aside className={styles.sidePanel}>
+      <Input size="large" type="text" placeholder="Plan name" />
+      <div>
+        <label>Description</label>
+        <textarea rows="5" cols="27"></textarea>
+      </div>
+      {finalProduct && finalAmount && (
+        <InputsAndButtons
+          fetchPlan={fetchPlan}
+          finalProduct={finalProduct}
+          finalAmount={finalAmount}
+        />
+      )}
     </aside>
   );
 });
@@ -227,33 +236,19 @@ export default function Plan() {
   const [finalProduct, setFinalProduct] = useState("");
   const [finalAmount, setFinalAmount] = useState(0);
 
-  useEffect(() => {
-    setFinalProduct("Crystal Oscillator");
-    setFinalAmount(100);
+  const fetchPlan = useCallback((product, amount) => {
+    (async () => {
+      const response = await fetch(`/api/plan/new/${product}?amount=${amount}`);
+      const newPlan = await response.json();
+      setPlan(newPlan);
+      setFinalProduct(product);
+      setFinalAmount(amount);
+    })();
   }, []);
 
   useEffect(() => {
-    if (finalProduct && finalAmount) {
-      (async () => {
-        const response = await fetch(
-          `/api/plan/new/${finalProduct}?amount=${finalAmount}`
-        );
-        const plan = await response.json();
-        setPlan(plan);
-      })();
-    }
-  }, [finalProduct, finalAmount]);
-
-  const updateFinalValues = useCallback(
-    (product, amount) => {
-      if (plan.item !== product) {
-        setFinalProduct(product);
-      } else if (plan.amount !== amount) {
-        setFinalAmount(amount);
-      }
-    },
-    [plan]
-  );
+    fetchPlan("Crystal Oscillator", 100);
+  }, []);
 
   const updatePlan = (path, newNode, parent = null) => {
     const node = parent ?? { ...plan };
@@ -286,7 +281,7 @@ export default function Plan() {
       <LeftSidePanel
         finalProduct={finalProduct}
         finalAmount={finalAmount}
-        updateFinalValues={updateFinalValues}
+        fetchPlan={fetchPlan}
       />
       <div className={styles.planView}>
         {plan && <PlanSection plan={plan} layer={1} updatePlan={updatePlan} />}
