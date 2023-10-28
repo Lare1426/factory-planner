@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, memo } from "react";
 import styles from "./Plan.module.scss";
 import { Button, Input } from "@/components";
 
@@ -19,7 +19,11 @@ const ores = [
 
 const roundTo4DP = (num) => Math.round((num + Number.EPSILON) * 10000) / 10000;
 
-function LeftSidePanel({ finalProduct, finalAmount, updateFinalValues }) {
+const LeftSidePanel = memo(function LeftSidePanel({
+  finalProduct,
+  finalAmount,
+  updateFinalValues,
+}) {
   const [inputProduct, setInputProduct] = useState(finalProduct);
   const [inputAmount, setInputAmount] = useState(finalAmount);
 
@@ -89,7 +93,7 @@ function LeftSidePanel({ finalProduct, finalAmount, updateFinalValues }) {
       </div>
     </aside>
   );
-}
+});
 
 function PlanSection({ plan, layer, updatePlan, path = [] }) {
   const layerColor = `layer${layer}`;
@@ -171,7 +175,10 @@ const findTotalAmounts = (plan) => {
   return totalAmounts;
 };
 
-function RightSidePanel({ totalOres, allProducts }) {
+const RightSidePanel = memo(function RightSidePanel({
+  totalOres,
+  allProducts,
+}) {
   return (
     <aside className={styles.sidePanel}>
       <ul>
@@ -192,7 +199,7 @@ function RightSidePanel({ totalOres, allProducts }) {
       </ul>
     </aside>
   );
-}
+});
 
 export default function Plan() {
   const [plan, setPlan] = useState();
@@ -239,6 +246,17 @@ export default function Plan() {
     setAllProducts(preAllProducts);
   }, [plan]);
 
+  const updateFinalValues = useCallback(
+    (product, amount) => {
+      if (plan.item !== product) {
+        setFinalProduct(product);
+      } else if (plan.amount !== amount) {
+        setFinalAmount(amount);
+      }
+    },
+    [plan]
+  );
+
   const updatePlan = (path, newNode, parent = null) => {
     const node = parent ?? { ...plan };
 
@@ -262,14 +280,6 @@ export default function Plan() {
       }
     } else {
       setPlan(newNode);
-    }
-  };
-
-  const updateFinalValues = (product, amount) => {
-    if (plan.item !== product) {
-      setFinalProduct(product);
-    } else if (plan.amount !== amount) {
-      setFinalAmount(amount);
     }
   };
 
