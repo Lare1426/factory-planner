@@ -29,6 +29,11 @@ function InputsAndButtons({ fetchPlan, finalProduct, finalAmount }) {
 
   return (
     <>
+      <Input size="large" type="text" placeholder="Plan name" />
+      <div>
+        <label>Description</label>
+        <textarea rows="5" cols="27"></textarea>
+      </div>
       <div>
         <label>Product</label>
         <Input
@@ -88,11 +93,6 @@ const LeftSidePanel = memo(function LeftSidePanel({
 }) {
   return (
     <aside className={styles.sidePanel}>
-      <Input size="large" type="text" placeholder="Plan name" />
-      <div>
-        <label>Description</label>
-        <textarea rows="5" cols="27"></textarea>
-      </div>
       {finalProduct && finalAmount && (
         <InputsAndButtons
           fetchPlan={fetchPlan}
