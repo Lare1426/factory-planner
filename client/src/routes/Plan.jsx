@@ -184,6 +184,15 @@ const findTotalAmounts = (plan) => {
   return totalAmounts;
 };
 
+const updatePlanAmounts = async (plan, amount) => {
+  if (plan.ingredients) {
+    for (const ingredient of plan.ingredients) {
+      updatePlanAmounts(ingredient, ingredient.amount / plan.amount * amount);
+    }
+  } 
+  plan.amount = amount;
+}
+
 const RightSidePanel = memo(function RightSidePanel({ plan }) {
   const [totalOres, setTotalOres] = useState({});
   const [allProducts, setAllProducts] = useState({});
@@ -235,11 +244,17 @@ export default function Plan() {
 
   const fetchPlan = useCallback((product, amount) => {
     (async () => {
-      const response = await fetch(`/api/plan/new/${product}?amount=${amount}`);
-      const newPlan = await response.json();
-      setPlan(newPlan);
-      setFinalProduct(product);
-      setFinalAmount(amount);
+      if (product !== finalProduct) {
+        const response = await fetch(`/api/plan/new/${product}?amount=${amount}`);
+        const newPlan = await response.json();
+        setPlan(newPlan);
+        setFinalProduct(product);
+        setFinalAmount(amount);
+      } else {
+        const newPlan = { ...plan };
+        updatePlanAmounts(newPlan, amount);
+        setPlan(newPlan);
+      }
     })();
   }, []);
 
