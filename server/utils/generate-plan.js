@@ -1,4 +1,5 @@
-import recipesDB from "./recipes-db.js";
+import * as recipesDB from "./recipes-db.js";
+import { round } from "../../shared/round.js";
 
 const ores = [
   "Bauxite",
@@ -15,7 +16,7 @@ const ores = [
   "Crude Oil",
 ];
 
-const getProducts = async () => {
+export const getProducts = async () => {
   const recipesMap = await recipesDB.map();
 
   const products = recipesMap.rows.reduce((acc, partialProduct) => {
@@ -45,17 +46,15 @@ const getProducts = async () => {
 
 const productsWithRecipes = await getProducts();
 
-const roundTo4DP = (num) => Math.round((num + Number.EPSILON) * 10000) / 10000;
-
-const findDesiredProduct = (products, desiredProduct) => {
+const findDesiredProduct = (products, desiredProductName) => {
   for (const product of products) {
-    if (product.item === desiredProduct) {
+    if (product.item === desiredProductName) {
       return product;
     }
   }
 };
 
-const generate = async (item, amount, recipeToUse = null) => {
+export const generate = async (item, amount, recipeToUse = null) => {
   let recipe;
   let alternateRecipes;
 
@@ -69,6 +68,10 @@ const generate = async (item, amount, recipeToUse = null) => {
         amount,
         recipe,
         alternateRecipes,
+        totalOreCount: {
+          [item]: amount,
+        },
+        allProducts: {},
       };
     }
   } else {
@@ -76,6 +79,10 @@ const generate = async (item, amount, recipeToUse = null) => {
     return {
       item,
       amount,
+      totalOreCount: {
+        [item]: amount,
+      },
+      allProducts: {},
     };
   }
 
@@ -95,25 +102,48 @@ const generate = async (item, amount, recipeToUse = null) => {
 
   const recipeProductsPerMinute =
     (60 / recipeData.time) * recipeProductionAmount;
-  const buildings = roundTo4DP(amount / recipeProductsPerMinute);
+  const buildingCount = round(amount / recipeProductsPerMinute, 4);
+
+  const totalOreCount = {};
+  const allProducts = { [item]: { amount, count: 1 } };
 
   const ingredients = await Promise.all(
-    recipeData.ingredients.map((ingredient) => {
+    recipeData.ingredients.map(async (ingredient) => {
       const recipeAmount = ingredient.amount / recipeProductionAmount;
-      const ingredientAmount = roundTo4DP(amount * recipeAmount);
-      return generate(ingredient.item, ingredientAmount);
+      const ingredientAmount = round(amount * recipeAmount, 5);
+      const plan = await generate(ingredient.item, ingredientAmount);
+
+      for (const [ore, amount] of Object.entries(plan.totalOreCount)) {
+        if (ore in totalOreCount) {
+          totalOreCount[ore] += amount;
+        } else {
+          totalOreCount[ore] = amount;
+        }
+      }
+
+      for (const [item, { amount, count }] of Object.entries(
+        plan.allProducts
+      )) {
+        if (item in allProducts) {
+          allProducts[item].amount += amount;
+          allProducts[item].count += count;
+        } else {
+          allProducts[item] = { amount, count };
+        }
+      }
+      return plan;
     })
   );
 
   return {
     item,
     amount,
-    buildings,
+    buildingCount,
     producedIn,
     recipe,
     alternateRecipes,
+    totalOreCount,
+    allProducts,
     ingredients,
   };
 };
-
-export default { generate, getProducts };

@@ -1,6 +1,6 @@
 import styles from "./Input.module.scss";
 
-export default function Input({
+export const Input = ({
   size,
   type,
   placeholder,
@@ -8,7 +8,7 @@ export default function Input({
   max,
   setValue,
   value,
-}) {
+}) => {
   const onInputChange = (event) => {
     setValue(event.target.value);
   };
@@ -35,4 +35,4 @@ export default function Input({
       onChange={onInputChange}
     />
   );
-}
+};

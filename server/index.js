@@ -2,7 +2,7 @@ import "dotenv/config";
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
-import generatePlan from "./utils/generate-plan.js";
+import * as generatePlan from "./utils/generate-plan.js";
 
 const PORT = process.env.PORT ?? 3000;
 const IP = process.env.IP;

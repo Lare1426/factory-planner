@@ -4,7 +4,7 @@ import { logoPng } from "@/assets";
 import styles from "./Header.module.scss";
 import { Button, Input } from "@/components";
 
-export default function Header() {
+export const Header = () => {
   const [searchValue, setSearchValue] = useState("");
 
   return (
@@ -32,4 +32,4 @@ export default function Header() {
       <Outlet />
     </>
   );
-}
+};

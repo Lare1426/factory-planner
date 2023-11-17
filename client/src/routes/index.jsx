@@ -1,4 +1,3 @@
-import Home from "./Home";
-import Create from "./Create";
-
-export { Home, Create };
+export { Home } from "./Home";
+export { Create } from "./Create";
+export { Plan } from "./Plan";
