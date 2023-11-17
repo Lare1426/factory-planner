@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, memo } from "react";
+import { useEffect, useState } from "react";
 import styles from "./Plan.module.scss";
 import { Button, Input } from "@/components";
 
@@ -19,7 +19,7 @@ const ores = [
 
 const roundTo4DP = (num) => Math.round((num + Number.EPSILON) * 10000) / 10000;
 
-function InputsAndButtons({ fetchPlan, finalProduct, finalAmount }) {
+const InputsAndButtons = ({ fetchPlan, finalProduct, finalAmount }) => {
   const [inputProduct, setInputProduct] = useState(finalProduct);
   const [inputAmount, setInputAmount] = useState(finalAmount);
 
@@ -84,13 +84,9 @@ function InputsAndButtons({ fetchPlan, finalProduct, finalAmount }) {
       </div>
     </>
   );
-}
+};
 
-const LeftSidePanel = memo(function LeftSidePanel({
-  finalProduct,
-  finalAmount,
-  fetchPlan,
-}) {
+const LeftSidePanel = ({ finalProduct, finalAmount, fetchPlan }) => {
   return (
     <aside className={styles.sidePanel}>
       {finalProduct && finalAmount && (
@@ -102,9 +98,9 @@ const LeftSidePanel = memo(function LeftSidePanel({
       )}
     </aside>
   );
-});
+};
 
-function PlanSection({ plan, layer, updatePlan, path = [] }) {
+const PlanSection = ({ plan, layer, updatePlan, path = [] }) => {
   const layerColor = `layer${layer}`;
 
   const onChange = async (e) => {
@@ -151,7 +147,7 @@ function PlanSection({ plan, layer, updatePlan, path = [] }) {
       ))}
     </section>
   );
-}
+};
 
 const findTotalAmounts = (plan) => {
   const totalAmounts = {
@@ -187,13 +183,13 @@ const findTotalAmounts = (plan) => {
 const updatePlanAmounts = async (plan, amount) => {
   if (plan.ingredients) {
     for (const ingredient of plan.ingredients) {
-      updatePlanAmounts(ingredient, ingredient.amount / plan.amount * amount);
+      updatePlanAmounts(ingredient, (ingredient.amount / plan.amount) * amount);
     }
-  } 
+  }
   plan.amount = amount;
-}
+};
 
-const RightSidePanel = memo(function RightSidePanel({ plan }) {
+const RightSidePanel = ({ plan }) => {
   const [totalOres, setTotalOres] = useState({});
   const [allProducts, setAllProducts] = useState({});
 
@@ -235,28 +231,31 @@ const RightSidePanel = memo(function RightSidePanel({ plan }) {
       </ul>
     </aside>
   );
-});
+};
 
-export default function Plan() {
+export const Plan = () => {
   const [plan, setPlan] = useState();
   const [finalProduct, setFinalProduct] = useState("");
   const [finalAmount, setFinalAmount] = useState(0);
 
-  const fetchPlan = useCallback((product, amount) => {
+  const fetchPlan = (product, amount) => {
     (async () => {
       if (product !== finalProduct) {
-        const response = await fetch(`/api/plan/new/${product}?amount=${amount}`);
+        const response = await fetch(
+          `/api/plan/new/${product}?amount=${amount}`
+        );
         const newPlan = await response.json();
         setPlan(newPlan);
         setFinalProduct(product);
-        setFinalAmount(amount);
+        amount !== finalAmount && setFinalAmount(amount);
       } else {
         const newPlan = { ...plan };
         updatePlanAmounts(newPlan, amount);
+        setFinalAmount(amount);
         setPlan(newPlan);
       }
     })();
-  }, []);
+  };
 
   useEffect(() => {
     fetchPlan("Crystal Oscillator", 100);
@@ -301,4 +300,4 @@ export default function Plan() {
       {plan && <RightSidePanel plan={plan} />}
     </main>
   );
-}
+};

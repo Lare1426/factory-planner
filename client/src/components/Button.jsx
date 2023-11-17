@@ -1,13 +1,13 @@
 import styles from "./Button.module.scss";
 
-export default function Button({
+export const Button = ({
   children,
   size,
   color,
   shadow,
   onClick,
   disabled = false,
-}) {
+}) => {
   let classNames = styles.customButton;
 
   if (["small", "large"].includes(size)) {
@@ -27,4 +27,4 @@ export default function Button({
       {children}
     </button>
   );
-}
+};

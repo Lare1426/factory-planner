@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import styles from "./Home.module.scss";
 import { Button, Input } from "@/components";
 
-export default function Home() {
+export const Home = () => {
   const [product, setProduct] = useState("");
   const [amount, setAmount] = useState("");
   let isGeneratePlanDisabled = !(product && amount);
@@ -55,4 +55,4 @@ export default function Home() {
       </div>
     </main>
   );
-}
+};

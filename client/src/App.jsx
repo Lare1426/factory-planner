@@ -2,7 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import { Header } from "@/components";
 import { Home, Create, Plan } from "@/routes";
 
-export default function App() {
+export const App = () => {
   return (
     <>
       <Routes>
@@ -14,4 +14,4 @@ export default function App() {
       </Routes>
     </>
   );
-}
+};

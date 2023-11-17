@@ -1,5 +1,3 @@
-import Header from "./Header";
-import Button from "./Button";
-import Input from "./Input";
-
-export { Header, Button, Input };
+export { Header } from "./Header";
+export { Button } from "./Button";
+export { Input } from "./Input";

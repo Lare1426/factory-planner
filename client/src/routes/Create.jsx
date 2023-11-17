@@ -4,7 +4,7 @@ import { Input, Button } from "@/components";
 
 const products = Array(19).fill("Electromagnetic control rod");
 
-export default function Create() {
+export const Create = () => {
   const [finalProduct, setFinalProduct] = useState("");
   const [amount, setAmount] = useState("");
   let isGeneratePlanDisabled = !(finalProduct && amount);
@@ -57,4 +57,4 @@ export default function Create() {
       </div>
     </main>
   );
-}
+};
