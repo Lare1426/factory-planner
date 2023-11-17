@@ -1,4 +1,5 @@
-import recipesDB from "./recipes-db.js";
+import * as recipesDB from "./recipes-db.js";
+import { round } from "../../shared/round.js";
 
 const ores = [
   "Bauxite",
@@ -15,7 +16,7 @@ const ores = [
   "Crude Oil",
 ];
 
-const getProducts = async () => {
+export const getProducts = async () => {
   const recipesMap = await recipesDB.map();
 
   const products = recipesMap.rows.reduce((acc, partialProduct) => {
@@ -45,8 +46,6 @@ const getProducts = async () => {
 
 const productsWithRecipes = await getProducts();
 
-const roundTo4DP = (num) => Math.round((num + Number.EPSILON) * 10000) / 10000;
-
 const findDesiredProduct = (products, desiredProductName) => {
   for (const product of products) {
     if (product.item === desiredProductName) {
@@ -55,7 +54,7 @@ const findDesiredProduct = (products, desiredProductName) => {
   }
 };
 
-const generate = async (item, amount, recipeToUse = null) => {
+export const generate = async (item, amount, recipeToUse = null) => {
   let recipe;
   let alternateRecipes;
 
@@ -103,7 +102,7 @@ const generate = async (item, amount, recipeToUse = null) => {
 
   const recipeProductsPerMinute =
     (60 / recipeData.time) * recipeProductionAmount;
-  const buildings = roundTo4DP(amount / recipeProductsPerMinute);
+  const buildingCount = round(amount / recipeProductsPerMinute, 4);
 
   const totalOreCount = {};
   const allProducts = { [item]: { amount, count: 1 } };
@@ -111,7 +110,7 @@ const generate = async (item, amount, recipeToUse = null) => {
   const ingredients = await Promise.all(
     recipeData.ingredients.map(async (ingredient) => {
       const recipeAmount = ingredient.amount / recipeProductionAmount;
-      const ingredientAmount = roundTo4DP(amount * recipeAmount);
+      const ingredientAmount = round(amount * recipeAmount, 5);
       const plan = await generate(ingredient.item, ingredientAmount);
 
       for (const [ore, amount] of Object.entries(plan.totalOreCount)) {
@@ -139,7 +138,7 @@ const generate = async (item, amount, recipeToUse = null) => {
   return {
     item,
     amount,
-    buildings,
+    buildingCount,
     producedIn,
     recipe,
     alternateRecipes,
@@ -148,5 +147,3 @@ const generate = async (item, amount, recipeToUse = null) => {
     ingredients,
   };
 };
-
-export default { generate, getProducts };

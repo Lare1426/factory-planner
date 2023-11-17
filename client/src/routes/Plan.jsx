@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import styles from "./Plan.module.scss";
 import { Button, Input } from "@/components";
+import { round } from "../../../shared/round";
 
 const ores = [
   "Bauxite",
@@ -16,8 +17,6 @@ const ores = [
   "Nitrogen Gas",
   "Crude Oil",
 ];
-
-const roundTo4DP = (num) => Math.round((num + Number.EPSILON) * 10000) / 10000;
 
 const InputsAndButtons = ({ fetchPlan, finalProduct, finalAmount }) => {
   const [inputProduct, setInputProduct] = useState(finalProduct);
@@ -130,12 +129,12 @@ const PlanSection = ({ plan, layer, updatePlan, path = [] }) => {
           </select>
         </div>
       )}
-      {plan.buildings && (
+      {plan.buildingCount && (
         <div>
-          Buildings: {plan.buildings} {plan.producedIn}
+          Buildings: {round(plan.buildingCount, 4)} {plan.producedIn}
         </div>
       )}
-      <div>Amount: {plan.amount}/min</div>
+      <div>Amount: {round(plan.amount, 4)}/min</div>
       {plan.ingredients?.map((ingredient, index) => (
         <PlanSection
           plan={ingredient}
@@ -186,7 +185,10 @@ const updatePlanAmounts = async (plan, amount) => {
       updatePlanAmounts(ingredient, (ingredient.amount / plan.amount) * amount);
     }
   }
-  plan.amount = amount;
+  if (plan.buildingCount) {
+    plan.buildingCount = round((plan.buildingCount / plan.amount) * amount, 5);
+  }
+  plan.amount = round(amount, 5);
 };
 
 const RightSidePanel = ({ plan }) => {
@@ -217,7 +219,7 @@ const RightSidePanel = ({ plan }) => {
         <div className={styles.title}>Total ore amounts:</div>
         {Object.entries(totalOres).map(([ore, amount], index) => (
           <li key={`${ore}${index}`}>
-            {ore}: {roundTo4DP(amount)}/min
+            {ore}: {round(amount, 4)}/min
           </li>
         ))}
       </ul>
@@ -225,7 +227,7 @@ const RightSidePanel = ({ plan }) => {
         <div className={styles.title}>Common product amounts:</div>
         {Object.entries(allProducts).map(([item, amount], index) => (
           <li key={`${item}${index}`}>
-            {item}: {roundTo4DP(amount)}/min
+            {item}: {round(amount, 4)}/min
           </li>
         ))}
       </ul>

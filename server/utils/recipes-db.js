@@ -4,7 +4,7 @@ const authHeaders = {
   Authorization: `Basic ${process.env.ENCODED_DB_CREDENTIALS}`,
 };
 
-const get = async (name) => {
+export const get = async (name) => {
   const response = await fetch(`${baseUrl}/${name}`, {
     method: "GET",
     headers: authHeaders,
@@ -12,7 +12,7 @@ const get = async (name) => {
   return response.json();
 };
 
-const put = async (id, document) => {
+export const put = async (id, document) => {
   const response = await fetch(`${baseUrl}/${id}`, {
     method: "PUT",
     headers: {
@@ -24,12 +24,10 @@ const put = async (id, document) => {
   return response.json();
 };
 
-const map = async () => {
+export const map = async () => {
   const response = await fetch(`${baseUrl}/_design/views/_view/products`, {
     method: "GET",
     headers: authHeaders,
   });
   return response.json();
 };
-
-export default { get, put, map };
