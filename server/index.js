@@ -24,8 +24,8 @@ apiRouter.get("/plan/:id", async (req, res) => {
   res.json(await generate("Crystal Oscillator", 100));
 });
 
-apiRouter.get("/getProducts", async (req, res) => {
-  res.json(await getProducts());
+apiRouter.get("/products", async (req, res) => {
+  res.json(Object.keys(await getProducts()));
 });
 
 server.use("/api", apiRouter);

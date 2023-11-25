@@ -8,6 +8,7 @@ export const Input = ({
   max,
   setValue,
   value,
+  list,
 }) => {
   const onInputChange = (event) => {
     setValue(event.target.value);
@@ -32,6 +33,7 @@ export const Input = ({
       min={min}
       max={max}
       value={value}
+      list={list}
       onChange={onInputChange}
     />
   );

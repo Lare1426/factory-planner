@@ -1,12 +1,25 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import styles from "./Home.module.scss";
 import { Button, Input } from "@/components";
 
 export const Home = () => {
-  const [product, setProduct] = useState("");
-  const [amount, setAmount] = useState("");
-  let isGeneratePlanDisabled = !(product && amount);
+  const [inputProduct, setInputProduct] = useState("");
+  const [inputAmount, setInputAmount] = useState();
+  const [products, setProducts] = useState([]);
+
+  let isGeneratePlanDisabled = !(
+    products.includes(inputProduct) && inputAmount > 0
+  );
+
+  useEffect(() => {
+    (async () => {
+      const response = await fetch("/api/products");
+      setProducts(await response.json());
+    })();
+  }, []);
+
+  console.log(products);
 
   return (
     <main className={styles.home}>
@@ -31,9 +44,15 @@ export const Home = () => {
             type="text"
             placeholder="Select product"
             size="large"
-            setValue={setProduct}
-            value={product}
+            setValue={setInputProduct}
+            value={inputProduct}
+            list={"products"}
           />
+          <datalist id="products">
+            {products.map((product) => {
+              return <option value={product}></option>;
+            })}
+          </datalist>
           <label>Total amount per minute</label>
           <Input
             type="number"
@@ -41,10 +60,10 @@ export const Home = () => {
             size="small"
             min={0}
             max={20000}
-            setValue={setAmount}
-            value={amount}
+            setValue={setInputAmount}
+            value={inputAmount}
           />
-          <Link to="/plan/new" state={{ product, amount }}>
+          <Link to="/plan/new" state={{ inputProduct, inputAmount }}>
             <Button
               size="small"
               color="primary"
