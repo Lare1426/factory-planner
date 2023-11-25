@@ -44,7 +44,7 @@ export const Home = () => {
             setValue={setAmount}
             value={amount}
           />
-          <Link to="/plan" state={{ product, amount }}>
+          <Link to="/plan/new" state={{ product, amount }}>
             <Button
               size="small"
               color="primary"

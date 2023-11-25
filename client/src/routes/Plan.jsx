@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { Navigate, useLocation, useParams } from "react-router-dom";
 import styles from "./Plan.module.scss";
 import { Button, Input } from "@/components";
 import { round } from "../../../shared/round";
@@ -264,11 +264,23 @@ export const Plan = () => {
   const { state } = useLocation();
   const { id } = useParams();
 
-  console.log(id);
-
   useEffect(() => {
-    fetchPlan(state?.product ?? "Crystal Oscillator", state?.amount ?? 100);
+    if (id) {
+      (async () => {
+        const response = await fetch(`/api/plan/${id}`);
+        const plan = await response.json();
+        setPlan(plan);
+        setFinalProduct(plan.item);
+        setFinalAmount(plan.amount);
+      })();
+    } else if (state) {
+      fetchPlan(state.product, state.amount);
+    }
   }, []);
+
+  if (!state && !id) {
+    return <Navigate to="/" replace />;
+  }
 
   const updatePlan = (path, newNode, parent = null) => {
     const node = parent ?? { ...plan };

@@ -19,6 +19,10 @@ const router = createBrowserRouter([
         element: <Create />,
       },
       {
+        path: "/plan/new",
+        element: <Plan />,
+      },
+      {
         path: "/plan/:id",
         element: <Plan />,
       },
