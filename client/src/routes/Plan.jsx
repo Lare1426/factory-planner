@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useLocation, useParams } from "react-router-dom";
 import styles from "./Plan.module.scss";
 import { Button, Input } from "@/components";
 import { round } from "../../../shared/round";
@@ -23,7 +24,8 @@ const InputsAndButtons = ({ fetchPlan, finalProduct, finalAmount }) => {
   const [inputAmount, setInputAmount] = useState(finalAmount);
 
   const isApplyDisabled = !(
-    inputProduct !== finalProduct || inputAmount !== finalAmount
+    inputProduct !== finalProduct ||
+    (inputAmount !== finalAmount && inputAmount > 0)
   );
 
   return (
@@ -48,7 +50,7 @@ const InputsAndButtons = ({ fetchPlan, finalProduct, finalAmount }) => {
           size="small"
           type="number"
           placeholder="0"
-          min={0}
+          min={1}
           max={20000}
           value={inputAmount}
           setValue={(value) => setInputAmount(parseInt(value))}
@@ -259,8 +261,13 @@ export const Plan = () => {
     })();
   };
 
+  const { state } = useLocation();
+  const { id } = useParams();
+
+  console.log(id);
+
   useEffect(() => {
-    fetchPlan("Crystal Oscillator", 100);
+    fetchPlan(state?.product ?? "Crystal Oscillator", state?.amount ?? 100);
   }, []);
 
   const updatePlan = (path, newNode, parent = null) => {

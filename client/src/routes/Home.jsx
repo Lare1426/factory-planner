@@ -44,13 +44,15 @@ export const Home = () => {
             setValue={setAmount}
             value={amount}
           />
-          <Button
-            size="small"
-            color="primary"
-            disabled={isGeneratePlanDisabled}
-          >
-            Generate plan
-          </Button>
+          <Link to="/plan" state={{ product, amount }}>
+            <Button
+              size="small"
+              color="primary"
+              disabled={isGeneratePlanDisabled}
+            >
+              Generate plan
+            </Button>
+          </Link>
         </div>
       </div>
     </main>
