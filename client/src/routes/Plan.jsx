@@ -25,7 +25,7 @@ const InputsAndButtons = ({ fetchPlan, finalProduct, finalAmount }) => {
 
   const isApplyDisabled = !(
     inputProduct !== finalProduct ||
-    (inputAmount !== finalAmount && inputAmount > 0)
+    (inputAmount !== finalAmount && inputAmount > 0 && inputAmount < 50001)
   );
 
   return (
@@ -51,7 +51,7 @@ const InputsAndButtons = ({ fetchPlan, finalProduct, finalAmount }) => {
           type="number"
           placeholder="0"
           min={1}
-          max={20000}
+          max={50000}
           value={inputAmount}
           setValue={(value) => setInputAmount(parseInt(value))}
         />
@@ -274,7 +274,7 @@ export const Plan = () => {
         setFinalAmount(plan.amount);
       })();
     } else if (state) {
-      fetchPlan(state.product, state.amount);
+      fetchPlan(state.inputProduct, state.inputAmount);
     }
   }, []);
 

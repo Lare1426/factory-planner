@@ -1,13 +1,25 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import styles from "./Create.module.scss";
 import { Input, Button } from "@/components";
 
-const products = Array(19).fill("Electromagnetic control rod");
-
 export const Create = () => {
-  const [finalProduct, setFinalProduct] = useState("");
-  const [amount, setAmount] = useState("");
-  let isGeneratePlanDisabled = !(finalProduct && amount);
+  const [inputProduct, setInputProduct] = useState("");
+  const [inputAmount, setInputAmount] = useState("");
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    (async () => {
+      const response = await fetch("/api/products");
+      setProducts(await response.json());
+    })();
+  }, []);
+
+  let isGeneratePlanDisabled = !(
+    products.includes(inputProduct) &&
+    inputAmount > 0 &&
+    inputAmount < 50001
+  );
 
   return (
     <main className={styles.create}>
@@ -18,35 +30,37 @@ export const Create = () => {
             size="large"
             type="text"
             placeholder="Enter a product"
-            value={finalProduct}
-            setValue={setFinalProduct}
+            value={inputProduct}
+            setValue={setInputProduct}
           />
           <label>Enter the desired production amount</label>
           <Input
             size="small"
             type="number"
-            placeholder={0}
-            min={0}
-            max={20000}
-            value={amount}
-            setValue={setAmount}
+            placeholder={1}
+            min={1}
+            max={50001}
+            value={inputAmount}
+            setValue={setInputAmount}
           />
-          <Button
-            size="small"
-            color="primary"
-            disabled={isGeneratePlanDisabled}
-          >
-            Generate plan
-          </Button>
+          <Link to="/plan/new" state={{ inputProduct, inputAmount }}>
+            <Button
+              size="small"
+              color="primary"
+              disabled={isGeneratePlanDisabled}
+            >
+              Generate plan
+            </Button>
+          </Link>
         </div>
         <div className={styles.productSelection}>
           {products.map((product, index) => (
             <div className={styles.buttonContainer} key={`${product}${index}`}>
               <Button
                 size="small"
-                color={finalProduct === product ? "primary" : "tertiary"}
+                color={inputProduct === product ? "primary" : "tertiary"}
                 onClick={() => {
-                  setFinalProduct(product);
+                  setInputProduct(product);
                 }}
               >
                 {product}

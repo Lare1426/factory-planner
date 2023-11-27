@@ -9,7 +9,9 @@ export const Home = () => {
   const [products, setProducts] = useState([]);
 
   let isGeneratePlanDisabled = !(
-    products.includes(inputProduct) && inputAmount > 0
+    products.includes(inputProduct) &&
+    inputAmount > 0 &&
+    inputAmount < 50001
   );
 
   useEffect(() => {
@@ -56,10 +58,10 @@ export const Home = () => {
           <label>Total amount per minute</label>
           <Input
             type="number"
-            placeholder="0"
+            placeholder={1}
             size="small"
             min={0}
-            max={20000}
+            max={50000}
             setValue={setInputAmount}
             value={inputAmount}
           />

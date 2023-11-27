@@ -1,12 +1,16 @@
 .create {
   width: 100%;
+  height: calc(100% - var(--header-height));
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
   .main-container {
     width: 95%;
-    height: 820px;
+    height: 90%;
     background-color: var(--secondary);
     border-radius: 20px;
-    margin: 20px auto;
+
     padding: 20px;
 
     .inputs {
@@ -23,10 +27,11 @@
 
     .product-selection {
       width: 100%;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
+      height: 90%;
       margin-top: 30px;
+      overflow-y: scroll;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
 
       .button-container {
         height: 60px;
