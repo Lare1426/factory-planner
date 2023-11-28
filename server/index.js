@@ -2,7 +2,8 @@ import "dotenv/config";
 import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
-import { generate, getProducts } from "./utils/generate-plan.js";
+import { generate } from "./utils/generate-plan.js";
+import { getProducts } from "./utils/get-products.js";
 
 const PORT = process.env.PORT ?? 3000;
 const IP = process.env.IP;

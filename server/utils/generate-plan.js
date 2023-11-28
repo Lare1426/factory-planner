@@ -1,48 +1,7 @@
 import * as recipesDB from "./recipes-db.js";
-import { round } from "../../shared/round.js";
-
-const ores = [
-  "Bauxite",
-  "Caterium Ore",
-  "Coal",
-  "Copper Ore",
-  "Iron Ore",
-  "Limestone",
-  "Raw Quartz",
-  "Sulfur",
-  "Uranium",
-  "Water",
-  "Nitrogen Gas",
-  "Crude Oil",
-];
-
-export const getProducts = async () => {
-  const recipesMap = await recipesDB.map();
-
-  const products = recipesMap.rows.reduce((acc, partialProduct) => {
-    const { key: productName, value: recipeName } = partialProduct;
-    const product = acc[productName] ?? { base: "", alternate: [] };
-
-    if (ores.includes(productName)) {
-      product.base = productName;
-      product.alternate.push(recipeName);
-    } else {
-      if (!product.base) {
-        product.base = recipeName;
-      } else if (recipeName === productName) {
-        product.alternate.push(product.base);
-        product.base = recipeName;
-      } else {
-        product.alternate.push(recipeName);
-      }
-    }
-
-    acc[productName] = product;
-    return acc;
-  }, {});
-
-  return products;
-};
+import { getProducts } from "./get-products.js";
+import { round } from "../../shared/round.js"
+import { ores } from "../../shared/ores.js";
 
 const productsWithRecipes = await getProducts();
 

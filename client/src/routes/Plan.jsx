@@ -3,29 +3,25 @@ import { Navigate, useLocation, useParams } from "react-router-dom";
 import styles from "./Plan.module.scss";
 import { Button, Input } from "@/components";
 import { round } from "../../../shared/round";
-
-const ores = [
-  "Bauxite",
-  "Caterium Ore",
-  "Coal",
-  "Copper Ore",
-  "Iron Ore",
-  "Limestone",
-  "Raw Quartz",
-  "Sulfur",
-  "Uranium",
-  "Water",
-  "Nitrogen Gas",
-  "Crude Oil",
-];
+import { ores } from "../../../shared/ores";
 
 const InputsAndButtons = ({ fetchPlan, finalProduct, finalAmount }) => {
   const [inputProduct, setInputProduct] = useState(finalProduct);
   const [inputAmount, setInputAmount] = useState(finalAmount);
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    (async () => {
+      const response = await fetch("/api/products");
+      setProducts(await response.json());
+    })();
+  }, []);
 
   const isApplyDisabled = !(
-    inputProduct !== finalProduct ||
-    (inputAmount !== finalAmount && inputAmount > 0 && inputAmount < 50001)
+    (inputProduct !== finalProduct || inputAmount !== finalAmount) &&
+    inputAmount > 0 &&
+    inputAmount < 50001 &&
+    products.includes(inputProduct)
   );
 
   return (
@@ -42,7 +38,13 @@ const InputsAndButtons = ({ fetchPlan, finalProduct, finalAmount }) => {
           type="text"
           value={inputProduct}
           setValue={setInputProduct}
+          list={"products"}
         />
+        <datalist id="products">
+          {products.map((product, index) => {
+            return <option value={product} key={index}></option>;
+          })}
+        </datalist>
       </div>
       <div>
         <label>Production amount</label>
@@ -53,7 +55,7 @@ const InputsAndButtons = ({ fetchPlan, finalProduct, finalAmount }) => {
           min={1}
           max={50000}
           value={inputAmount}
-          setValue={(value) => setInputAmount(parseInt(value))}
+          setValue={setInputAmount}
         />
       </div>
       <div className={styles.buttons}>

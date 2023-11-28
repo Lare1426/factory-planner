@@ -21,8 +21,6 @@ export const Home = () => {
     })();
   }, []);
 
-  console.log(products);
-
   return (
     <main className={styles.home}>
       <div className={styles.planList}>
@@ -51,8 +49,8 @@ export const Home = () => {
             list={"products"}
           />
           <datalist id="products">
-            {products.map((product) => {
-              return <option value={product}></option>;
+            {products.map((product, index) => {
+              return <option value={product} key={index}></option>;
             })}
           </datalist>
           <label>Total amount per minute</label>
