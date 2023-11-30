@@ -23,3 +23,26 @@
     outline: 2px solid red;
   }
 }
+
+ul {
+  position: absolute;
+  max-height: 200px;
+  overflow-y: auto;
+  background-color: var(--tertiary);
+  z-index: 100;
+  list-style: none;
+  padding: 0;
+
+  li {
+    margin: 5px;
+
+    &.selected {
+      background-color: var(--primary);
+    }
+
+    &:hover {
+      cursor: pointer;
+      background-color: var(--background);
+    }
+  }
+}

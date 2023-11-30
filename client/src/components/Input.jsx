@@ -1,3 +1,4 @@
+import { useState, useRef } from "react";
 import styles from "./Input.module.scss";
 
 export const Input = ({
@@ -10,6 +11,11 @@ export const Input = ({
   value,
   list,
 }) => {
+  const [isInputFocused, setIsInputFocused] = useState(false);
+  const inputRef = useRef(null);
+
+  const isDatalistShown = list && isInputFocused;
+
   const onInputChange = (event) => {
     setValue(event.target.value);
   };
@@ -26,15 +32,50 @@ export const Input = ({
   }
 
   return (
-    <input
-      className={classNames}
-      type={type}
-      placeholder={placeholder}
-      min={min}
-      max={max}
-      value={value}
-      list={list}
-      onChange={onInputChange}
-    />
+    <>
+      <input
+        className={classNames}
+        type={type}
+        placeholder={placeholder}
+        min={min}
+        max={max}
+        value={value}
+        onChange={onInputChange}
+        onFocus={() => {
+          setIsInputFocused(true);
+        }}
+        onBlur={async () => {
+          await new Promise((r) => setTimeout(r, 110));
+          setIsInputFocused(false);
+        }}
+        ref={inputRef}
+      />
+      {isDatalistShown && (
+        // styling is to position relative to input field
+        <ul style={{ top: inputRef.current.getBoundingClientRect().y + 30 }}>
+          {list.includes(value) && <li className={styles.selected}>{value}</li>}
+          {list.map((item) => {
+            if (
+              item !== value &&
+              (item.toLowerCase().includes(value.toLowerCase()) ||
+                list.includes(value))
+            ) {
+              return (
+                <li
+                  key={item}
+                  onClick={async () => {
+                    setValue(item);
+                    await new Promise((r) => setTimeout(r, 100));
+                    inputRef.current.focus();
+                  }}
+                >
+                  {item}
+                </li>
+              );
+            }
+          })}
+        </ul>
+      )}
+    </>
   );
 };

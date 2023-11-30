@@ -46,13 +46,8 @@ export const Home = () => {
             size="large"
             setValue={setInputProduct}
             value={inputProduct}
-            list={"products"}
+            list={products}
           />
-          <datalist id="products">
-            {products.map((product, index) => {
-              return <option value={product} key={index}></option>;
-            })}
-          </datalist>
           <label>Total amount per minute</label>
           <Input
             type="number"
