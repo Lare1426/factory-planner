@@ -5,7 +5,7 @@ import { Button, Input } from "@/components";
 
 export const Home = () => {
   const [inputProduct, setInputProduct] = useState("");
-  const [inputAmount, setInputAmount] = useState();
+  const [inputAmount, setInputAmount] = useState("");
   const [products, setProducts] = useState([]);
 
   let isGeneratePlanDisabled = !(
@@ -46,14 +46,14 @@ export const Home = () => {
             size="large"
             setValue={setInputProduct}
             value={inputProduct}
-            list={products}
+            customList={products}
           />
           <label>Total amount per minute</label>
           <Input
             type="number"
             placeholder={1}
             size="small"
-            min={0}
+            min={1}
             max={50000}
             setValue={setInputAmount}
             value={inputAmount}

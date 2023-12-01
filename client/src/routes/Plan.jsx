@@ -38,13 +38,8 @@ const InputsAndButtons = ({ fetchPlan, finalProduct, finalAmount }) => {
           type="text"
           value={inputProduct}
           setValue={setInputProduct}
-          list={"products"}
+          customList={products}
         />
-        <datalist id="products">
-          {products.map((product, index) => {
-            return <option value={product} key={index}></option>;
-          })}
-        </datalist>
       </div>
       <div>
         <label>Production amount</label>

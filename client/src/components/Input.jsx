@@ -10,11 +10,12 @@ export const Input = ({
   setValue,
   value,
   list,
+  customList,
 }) => {
   const [isInputFocused, setIsInputFocused] = useState(false);
   const inputRef = useRef(null);
 
-  const isDatalistShown = list && isInputFocused;
+  const isDatalistShown = list || (customList && isInputFocused);
 
   const onInputChange = (event) => {
     setValue(event.target.value);
@@ -40,6 +41,7 @@ export const Input = ({
         min={min}
         max={max}
         value={value}
+        list={list}
         onChange={onInputChange}
         onFocus={() => {
           setIsInputFocused(true);
@@ -50,15 +52,23 @@ export const Input = ({
         }}
         ref={inputRef}
       />
-      {isDatalistShown && (
+      {isDatalistShown && customList && (
         // styling is to position relative to input field
-        <ul style={{ top: inputRef.current.getBoundingClientRect().y + 30 }}>
-          {list.includes(value) && <li className={styles.selected}>{value}</li>}
-          {list.map((item) => {
+        <ul
+          className={styles.customDataList}
+          style={{
+            top: inputRef.current.getBoundingClientRect().y + 50,
+            left: inputRef.current.getBoundingClientRect().x + 20,
+          }}
+        >
+          {customList.includes(value) && (
+            <li className={styles.selected}>{value}</li>
+          )}
+          {customList.map((item) => {
             if (
               item !== value &&
               (item.toLowerCase().includes(value.toLowerCase()) ||
-                list.includes(value))
+                customList.includes(value))
             ) {
               return (
                 <li
