@@ -45,7 +45,7 @@ export const Input = ({
           setIsInputFocused(true);
         }}
         onBlur={async () => {
-          await new Promise((r) => setTimeout(r, 110));
+          await new Promise((r) => setTimeout(r, 100));
           setIsInputFocused(false);
         }}
         ref={inputRef}
@@ -63,10 +63,8 @@ export const Input = ({
               return (
                 <li
                   key={item}
-                  onClick={async () => {
+                  onClick={() => {
                     setValue(item);
-                    await new Promise((r) => setTimeout(r, 100));
-                    inputRef.current.focus();
                   }}
                 >
                   {item}

@@ -3,6 +3,49 @@ import { Link } from "react-router-dom";
 import styles from "./Create.module.scss";
 import { Input, Button } from "@/components";
 
+const ProductSelection = ({ inputProduct, setInputProduct, products }) => {
+  const isInputInProducts = products.includes(inputProduct);
+
+  return (
+    <div className={styles.productSelection}>
+      {isInputInProducts && (
+        <div className={styles.buttonContainer}>
+          <Button size="small" color={"primary"}>
+            {inputProduct}
+          </Button>
+        </div>
+      )}
+
+      {products.map((product, index) => {
+        const isInputInProduct = product
+          .toLowerCase()
+          .includes(inputProduct.toLowerCase());
+
+        if (
+          !(isInputInProduct || isInputInProducts) ||
+          product === inputProduct
+        ) {
+          return;
+        }
+
+        return (
+          <div className={styles.buttonContainer} key={`${product}${index}`}>
+            <Button
+              size="small"
+              color={inputProduct === product ? "primary" : "tertiary"}
+              onClick={() => {
+                setInputProduct(product);
+              }}
+            >
+              {product}
+            </Button>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
 export const Create = () => {
   const [inputProduct, setInputProduct] = useState("");
   const [inputAmount, setInputAmount] = useState("");
@@ -53,21 +96,11 @@ export const Create = () => {
             </Button>
           </Link>
         </div>
-        <div className={styles.productSelection}>
-          {products.map((product, index) => (
-            <div className={styles.buttonContainer} key={`${product}${index}`}>
-              <Button
-                size="small"
-                color={inputProduct === product ? "primary" : "tertiary"}
-                onClick={() => {
-                  setInputProduct(product);
-                }}
-              >
-                {product}
-              </Button>
-            </div>
-          ))}
-        </div>
+        <ProductSelection
+          inputProduct={inputProduct}
+          setInputProduct={setInputProduct}
+          products={products}
+        />
       </div>
     </main>
   );
