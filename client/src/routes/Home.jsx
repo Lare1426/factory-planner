@@ -68,6 +68,30 @@ export const Home = () => {
             </Button>
           </Link>
         </div>
+        <div className={styles.buttons}>
+          <Button
+            size="large"
+            color="primary"
+            shadow="drop"
+            onClick={() => {
+              const input = document.createElement("input");
+              input.style = "display: hidden";
+              input.type = "file";
+              input.onchange = (event) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                  console.log(JSON.parse(e.target.result));
+                };
+                reader.readAsText(event.target.files[0]);
+              };
+              document.body.appendChild(input);
+              input.click();
+              document.body.removeChild(input);
+            }}
+          >
+            Import
+          </Button>
+        </div>
       </div>
     </main>
   );
