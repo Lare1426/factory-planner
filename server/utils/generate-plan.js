@@ -1,6 +1,6 @@
 import * as recipesDB from "./recipes-db.js";
 import { getProducts } from "./get-products.js";
-import { round } from "../../shared/round.js"
+import { round } from "../../shared/round.js";
 import { ores } from "../../shared/ores.js";
 
 const productsWithRecipes = await getProducts();
@@ -63,33 +63,11 @@ export const generate = async (item, amount, recipeToUse = null) => {
     (60 / recipeData.time) * recipeProductionAmount;
   const buildingCount = round(amount / recipeProductsPerMinute, 4);
 
-  const totalOreCount = {};
-  const allProducts = { [item]: { amount, count: 1 } };
-
   const ingredients = await Promise.all(
     recipeData.ingredients.map(async (ingredient) => {
       const recipeAmount = ingredient.amount / recipeProductionAmount;
       const ingredientAmount = round(amount * recipeAmount, 5);
       const plan = await generate(ingredient.item, ingredientAmount);
-
-      for (const [ore, amount] of Object.entries(plan.totalOreCount)) {
-        if (ore in totalOreCount) {
-          totalOreCount[ore] += amount;
-        } else {
-          totalOreCount[ore] = amount;
-        }
-      }
-
-      for (const [item, { amount, count }] of Object.entries(
-        plan.allProducts
-      )) {
-        if (item in allProducts) {
-          allProducts[item].amount += amount;
-          allProducts[item].count += count;
-        } else {
-          allProducts[item] = { amount, count };
-        }
-      }
       return plan;
     })
   );
@@ -101,8 +79,6 @@ export const generate = async (item, amount, recipeToUse = null) => {
     producedIn,
     recipe,
     alternateRecipes,
-    totalOreCount,
-    allProducts,
     ingredients,
   };
 };
