@@ -77,7 +77,7 @@ const InputsAndButtons = ({ fetchPlan, plan }) => {
             extractLink.style = "display: none";
             document.body.appendChild(extractLink);
             extractLink.href = URL.createObjectURL(blob);
-            extractLink.download = "plan-data.json";
+            extractLink.download = `${plan.item}.json`;
             extractLink.click();
             document.body.removeChild(extractLink);
           }}
