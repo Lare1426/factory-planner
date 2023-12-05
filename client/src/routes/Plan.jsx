@@ -275,7 +275,11 @@ export const Plan = () => {
         setPlan(plan);
       })();
     } else if (state) {
-      fetchPlan(state.inputProduct, state.inputAmount);
+      if (state.plan) {
+        setPlan(state.plan);
+      } else {
+        fetchPlan(state.inputProduct, state.inputAmount);
+      }
     }
   }, []);
 

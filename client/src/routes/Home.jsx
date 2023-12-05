@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import styles from "./Home.module.scss";
 import { Button, Input } from "@/components";
 
@@ -7,6 +7,7 @@ export const Home = () => {
   const [inputProduct, setInputProduct] = useState("");
   const [inputAmount, setInputAmount] = useState("");
   const [products, setProducts] = useState([]);
+  const navigate = useNavigate();
 
   let isGeneratePlanDisabled = !(
     products.includes(inputProduct) &&
@@ -20,6 +21,12 @@ export const Home = () => {
       setProducts(await response.json());
     })();
   }, []);
+
+  const navigatePlan = (plan) => {
+    navigate("/plan/new", {
+      state: { plan },
+    });
+  };
 
   return (
     <main className={styles.home}>
@@ -69,28 +76,7 @@ export const Home = () => {
           </Link>
         </div>
         <div className={styles.buttons}>
-          <Button
-            size="large"
-            color="primary"
-            shadow="drop"
-            onClick={() => {
-              const input = document.createElement("input");
-              input.style = "display: hidden";
-              input.type = "file";
-              input.onchange = (event) => {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                  console.log(JSON.parse(e.target.result));
-                };
-                reader.readAsText(event.target.files[0]);
-              };
-              document.body.appendChild(input);
-              input.click();
-              document.body.removeChild(input);
-            }}
-          >
-            Import
-          </Button>
+          <Input size="large" type="file" setValue={navigatePlan} />
         </div>
       </div>
     </main>

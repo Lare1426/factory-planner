@@ -18,16 +18,26 @@ export const Input = ({
   const isDatalistShown = list || (customList && isInputFocused);
 
   const onInputChange = (event) => {
-    setValue(event.target.value);
+    if (type === "file") {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setValue(JSON.parse(e.target.result));
+      };
+      reader.readAsText(event.target.files[0]);
+    } else {
+      setValue(event.target.value);
+    }
   };
 
-  let classNames = styles.customInput;
+  let classNames = `${styles.customInput} ${
+    type === "file" && styles.fileInput
+  }`;
 
   if (["small", "large"].includes(size)) {
     classNames += ` ${styles[size]}`;
   }
 
-  if (type === "text") {
+  if (type !== "text") {
     min = null;
     max = null;
   }
@@ -51,11 +61,17 @@ export const Input = ({
           setIsInputFocused(false);
         }}
         ref={inputRef}
+        id={type === "file" ? "fileInput" : null}
       />
+      {type === "file" && (
+        <label htmlFor="fileInput" className={styles.fileInputLabel}>
+          Import
+        </label>
+      )}
       {isDatalistShown && customList && (
-        // styling is to position relative to input field
         <ul
           className={styles.customDataList}
+          // styling is to position relative to input field
           style={{
             top: inputRef.current.getBoundingClientRect().y + 50,
             left: inputRef.current.getBoundingClientRect().x + 20,
