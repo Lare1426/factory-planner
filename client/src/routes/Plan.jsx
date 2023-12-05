@@ -66,19 +66,34 @@ const InputsAndButtons = ({ fetchPlan, plan }) => {
         >
           Apply
         </Button>
-        <Button size="small" color="primary">
+        <Button
+          size="small"
+          color="primary"
+          onClick={() => {
+            const blob = new Blob([JSON.stringify(plan)], {
+              type: "application/json",
+            });
+            const extractLink = document.createElement("a");
+            extractLink.style = "display: none";
+            document.body.appendChild(extractLink);
+            extractLink.href = URL.createObjectURL(blob);
+            extractLink.download = "plan-data.json";
+            extractLink.click();
+            document.body.removeChild(extractLink);
+          }}
+        >
           Export
         </Button>
-        <Button size="small" color="primary">
+        <Button size="small" color="primary" disabled={true}>
           Save
         </Button>
-        <Button size="small" color="primary">
+        <Button size="small" color="primary" disabled={true}>
           Favourite
         </Button>
-        <Button size="small" color="primary">
+        <Button size="small" color="primary" disabled={true}>
           Share
         </Button>
-        <Button size="small" color="red">
+        <Button size="small" color="red" disabled={true}>
           Delete
         </Button>
       </div>
