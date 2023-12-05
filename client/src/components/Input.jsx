@@ -64,7 +64,10 @@ export const Input = ({
         id={type === "file" ? "fileInput" : null}
       />
       {type === "file" && (
-        <label htmlFor="fileInput" className={styles.fileInputLabel}>
+        <label
+          htmlFor="fileInput"
+          className={`primary-button-style ${styles.fileInputLabel}`}
+        >
           Import
         </label>
       )}

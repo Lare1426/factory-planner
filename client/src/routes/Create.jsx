@@ -86,14 +86,12 @@ export const Create = () => {
             value={inputAmount}
             setValue={setInputAmount}
           />
-          <Link to="/plan/new" state={{ inputProduct, inputAmount }}>
-            <Button
-              size="small"
-              color="primary"
-              disabled={isGeneratePlanDisabled}
-            >
-              Generate plan
-            </Button>
+          <Link
+            to="/plan/new"
+            state={{ inputProduct, inputAmount }}
+            className={`primary-button-style ${styles.customLink}`}
+          >
+            Generate plan
           </Link>
         </div>
         <ProductSelection

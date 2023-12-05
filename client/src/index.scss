@@ -24,6 +24,28 @@ body {
   height: 100%;
 }
 
+.primary-button-style {
+  border-radius: 50px;
+  border: none;
+  color: var(--text);
+  background-color: var(--primary);
+  text-decoration: none;
+  text-align: center;
+
+  &:hover {
+    cursor: pointer;
+    filter: brightness(0.95);
+  }
+
+  &:active {
+    filter: brightness(0.9);
+  }
+
+  &:focus {
+    outline: 2px solid var(--accent);
+  }
+}
+
 #root {
   height: 100%;
 }
