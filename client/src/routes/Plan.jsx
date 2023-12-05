@@ -5,9 +5,9 @@ import { Button, Input } from "@/components";
 import { round } from "../../../shared/round";
 import { ores } from "../../../shared/ores";
 
-const InputsAndButtons = ({ fetchPlan, finalProduct, finalAmount }) => {
-  const [inputProduct, setInputProduct] = useState(finalProduct);
-  const [inputAmount, setInputAmount] = useState(finalAmount);
+const InputsAndButtons = ({ fetchPlan, plan }) => {
+  const [inputProduct, setInputProduct] = useState(plan.item);
+  const [inputAmount, setInputAmount] = useState(plan.amount);
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
@@ -18,7 +18,7 @@ const InputsAndButtons = ({ fetchPlan, finalProduct, finalAmount }) => {
   }, []);
 
   const isApplyDisabled = !(
-    (inputProduct !== finalProduct || inputAmount !== finalAmount) &&
+    (inputProduct !== plan.item || inputAmount !== plan.amount) &&
     inputAmount > 0 &&
     inputAmount < 50001 &&
     products.includes(inputProduct)
@@ -50,7 +50,9 @@ const InputsAndButtons = ({ fetchPlan, finalProduct, finalAmount }) => {
           min={1}
           max={50000}
           value={inputAmount}
-          setValue={setInputAmount}
+          setValue={(value) => {
+            setInputAmount(parseInt(value));
+          }}
         />
       </div>
       <div className={styles.buttons}>
@@ -84,16 +86,10 @@ const InputsAndButtons = ({ fetchPlan, finalProduct, finalAmount }) => {
   );
 };
 
-const LeftSidePanel = ({ finalProduct, finalAmount, fetchPlan }) => {
+const LeftSidePanel = ({ fetchPlan, plan }) => {
   return (
     <aside className={styles.sidePanel}>
-      {finalProduct && finalAmount && (
-        <InputsAndButtons
-          fetchPlan={fetchPlan}
-          finalProduct={finalProduct}
-          finalAmount={finalAmount}
-        />
-      )}
+      {plan && <InputsAndButtons fetchPlan={fetchPlan} plan={plan} />}
     </aside>
   );
 };
@@ -236,23 +232,18 @@ const RightSidePanel = ({ plan }) => {
 
 export const Plan = () => {
   const [plan, setPlan] = useState();
-  const [finalProduct, setFinalProduct] = useState("");
-  const [finalAmount, setFinalAmount] = useState(0);
 
   const fetchPlan = (product, amount) => {
     (async () => {
-      if (product !== finalProduct) {
+      if (!plan || product !== plan.item) {
         const response = await fetch(
           `/api/plan/new/${product}?amount=${amount}`
         );
         const newPlan = await response.json();
         setPlan(newPlan);
-        setFinalProduct(product);
-        amount !== finalAmount && setFinalAmount(amount);
       } else {
         const newPlan = { ...plan };
         updatePlanAmounts(newPlan, amount);
-        setFinalAmount(amount);
         setPlan(newPlan);
       }
     })();
@@ -267,8 +258,6 @@ export const Plan = () => {
         const response = await fetch(`/api/plan/${id}`);
         const plan = await response.json();
         setPlan(plan);
-        setFinalProduct(plan.item);
-        setFinalAmount(plan.amount);
       })();
     } else if (state) {
       fetchPlan(state.inputProduct, state.inputAmount);
@@ -307,11 +296,7 @@ export const Plan = () => {
 
   return (
     <main className={styles.plan}>
-      <LeftSidePanel
-        finalProduct={finalProduct}
-        finalAmount={finalAmount}
-        fetchPlan={fetchPlan}
-      />
+      <LeftSidePanel fetchPlan={fetchPlan} plan={plan} />
       <div className={styles.planView}>
         {plan && <PlanSection plan={plan} layer={1} updatePlan={updatePlan} />}
       </div>
