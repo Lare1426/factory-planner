@@ -59,3 +59,29 @@ export const selectAccounts = async () => {
   const [rows] = await executeQuery("SELECT * FROM account;");
   return rows;
 };
+
+export const insertPlan = async ({
+  id,
+  name,
+  description = null,
+  product,
+  amount,
+  creator,
+}) => {
+  const [result] = await executeQuery(
+    "INSERT INTO plan (id, name, description, product, amount, creator) VALUES (?, ?, ?, ?, ?, ?);",
+    [id, name, description, product, amount, creator]
+  );
+  return result;
+};
+
+// console.log(
+//   await insertPlan({
+//     id: "lökjhjasdyu8",
+//     name: "yes",
+//     description: "no",
+//     product: "yes",
+//     amount: 400,
+//     creator: "ohasdu",
+//   })
+// );

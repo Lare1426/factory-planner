@@ -4,6 +4,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { generate } from "./utils/generate-plan.js";
 import { getProducts } from "./utils/get-products.js";
+import "./utils/rdb.js";
 
 const PORT = process.env.PORT ?? 3000;
 const IP = process.env.IP;
