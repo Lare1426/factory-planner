@@ -77,11 +77,24 @@ export const insertPlan = async ({
 
 // console.log(
 //   await insertPlan({
-//     id: "lökjhjasdyu8",
-//     name: "yes",
-//     description: "no",
+//     id: "lkhnna",
+//     name: "no",
+//     description: "yes",
 //     product: "yes",
-//     amount: 400,
-//     creator: "ohasdu",
+//     amount: 100,
+//     creator: "ohiisdu",
 //   })
 // );
+
+export const selectPlan = async ({ id }) => {
+  const [[plan]] = await executeQuery(`SELECT * FROM plan WHERE id = ?`, [id]);
+  return plan;
+};
+
+export const selectPlans = async () => {
+  const [rows] = await executeQuery("SELECT * FROM plan");
+  return rows;
+};
+
+// console.log(await selectPlan({ id: "lökjhjasdyu8" }));
+// console.log(await selectPlans());
