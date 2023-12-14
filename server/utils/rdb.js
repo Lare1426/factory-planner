@@ -75,17 +75,6 @@ export const insertPlan = async ({
   return result;
 };
 
-// console.log(
-//   await insertPlan({
-//     id: "lkhnna",
-//     name: "no",
-//     description: "yes",
-//     product: "yes",
-//     amount: 100,
-//     creator: "ohiisdu",
-//   })
-// );
-
 export const selectPlan = async ({ id }) => {
   const [[plan]] = await executeQuery(`SELECT * FROM plan WHERE id = ?`, [id]);
   return plan;
@@ -96,5 +85,20 @@ export const selectPlans = async () => {
   return rows;
 };
 
-// console.log(await selectPlan({ id: "lökjhjasdyu8" }));
-// console.log(await selectPlans());
+export const updatePlan = async ({ id, ...values }) => {
+  const updateFields = [];
+  const updateValues = [];
+
+  for (const key of ["name", "description", "product", "amount"]) {
+    if (values[key]) {
+      updateFields.push(`${key} = ?`);
+      updateValues.push(values[key]);
+    }
+  }
+
+  const [result] = await executeQuery(
+    `UPDATE plan SET ${updateFields.join(",")} WHERE id = ?;`,
+    [...updateValues, id]
+  );
+  return result;
+};
