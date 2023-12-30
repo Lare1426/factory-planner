@@ -14,6 +14,8 @@ const executeQuery = async (queryString, queryParams) => {
   return result;
 };
 
+// account
+
 export const insertAccount = async ({ id, username, password }) => {
   const [result] = await executeQuery(
     "INSERT INTO account (id, username, password) VALUES (?, ?, ?);",
@@ -60,6 +62,8 @@ export const selectAccounts = async () => {
   return rows;
 };
 
+// plan
+
 export const insertPlan = async ({
   id,
   name,
@@ -99,6 +103,37 @@ export const updatePlan = async ({ id, ...values }) => {
   const [result] = await executeQuery(
     `UPDATE plan SET ${updateFields.join(",")} WHERE id = ?;`,
     [...updateValues, id]
+  );
+  return result;
+};
+
+export const deletePlan = async ({ id }) => {
+  const [result] = await executeQuery("DELETE FROM plan WHERE id = ?;", [id]);
+  return result;
+};
+
+// account plan
+
+export const insertAccountPlan = async ({ accountId, planId, type }) => {
+  const [result] = await executeQuery(
+    "INSERT INTO account-plan (accountId, planId, type) VALUES (?, ?, ?);",
+    [accountId, planId, type]
+  );
+  return result;
+};
+
+export const deleteAccountPlan = async ({ accountId, planId }) => {
+  const [result] = await executeQuery(
+    "DELETE FROM account-plan WHERE accountId = ? AND planId = ?;",
+    [accountId, planId]
+  );
+  return result;
+};
+
+export const uodateAccountPlan = async ({ accountId, planId, type }) => {
+  const [result] = await executeQuery(
+    "UPDATE account-plan SET type = ? VALUES ? WHERE accountId = ? AND planId = ?;",
+    [type, accountId, planId]
   );
   return result;
 };
