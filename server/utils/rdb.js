@@ -14,6 +14,31 @@ const executeQuery = async (queryString, queryParams) => {
   return result;
 };
 
+/**
+ * @param {string} tableName
+ * @param {string} id - unique id of row to update
+ * @param {string[]} fields - possible fields to update
+ * @param {object} valuesObject - keys are fields which represent values to update with
+ * @returns {mysql.ResultSetHeader[]}
+ */
+const updateSpecificFields = async (tableName, id, fields, valuesObject) => {
+  const updateFields = [];
+  const updateValues = [];
+
+  for (const field of fields) {
+    if (valuesObject.hasOwn(field)) {
+      updateFields.push(`${field} = ?`);
+      updateValues.push(valuesObject[field]);
+    }
+  }
+
+  const [result] = await executeQuery(
+    `UPDATE ${tableName} SET ${updateFields.join(",")} WHERE id = ?;`,
+    [...updateValues, id]
+  );
+  return result;
+};
+
 // account
 
 export const insertAccount = async ({ id, username, password }) => {
@@ -31,22 +56,8 @@ export const deleteAccount = async ({ id }) => {
   return result;
 };
 
-export const updateAccount = async ({ id, ...values }) => {
-  const updateFields = [];
-  const updateValues = [];
-
-  for (const key of ["username", "password"]) {
-    if (values[key]) {
-      updateFields.push(`${key} = ?`);
-      updateValues.push(values[key]);
-    }
-  }
-
-  const [result] = await executeQuery(
-    `UPDATE account SET ${updateFields.join(",")} WHERE id = ?;`,
-    [...updateValues, id]
-  );
-  return result;
+export const updateAccount = ({ id, ...values }) => {
+  return updateSpecificFields("account", id, ["username", "password"], values);
 };
 
 export const selectAccount = async ({ id, username }) => {
@@ -73,7 +84,14 @@ export const insertPlan = async ({
   creator,
 }) => {
   const [result] = await executeQuery(
-    "INSERT INTO plan (id, name, description, product, amount, creator) VALUES (?, ?, ?, ?, ?, ?);",
+    `INSERT INTO plan (
+      id, 
+      name, 
+      description, 
+      product, 
+      amount, 
+      creator
+    ) VALUES (?, ?, ?, ?, ?, ?);`,
     [id, name, description, product, amount, creator]
   );
   return result;
@@ -89,22 +107,13 @@ export const selectPlans = async () => {
   return rows;
 };
 
-export const updatePlan = async ({ id, ...values }) => {
-  const updateFields = [];
-  const updateValues = [];
-
-  for (const key of ["name", "description", "product", "amount"]) {
-    if (values[key]) {
-      updateFields.push(`${key} = ?`);
-      updateValues.push(values[key]);
-    }
-  }
-
-  const [result] = await executeQuery(
-    `UPDATE plan SET ${updateFields.join(",")} WHERE id = ?;`,
-    [...updateValues, id]
+export const updatePlan = ({ id, ...values }) => {
+  return updateSpecificFields(
+    "plan",
+    id,
+    ["name", "description", "product", "amount"],
+    values
   );
-  return result;
 };
 
 export const deletePlan = async ({ id }) => {
@@ -130,9 +139,9 @@ export const deleteAccountPlan = async ({ accountId, planId }) => {
   return result;
 };
 
-export const uodateAccountPlan = async ({ accountId, planId, type }) => {
+export const updateAccountPlan = async ({ accountId, planId, type }) => {
   const [result] = await executeQuery(
-    "UPDATE account-plan SET type = ? VALUES ? WHERE accountId = ? AND planId = ?;",
+    "UPDATE account-plan SET type = ? WHERE accountId = ? AND planId = ?;",
     [type, accountId, planId]
   );
   return result;
