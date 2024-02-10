@@ -1,9 +1,14 @@
-import { executeQuery } from "./rdb";
+import { executeQuery, updateSpecificFields } from "./rdb.js";
 
-export const insertAccountPlan = async ({ accountId, planId, type }) => {
+export const insertAccountPlan = async ({
+  accountId,
+  planId,
+  shared = 0,
+  favourite = 0,
+}) => {
   const [result] = await executeQuery(
-    "INSERT INTO account-plan (accountId, planId, type) VALUES (?, ?, ?);",
-    [accountId, planId, type]
+    "INSERT INTO account-plan (accountId, planId, shared, favourite) VALUES (?, ?, ?, ?);",
+    [accountId, planId, shared, favourite]
   );
   return result;
 };
@@ -22,4 +27,10 @@ export const updateAccountPlan = async ({ accountId, planId, type }) => {
     [type, accountId, planId]
   );
   return result;
+  return updateSpecificFields(
+    "account-plan",
+    id,
+    ["name", "description", "product", "amount", "public"],
+    values
+  );
 };

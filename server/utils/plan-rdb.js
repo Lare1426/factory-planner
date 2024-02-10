@@ -33,11 +33,10 @@ export const selectPlans = async () => {
 };
 
 export const updatePlan = ({ id, values }) => {
-  console.log(values);
   return updateSpecificFields(
     "plan",
     id,
-    ["name", "description", "product", "amount"],
+    ["name", "description", "product", "amount", "public"],
     values
   );
 };
