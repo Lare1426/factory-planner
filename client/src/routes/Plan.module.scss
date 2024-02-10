@@ -95,7 +95,20 @@
         }
       }
 
-      $background-colors: (
+      $light-background-colors: (
+        #57c6fd,
+        #64f564,
+        #9f9ff1,
+        #bef354,
+        #f8a149,
+        #53f7a5,
+        #5facfa,
+        #f17ef1,
+        #8cfafa,
+        #f87474
+      );
+
+      $dark-background-colors: (
         #006699,
         #339933,
         #666699,
@@ -107,9 +120,20 @@
         #669999,
         #993333
       );
+
+      // light
       @for $i from 1 through 10 {
         &.layer#{$i} {
-          background-color: nth($background-colors, $i);
+          background-color: nth($light-background-colors, $i);
+        }
+      }
+
+      // dark
+      @media (prefers-color-scheme: dark) {
+        @for $i from 1 through 10 {
+          &.layer#{$i} {
+            background-color: nth($dark-background-colors, $i);
+          }
         }
       }
     }

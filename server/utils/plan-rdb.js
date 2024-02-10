@@ -32,9 +32,8 @@ export const selectPlans = async () => {
   return rows;
 };
 
-// console.log(await selectPlans());
-
-export const updatePlan = ({ id, ...values }) => {
+export const updatePlan = ({ id, values }) => {
+  console.log(values);
   return updateSpecificFields(
     "plan",
     id,
@@ -42,8 +41,6 @@ export const updatePlan = ({ id, ...values }) => {
     values
   );
 };
-
-console.log(await updatePlan("lkhnna", { name: "bad plan" }));
 
 export const deletePlan = async ({ id }) => {
   const [result] = await executeQuery("DELETE FROM plan WHERE id = ?;", [id]);

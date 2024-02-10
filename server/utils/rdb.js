@@ -31,7 +31,7 @@ export const updateSpecificFields = async (
   const updateValues = [];
 
   for (const field of fields) {
-    if (valuesObject.hasOwn(field)) {
+    if (Object.hasOwn(valuesObject, field)) {
       updateFields.push(`${field} = ?`);
       updateValues.push(valuesObject[field]);
     }
