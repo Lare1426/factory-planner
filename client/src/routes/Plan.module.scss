@@ -70,11 +70,16 @@
     overflow-y: auto;
 
     .plan-section {
-      width: max-content;
-      height: min-content;
+      width: fit-content;
+      height: max-content;
       padding: 10px 15px;
       border-radius: 20px;
       margin: 20px;
+
+      .ingredients {
+        display: flex;
+        flex-wrap: wrap;
+      }
 
       select {
         border: none;

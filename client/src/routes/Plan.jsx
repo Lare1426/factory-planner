@@ -139,15 +139,17 @@ const PlanSection = ({ plan, layer, updatePlan, path = [] }) => {
         </div>
       )}
       <div>Amount: {round(plan.amount, 4)}/min</div>
-      {plan.ingredients?.map((ingredient, index) => (
-        <PlanSection
-          plan={ingredient}
-          layer={layer % 10 === 0 ? 1 : layer + 1}
-          updatePlan={updatePlan}
-          path={[...path, ingredient.item]}
-          key={`${plan.recipe}-${ingredient.item}-${index}`}
-        />
-      ))}
+      <div className={styles.ingredients}>
+        {plan.ingredients?.map((ingredient, index) => (
+          <PlanSection
+            plan={ingredient}
+            layer={layer % 10 === 0 ? 1 : layer + 1}
+            updatePlan={updatePlan}
+            path={[...path, ingredient.item]}
+            key={`${plan.recipe}-${ingredient.item}-${index}`}
+          />
+        ))}
+      </div>
     </section>
   );
 };
@@ -220,7 +222,7 @@ const RightSidePanel = ({ plan }) => {
   return (
     <aside className={styles.sidePanel}>
       <ul>
-        <div className={styles.title}>Total ore amounts:</div>
+        <div className={styles.title}>Total ores:</div>
         {Object.entries(totalOres).map(([ore, amount], index) => (
           <li key={`${ore}${index}`}>
             {ore}: {round(amount, 4)}/min
@@ -228,7 +230,7 @@ const RightSidePanel = ({ plan }) => {
         ))}
       </ul>
       <ul>
-        <div className={styles.title}>Common product amounts:</div>
+        <div className={styles.title}>Common products:</div>
         {Object.entries(allProducts).map(([item, amount], index) => (
           <li key={`${item}${index}`}>
             {item}: {round(amount, 4)}/min
