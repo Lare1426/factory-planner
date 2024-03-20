@@ -2,10 +2,11 @@ import { useState } from "react";
 import { Outlet, Link } from "react-router-dom";
 import { logoPng } from "@/assets";
 import styles from "./Header.module.scss";
-import { Button, Input } from "@/components";
+import { Button, Input, LoginModal } from "@/components";
 
 export const Header = () => {
   const [searchValue, setSearchValue] = useState("");
+  const [isLoginModalShow, setIsLoginModalShow] = useState(false);
 
   return (
     <>
@@ -24,10 +25,18 @@ export const Header = () => {
             setValue={setSearchValue}
             value={searchValue}
           />
-          <Button size="small" color="tertiary">
+          <Button
+            size="small"
+            color="tertiary"
+            onClick={() => setIsLoginModalShow(true)}
+          >
             Login
           </Button>
         </div>
+        <LoginModal
+          isModalShown={isLoginModalShow}
+          onHide={() => setIsLoginModalShow(false)}
+        />
       </header>
       <Outlet />
     </>

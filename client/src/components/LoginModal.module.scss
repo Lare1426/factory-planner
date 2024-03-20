@@ -1,0 +1,22 @@
+.login-modal {
+  background-color: var(--primary);
+  color: var(--text);
+  border: none;
+  border-radius: 20px;
+
+  div {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    &.buttons {
+      display: flex;
+      flex-direction: row;
+    }
+  }
+
+  &::backdrop {
+    opacity: 0.5;
+    background-color: black;
+  }
+}

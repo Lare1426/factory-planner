@@ -54,7 +54,7 @@ export const Input = ({
         list={list}
         onChange={onInputChange}
         onFocus={() => {
-          setIsInputFocused(true);
+          customList && setIsInputFocused(true);
         }}
         onBlur={async () => {
           await new Promise((r) => setTimeout(r, 100));
