@@ -5,6 +5,8 @@ import { fileURLToPath } from "url";
 import { generate } from "./utils/generate-plan.js";
 import { getProducts } from "./utils/get-products.js";
 import "./utils/plan-rdb.js";
+import { selectAccount } from "./utils/account-rdb.js";
+import { generateToken } from "./utils/authorize.js";
 
 const PORT = process.env.PORT ?? 3000;
 const IP = process.env.IP;
@@ -14,6 +16,21 @@ const __dirname = path.dirname(__filename);
 
 const server = express();
 const apiRouter = express.Router();
+
+apiRouter.post("/authorize", (req, res) => {
+  const { username, password } = req.body;
+  const account = selectAccount({ username });
+
+  if (password === account.password) {
+    const token = generateToken(username);
+    res.cookie("authToken", token, {
+      maxAge: process.env.TOKEN_LIFETIME,
+      httpOnly: true,
+      sameSite: "strict",
+    });
+    res.sendStatus(200);
+  }
+});
 
 apiRouter.get("/plan/new/:product/:recipe?", async (req, res) => {
   const { product, recipe } = req.params;

@@ -1,4 +1,4 @@
-import { executeQuery, updateSpecificFields } from "./rdb";
+import { executeQuery, updateSpecificFields } from "./rdb.js";
 
 export const insertAccount = async ({ id, username, password }) => {
   const [result] = await executeQuery(
