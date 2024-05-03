@@ -15,13 +15,15 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const server = express();
+server.use(express.json());
 const apiRouter = express.Router();
 
-apiRouter.post("/authorize", (req, res) => {
+apiRouter.post("/authenticate", async (req, res) => {
   const { username, password } = req.body;
-  const account = selectAccount({ username });
+  // const account = await selectAccount({ username });
+  const account = username === "Lare" ? { password: "yes" } : null;
 
-  if (password === account.password) {
+  if (account && password === account.password) {
     const token = generateToken(username);
     res.cookie("authToken", token, {
       maxAge: process.env.TOKEN_LIFETIME,
@@ -29,6 +31,8 @@ apiRouter.post("/authorize", (req, res) => {
       sameSite: "strict",
     });
     res.sendStatus(200);
+  } else {
+    res.sendStatus(401);
   }
 });
 

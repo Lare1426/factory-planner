@@ -8,11 +8,11 @@ export const getPlanById = async (id) => {
   return response.json();
 };
 
-export const authorize = async (username, password) => {
-  const response = await fetch(`/api/authorize`, {
+export const authenticate = async (username, password) => {
+  const response = await fetch(`/api/authenticate`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username, password }),
   });
-  return response.status();
+  return response.status;
 };

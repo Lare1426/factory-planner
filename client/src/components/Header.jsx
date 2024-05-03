@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { Outlet, Link } from "react-router-dom";
 import { logoPng } from "@/assets";
-import styles from "./Header.module.scss";
 import { Button, Input, LoginModal } from "@/components";
+import { useAuthContext } from "@/utils/AuthContext";
+import styles from "./Header.module.scss";
 
 export const Header = () => {
+  const { isLoginSuccess } = useAuthContext();
+
   const [searchValue, setSearchValue] = useState("");
   const [isLoginModalShow, setIsLoginModalShow] = useState(false);
 
@@ -30,7 +33,7 @@ export const Header = () => {
             color="tertiary"
             onClick={() => setIsLoginModalShow(true)}
           >
-            Login
+            {isLoginSuccess ? "Account" : "Login"}
           </Button>
         </div>
         <LoginModal

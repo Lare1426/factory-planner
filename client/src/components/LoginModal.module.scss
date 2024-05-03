@@ -9,6 +9,12 @@
     flex-direction: column;
     gap: 20px;
 
+    .error {
+      color: #ff7852;
+      font-size: 30px;
+      margin: 0;
+    }
+
     &.buttons {
       display: flex;
       flex-direction: row;

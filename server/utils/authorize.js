@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 // const logger = require("./logger");
 
-const generateToken = (username) => {
+export const generateToken = (username) => {
   return jwt.sign({ username }, process.env.JWT_SECRET_KEY, {
     expiresIn: process.env.TOKEN_LIFETIME,
   });
@@ -27,5 +27,3 @@ function authenticateToken(req, res, next) {
     next();
   });
 }
-
-module.exports = { generateToken, authenticateToken };
