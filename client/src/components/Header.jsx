@@ -6,10 +6,10 @@ import { useAuthContext } from "@/utils/AuthContext";
 import styles from "./Header.module.scss";
 
 export const Header = () => {
-  const { isLoginSuccess } = useAuthContext();
+  const { isLoggedIn, isLoginModalShow, setIsLoginModalShow } =
+    useAuthContext();
 
   const [searchValue, setSearchValue] = useState("");
-  const [isLoginModalShow, setIsLoginModalShow] = useState(false);
 
   return (
     <>
@@ -31,9 +31,9 @@ export const Header = () => {
           <Button
             size="small"
             color="tertiary"
-            onClick={() => setIsLoginModalShow(true)}
+            onClick={() => !isLoggedIn && setIsLoginModalShow(true)}
           >
-            {isLoginSuccess ? "Account" : "Login"}
+            {isLoggedIn ? "Account" : "Login"}
           </Button>
         </div>
         <LoginModal

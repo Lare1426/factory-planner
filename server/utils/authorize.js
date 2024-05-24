@@ -7,23 +7,17 @@ export const generateToken = (username) => {
   });
 };
 
-function authenticateToken(req, res, next) {
-  const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
-
+export const authenticateToken = (req, res, next) => {
+  const token = req.headers.cookie?.slice(10);
   if (token == null) {
     return res.sendStatus(401);
   }
-
-  jwt.verify(token, process.env.JWT_SECRET_KEY, (err, user) => {
+  jwt.verify(token, process.env.JWT_SECRET_KEY, (err, username) => {
     // err && logger.warn(err);
-
     if (err) {
       return res.sendStatus(403);
     }
-
-    req.user = user;
-
+    req.username = username;
     next();
   });
-}
+};

@@ -3,10 +3,11 @@ import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Header } from "@/components";
 import { Home, Create, Plan } from "@/routes";
 import { AuthContext } from "./utils/AuthContext";
+import { authenticate } from "./utils/api";
 
 const router = createBrowserRouter([
   {
@@ -37,11 +38,34 @@ const router = createBrowserRouter([
 ]);
 
 export const App = () => {
-  const [isLoginSuccess, setIsLoginSuccess] = useState(false);
-  console.log("isLoginSuccess:", isLoginSuccess);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loggedInUsername, setLoggedInUsername] = useState("");
+  const [isLoginModalShow, setIsLoginModalShow] = useState(false);
+  const [loginModalMessage, setLoginModalMessage] = useState("");
+
+  useEffect(() => {
+    (async () => {
+      const response = await authenticate();
+      if (response.status === 200) {
+        setIsLoggedIn(true);
+        setLoggedInUsername((await response.json()).username);
+      }
+    })();
+  }, []);
 
   return (
-    <AuthContext.Provider value={{ isLoginSuccess, setIsLoginSuccess }}>
+    <AuthContext.Provider
+      value={{
+        isLoggedIn,
+        setIsLoggedIn,
+        loggedInUsername,
+        setLoggedInUsername,
+        isLoginModalShow,
+        setIsLoginModalShow,
+        loginModalMessage,
+        setLoginModalMessage,
+      }}
+    >
       <RouterProvider router={router} />
     </AuthContext.Provider>
   );

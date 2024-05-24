@@ -1,15 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import { Input, Button } from "@/components";
-import { authenticate } from "@/utils/api";
+import { authorise } from "@/utils/api";
 import { useAuthContext } from "@/utils/AuthContext";
 import styles from "./LoginModal.module.scss";
 
 export const LoginModal = ({ isModalShown, onHide }) => {
-  const { setIsLoginSuccess } = useAuthContext();
+  const { setIsLoggedIn, setLoggedInUsername, loginModalMessage } =
+    useAuthContext();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [isError, setIsError] = useState(false);
+  const [isCredentialError, setIsCredentialError] = useState(false);
   const modalRef = useRef(null);
 
   useEffect(() => {
@@ -17,18 +18,21 @@ export const LoginModal = ({ isModalShown, onHide }) => {
     return () => document.removeEventListener("keydown", onEscapeKeyDown);
   }, []);
 
-  const authenticateUser = async () => {
-    const status = await authenticate(username, password);
-    if (status === 401) {
-      setIsError(true);
-    } else if (status === 200) {
-      setIsLoginSuccess(true);
+  const authoriseUser = async () => {
+    if (await authorise(username, password)) {
+      setIsLoggedIn(true);
+      setLoggedInUsername(username);
       hide();
+    } else {
+      setIsCredentialError(true);
     }
   };
 
   const hide = () => {
     modalRef.current.close();
+    setUsername("");
+    setPassword("");
+    setIsCredentialError(false);
     onHide();
   };
 
@@ -41,6 +45,9 @@ export const LoginModal = ({ isModalShown, onHide }) => {
   return (
     <dialog ref={modalRef} open={false} className={styles.loginModal}>
       <div>
+        {loginModalMessage && (
+          <label className={styles.error}>{loginModalMessage}</label>
+        )}
         <label>Login or contact Lare to get an account!</label>
         <Input
           type="text"
@@ -56,9 +63,11 @@ export const LoginModal = ({ isModalShown, onHide }) => {
           value={password}
           setValue={setPassword}
         />
-        {isError && <p className={styles.error}>Invalid credentials!</p>}
+        {isCredentialError && (
+          <p className={styles.error}>{"Invalid credentials!"}</p>
+        )}
         <div className={styles.buttons}>
-          <Button size={"small"} color={"tertiary"} onClick={authenticateUser}>
+          <Button size={"small"} color={"tertiary"} onClick={authoriseUser}>
             Login
           </Button>
           <Button size={"small"} color={"tertiary"} onClick={hide}>
