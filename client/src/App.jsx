@@ -48,7 +48,7 @@ export const App = () => {
       const response = await authenticate();
       if (response.status === 200) {
         setIsLoggedIn(true);
-        setLoggedInUsername((await response.json()).username);
+        setLoggedInUsername(await response.json());
       }
     })();
   }, []);

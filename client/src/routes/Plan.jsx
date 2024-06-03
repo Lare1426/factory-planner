@@ -1,11 +1,38 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Navigate, useLocation, useParams } from "react-router-dom";
+import { v4 as uuidv4 } from "uuid";
 import styles from "./Plan.module.scss";
 import { Button, Input } from "@/components";
+import {
+  getNewPlan,
+  getPlanById,
+  putPlan,
+  deletePlanApi,
+  putFavouritePlan,
+  putSharedPlan,
+} from "@/utils/api";
+import { useAuthContext } from "@/utils/AuthContext";
 import { round } from "../../../shared/round";
 import { ores } from "../../../shared/ores";
 
-const InputsAndButtons = ({ fetchPlan, plan }) => {
+const LeftSidePanel = ({
+  fetchPlan,
+  plan,
+  isNewPlan,
+  inputName,
+  setInputName,
+  description,
+  setDescription,
+  isPublic,
+  setIsPublic,
+  creator,
+  savePlan,
+  deletePlan,
+  favouritePlan,
+  setIsShareModalShow,
+}) => {
+  const { isLoggedIn, loggedInUsername } = useAuthContext();
+
   const [inputProduct, setInputProduct] = useState(plan.item);
   const [inputAmount, setInputAmount] = useState(plan.amount);
   const [products, setProducts] = useState([]);
@@ -25,85 +52,138 @@ const InputsAndButtons = ({ fetchPlan, plan }) => {
   );
 
   return (
-    <>
-      <Input size="large" type="text" placeholder="Plan name" />
-      <div>
-        <label>Description</label>
-        <textarea rows="5" cols="27"></textarea>
-      </div>
-      <div>
-        <label>Product</label>
+    <aside className={styles.sidePanel}>
+      <>
         <Input
           size="large"
           type="text"
-          value={inputProduct}
-          setValue={setInputProduct}
-          customList={products}
+          placeholder="Plan name"
+          value={inputName}
+          setValue={setInputName}
+          disabled={!isNewPlan && creator !== loggedInUsername}
         />
-      </div>
-      <div>
-        <label>Production amount</label>
-        <Input
-          size="small"
-          type="number"
-          placeholder="0"
-          min={1}
-          max={50000}
-          value={inputAmount}
-          setValue={(value) => {
-            setInputAmount(parseInt(value));
-          }}
-        />
-      </div>
-      <div className={styles.buttons}>
-        <Button
-          size="small"
-          color="primary"
-          disabled={isApplyDisabled}
-          onClick={() => {
-            fetchPlan(inputProduct, inputAmount);
-          }}
-        >
-          Apply
-        </Button>
-        <a
-          href={URL.createObjectURL(
-            new Blob([JSON.stringify(plan)], {
-              type: "application/json",
-            })
+        <div>
+          <label>Description</label>
+          <textarea
+            rows="5"
+            cols="27"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            disabled={!isNewPlan && creator !== loggedInUsername}
+          ></textarea>
+        </div>
+        <div>
+          <label>Product</label>
+          <Input
+            size="large"
+            type="text"
+            value={inputProduct}
+            setValue={setInputProduct}
+            customList={products}
+            disabled={!isNewPlan && creator !== loggedInUsername}
+          />
+        </div>
+        <div>
+          <label>Production amount</label>
+          <Input
+            size="small"
+            type="number"
+            placeholder="0"
+            min={1}
+            max={50000}
+            value={inputAmount}
+            setValue={(value) => {
+              setInputAmount(parseInt(value));
+            }}
+            disabled={!isNewPlan && creator !== loggedInUsername}
+          />
+        </div>
+        <div>
+          {isNewPlan || loggedInUsername === creator ? (
+            <span>
+              <label className={styles.inline}>Public</label>
+              <input
+                type="checkbox"
+                className={styles.checkbox}
+                checked={isPublic}
+                onChange={(e) => setIsPublic(e.target.checked)}
+              />
+            </span>
+          ) : (
+            <label>Creator: {creator}</label>
           )}
-          download={`${plan.item}.json`}
-          onClick={() => {}}
-          className={`primary-button-style ${styles.exportLink}`}
-        >
-          Export
-        </a>
-        <Button size="small" color="primary" disabled={true}>
-          Save
-        </Button>
-        <Button size="small" color="primary" disabled={true}>
-          Favourite
-        </Button>
-        <Button size="small" color="primary" disabled={true}>
-          Share
-        </Button>
-        <Button size="small" color="red" disabled={true}>
-          Delete
-        </Button>
-      </div>
-    </>
-  );
-};
-
-const LeftSidePanel = ({ fetchPlan, plan }) => {
-  return (
-    <aside className={styles.sidePanel}>
-      {plan && <InputsAndButtons fetchPlan={fetchPlan} plan={plan} />}
+        </div>
+        <div className={styles.buttons}>
+          <Button
+            size="small"
+            color="primary"
+            disabled={isApplyDisabled}
+            onClick={() => {
+              fetchPlan(inputProduct, inputAmount);
+            }}
+          >
+            Apply
+          </Button>
+          <a
+            href={URL.createObjectURL(
+              new Blob([JSON.stringify(plan)], {
+                type: "application/json",
+              })
+            )}
+            download={`${plan.item}.json`}
+            onClick={() => {}}
+            className={`primary-button-style ${styles.exportLink}`}
+          >
+            Export
+          </a>
+          <Button
+            size="small"
+            color="primary"
+            onClick={savePlan}
+            disabled={!isLoggedIn}
+          >
+            Save
+          </Button>
+          <Button
+            size="small"
+            color="primary"
+            disabled={isNewPlan || !(isPublic && loggedInUsername)}
+            onClick={favouritePlan}
+          >
+            Favourite
+          </Button>
+          <Button
+            size="small"
+            color="primary"
+            disabled={isNewPlan || loggedInUsername !== creator}
+            onClick={() => setIsShareModalShow(true)}
+          >
+            Share
+          </Button>
+          <Button
+            size="small"
+            color="red"
+            disabled={isNewPlan || loggedInUsername !== creator}
+            onClick={deletePlan}
+          >
+            Delete
+          </Button>
+        </div>
+      </>
     </aside>
   );
 };
 
-const PlanSection = ({ plan, layer, updatePlan, path = [] }) => {
+const PlanSection = ({
+  plan,
+  layer,
+  updatePlan,
+  path = [],
+  creator,
+  isNewPlan,
+}) => {
+  const { loggedInUsername } = useAuthContext();
+
   const layerColor = `layer${layer}`;
 
   const onChange = async (e) => {
@@ -123,14 +203,18 @@ const PlanSection = ({ plan, layer, updatePlan, path = [] }) => {
       {plan.recipe && (
         <div>
           Recipe:
-          <select value={plan.recipe} onChange={onChange}>
-            <option value={plan.recipe}>{plan.recipe}</option>
-            {plan.alternateRecipes.map((alternateRecipe, index) => (
-              <option value={alternateRecipe} key={index}>
-                {alternateRecipe}
-              </option>
-            ))}
-          </select>
+          {isNewPlan || creator === loggedInUsername ? (
+            <select value={plan.recipe} onChange={onChange}>
+              <option value={plan.recipe}>{plan.recipe}</option>
+              {plan.alternateRecipes.map((alternateRecipe, index) => (
+                <option value={alternateRecipe} key={index}>
+                  {alternateRecipe}
+                </option>
+              ))}
+            </select>
+          ) : (
+            " " + plan.recipe
+          )}
         </div>
       )}
       {plan.buildingCount && (
@@ -147,6 +231,8 @@ const PlanSection = ({ plan, layer, updatePlan, path = [] }) => {
             updatePlan={updatePlan}
             path={[...path, ingredient.item]}
             key={`${plan.recipe}-${ingredient.item}-${index}`}
+            creator={creator}
+            isNewPlan={isNewPlan}
           />
         ))}
       </div>
@@ -241,16 +327,63 @@ const RightSidePanel = ({ plan }) => {
   );
 };
 
+const ShareModal = ({ isShareModalShow, sharePlan, shareError }) => {
+  const [username, setUsername] = useState("");
+  const [isError, setIsError] = useState(false);
+  const modalRef = useRef(null);
+
+  useEffect(() => {
+    document.addEventListener("keydown", onEscapeKeyDown);
+    return () => document.removeEventListener("keydown", onEscapeKeyDown);
+  }, []);
+
+  const hide = () => {
+    modalRef.current.close();
+    setUsername("");
+  };
+
+  const onEscapeKeyDown = (event) => event.key === "Escape" && hide();
+
+  if (isShareModalShow && !modalRef.current.open) {
+    modalRef.current.showModal();
+  }
+
+  return (
+    <dialog ref={modalRef} open={false} className={styles.shareModal}>
+      <div>
+        <Input
+          type="text"
+          placeholder="Username"
+          size={"large"}
+          value={username}
+          setValue={setUsername}
+        />
+        <Button size={"small"} color={"tertiary"} onClick={sharePlan}>
+          Share
+        </Button>
+        {isError && <p className={styles.error}>{shareError}</p>}
+      </div>
+    </dialog>
+  );
+};
+
 export const Plan = () => {
+  const { loggedInUsername, setIsLoginModalShow, setLoginModalMessage } =
+    useAuthContext();
+
   const [plan, setPlan] = useState();
+  const [planId, setPlanId] = useState(uuidv4());
+  const [inputName, setInputName] = useState("");
+  const [description, setDescription] = useState("");
+  const [isPublic, setIsPublic] = useState(false);
+  const [creator, setCreator] = useState("");
+  const [isShareModalShow, setIsShareModalShow] = useState(false);
+  const [shareError, setShareError] = useState("");
 
   const fetchPlan = (product, amount) => {
     (async () => {
       if (!plan || product !== plan.item) {
-        const response = await fetch(
-          `/api/plan/new/${product}?amount=${amount}`
-        );
-        const newPlan = await response.json();
+        const newPlan = await getNewPlan(product, amount);
         setPlan(newPlan);
       } else {
         const newPlan = { ...plan };
@@ -265,10 +398,20 @@ export const Plan = () => {
 
   useEffect(() => {
     if (id) {
+      setPlanId(id);
       (async () => {
-        const response = await fetch(`/api/plan/${id}`);
-        const plan = await response.json();
-        setPlan(plan);
+        try {
+          const { name, description, isPublic, creator, plan } =
+            await getPlanById(id);
+          setPlan(plan);
+          setInputName(name);
+          setDescription(description);
+          setIsPublic(isPublic);
+          setCreator(creator);
+        } catch (error) {
+          setIsLoginModalShow(true);
+          setLoginModalMessage(error.message);
+        }
       })();
     } else if (state) {
       if (state.plan) {
@@ -277,7 +420,7 @@ export const Plan = () => {
         fetchPlan(state.inputProduct, state.inputAmount);
       }
     }
-  }, []);
+  }, [loggedInUsername]);
 
   if (!state && !id) {
     return <Navigate to="/" replace />;
@@ -309,13 +452,84 @@ export const Plan = () => {
     }
   };
 
+  const savePlan = async () => {
+    try {
+      await putPlan(
+        plan,
+        loggedInUsername,
+        planId,
+        inputName,
+        description,
+        isPublic
+      );
+    } catch (error) {
+      setIsLoginModalShow(true);
+      setLoginModalMessage(error.message);
+    }
+  };
+
+  const deletePlan = async () => {
+    try {
+      await deletePlanApi(planId);
+    } catch (error) {
+      setIsLoginModalShow(true);
+      setLoginModalMessage(error.message);
+    }
+  };
+
+  const favouritePlan = async () => {
+    try {
+      await putFavouritePlan(planId);
+    } catch (error) {
+      setIsLoginModalShow(true);
+      setLoginModalMessage(error.message);
+    }
+  };
+
+  const sharePlan = async () => {
+    try {
+      await putSharedPlan(planId, account);
+      isShareModalShow(false);
+    } catch (error) {}
+  };
+
   return (
     <main className={styles.plan}>
-      <LeftSidePanel fetchPlan={fetchPlan} plan={plan} />
+      {plan && (
+        <LeftSidePanel
+          fetchPlan={fetchPlan}
+          plan={plan}
+          isNewPlan={!id}
+          inputName={inputName}
+          setInputName={setInputName}
+          description={description}
+          setDescription={setDescription}
+          isPublic={isPublic}
+          setIsPublic={setIsPublic}
+          creator={creator}
+          savePlan={savePlan}
+          deletePlan={deletePlan}
+          favouritePlan={favouritePlan}
+          setIsShareModalShow={setIsShareModalShow}
+        />
+      )}
       <div className={styles.planView}>
-        {plan && <PlanSection plan={plan} layer={1} updatePlan={updatePlan} />}
+        {plan && (
+          <PlanSection
+            plan={plan}
+            layer={1}
+            updatePlan={updatePlan}
+            creator={creator}
+            isNewPlan={!id}
+          />
+        )}
       </div>
       {plan && <RightSidePanel plan={plan} />}
+      <ShareModal
+        isShareModalShow={isShareModalShow}
+        sharePlan={sharePlan}
+        shareError={shareError}
+      />
     </main>
   );
 };

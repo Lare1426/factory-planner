@@ -11,6 +11,7 @@ export const Input = ({
   value,
   list,
   customList,
+  disabled,
 }) => {
   const [isInputFocused, setIsInputFocused] = useState(false);
   const inputRef = useRef(null);
@@ -52,6 +53,7 @@ export const Input = ({
         max={max}
         value={value}
         list={list}
+        disabled={disabled}
         onChange={onInputChange}
         onFocus={() => {
           customList && setIsInputFocused(true);

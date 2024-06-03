@@ -6,8 +6,7 @@ import { useAuthContext } from "@/utils/AuthContext";
 import styles from "./Header.module.scss";
 
 export const Header = () => {
-  const { isLoggedIn, isLoginModalShow, setIsLoginModalShow } =
-    useAuthContext();
+  const { isLoggedIn, setIsLoginModalShow } = useAuthContext();
 
   const [searchValue, setSearchValue] = useState("");
 
@@ -36,10 +35,7 @@ export const Header = () => {
             {isLoggedIn ? "Account" : "Login"}
           </Button>
         </div>
-        <LoginModal
-          isModalShown={isLoginModalShow}
-          onHide={() => setIsLoginModalShow(false)}
-        />
+        <LoginModal />
       </header>
       <Outlet />
     </>

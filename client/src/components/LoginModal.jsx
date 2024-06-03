@@ -4,9 +4,14 @@ import { authorise } from "@/utils/api";
 import { useAuthContext } from "@/utils/AuthContext";
 import styles from "./LoginModal.module.scss";
 
-export const LoginModal = ({ isModalShown, onHide }) => {
-  const { setIsLoggedIn, setLoggedInUsername, loginModalMessage } =
-    useAuthContext();
+export const LoginModal = () => {
+  const {
+    setIsLoggedIn,
+    setLoggedInUsername,
+    loginModalMessage,
+    isLoginModalShow,
+    setIsLoginModalShow,
+  } = useAuthContext();
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -33,14 +38,14 @@ export const LoginModal = ({ isModalShown, onHide }) => {
     setUsername("");
     setPassword("");
     setIsCredentialError(false);
-    onHide();
+    setIsLoginModalShow(false);
   };
 
-  if (isModalShown && !modalRef.current.open) {
+  if (isLoginModalShow && !modalRef.current.open) {
     modalRef.current.showModal();
   }
 
-  const onEscapeKeyDown = (event) => event.key === "Escape" && onHide();
+  const onEscapeKeyDown = (event) => event.key === "Escape" && hide();
 
   return (
     <dialog ref={modalRef} open={false} className={styles.loginModal}>
@@ -64,7 +69,7 @@ export const LoginModal = ({ isModalShown, onHide }) => {
           setValue={setPassword}
         />
         {isCredentialError && (
-          <p className={styles.error}>{"Invalid credentials!"}</p>
+          <p className={styles.error}>Invalid credentials!</p>
         )}
         <div className={styles.buttons}>
           <Button size={"small"} color={"tertiary"} onClick={authoriseUser}>

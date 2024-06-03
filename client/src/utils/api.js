@@ -5,6 +5,11 @@ export const getNewPlan = async (product, amount) => {
 
 export const getPlanById = async (id) => {
   const response = await fetch(`/api/plan/${id}`);
+  if (response.status === 401) {
+    throw new Error("Not logged in");
+  } else if (response.status === 403) {
+    throw new Error("Wrong account");
+  }
   return response.json();
 };
 
@@ -56,4 +61,29 @@ export const putPlan = async (
   );
 
   return response;
+};
+
+export const deletePlanApi = async (planId) => {
+  const response = await fetch(`/api/plan/${planId}`, { method: "DELETE" });
+  if (response.status === 403) {
+    throw new Error("Wrong account");
+  }
+};
+
+export const putFavouritePlan = async (planId) => {
+  const response = await authenticationRequiredApi(
+    `/api/plan/favourite/${planId}`,
+    {
+      method: "PUT",
+    }
+  );
+  if (response.status === 403) {
+    throw new Error("Wrong account");
+  }
+};
+
+export const putSharedPlan = async (planId, username) => {
+  const response = await authenticationRequiredApi(
+    `/api/plan/${planId}?username=${username}`
+  );
 };

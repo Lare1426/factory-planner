@@ -1,5 +1,4 @@
 import jwt from "jsonwebtoken";
-// const logger = require("./logger");
 
 export const generateToken = (username) => {
   return jwt.sign({ username }, process.env.JWT_SECRET_KEY, {
@@ -7,17 +6,29 @@ export const generateToken = (username) => {
   });
 };
 
-export const authenticateToken = (req, res, next) => {
+/**
+ * extract username from token else return null
+ * @returns {null | string}
+ */
+export const auhtenticateToken = (req) => {
   const token = req.headers.cookie?.slice(10);
   if (token == null) {
+    return null;
+  }
+
+  try {
+    return jwt.verify(token, process.env.JWT_SECRET_KEY).username;
+  } catch (error) {
+    return null;
+  }
+};
+
+export const authenticateTokenMiddleware = (req, res, next) => {
+  const username = auhtenticateToken(req);
+
+  if (!username) {
     return res.sendStatus(401);
   }
-  jwt.verify(token, process.env.JWT_SECRET_KEY, (err, username) => {
-    // err && logger.warn(err);
-    if (err) {
-      return res.sendStatus(403);
-    }
-    req.username = username;
-    next();
-  });
+  req.username = username;
+  next();
 };
