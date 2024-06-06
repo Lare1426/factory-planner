@@ -9,7 +9,9 @@ import {
   putPlan,
   deletePlanApi,
   putFavouritePlan,
+  getPlanFavourite,
   putSharedPlan,
+  getPlanSharedTo,
 } from "@/utils/api";
 import { useAuthContext } from "@/utils/AuthContext";
 import { round } from "../../../shared/round";
@@ -30,6 +32,9 @@ const LeftSidePanel = ({
   deletePlan,
   favouritePlan,
   setIsShareModalShow,
+  isSharedToUser,
+  isPlanFavourited,
+  originalPlan,
 }) => {
   const { isLoggedIn, loggedInUsername } = useAuthContext();
 
@@ -51,6 +56,16 @@ const LeftSidePanel = ({
     products.includes(inputProduct)
   );
 
+  const isSaveDisabled =
+    !isLoggedIn ||
+    (!isNewPlan && loggedInUsername !== creator && !isSharedToUser) ||
+    !(
+      originalPlan.name !== inputName ||
+      originalPlan.description !== description ||
+      originalPlan.isPublic !== isPublic ||
+      originalPlan.plan !== JSON.stringify(plan)
+    );
+
   return (
     <aside className={styles.sidePanel}>
       <>
@@ -60,7 +75,9 @@ const LeftSidePanel = ({
           placeholder="Plan name"
           value={inputName}
           setValue={setInputName}
-          disabled={!isNewPlan && creator !== loggedInUsername}
+          disabled={
+            !isNewPlan && creator !== loggedInUsername && !isSharedToUser
+          }
         />
         <div>
           <label>Description</label>
@@ -69,7 +86,9 @@ const LeftSidePanel = ({
             cols="27"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            disabled={!isNewPlan && creator !== loggedInUsername}
+            disabled={
+              !isNewPlan && creator !== loggedInUsername && !isSharedToUser
+            }
           ></textarea>
         </div>
         <div>
@@ -80,7 +99,9 @@ const LeftSidePanel = ({
             value={inputProduct}
             setValue={setInputProduct}
             customList={products}
-            disabled={!isNewPlan && creator !== loggedInUsername}
+            disabled={
+              !isNewPlan && creator !== loggedInUsername && !isSharedToUser
+            }
           />
         </div>
         <div>
@@ -95,7 +116,9 @@ const LeftSidePanel = ({
             setValue={(value) => {
               setInputAmount(parseInt(value));
             }}
-            disabled={!isNewPlan && creator !== loggedInUsername}
+            disabled={
+              !isNewPlan && creator !== loggedInUsername && !isSharedToUser
+            }
           />
         </div>
         <div>
@@ -140,17 +163,21 @@ const LeftSidePanel = ({
             size="small"
             color="primary"
             onClick={savePlan}
-            disabled={!isLoggedIn}
+            disabled={isSaveDisabled}
           >
             Save
           </Button>
           <Button
             size="small"
             color="primary"
-            disabled={isNewPlan || !(isPublic && loggedInUsername)}
+            disabled={
+              isNewPlan ||
+              !isLoggedIn ||
+              !(loggedInUsername === creator || isSharedToUser)
+            }
             onClick={favouritePlan}
           >
-            Favourite
+            {isPlanFavourited ? "Unfavourite" : "Favourite"}
           </Button>
           <Button
             size="small"
@@ -181,6 +208,7 @@ const PlanSection = ({
   path = [],
   creator,
   isNewPlan,
+  isSharedToUser,
 }) => {
   const { loggedInUsername } = useAuthContext();
 
@@ -203,7 +231,7 @@ const PlanSection = ({
       {plan.recipe && (
         <div>
           Recipe:
-          {isNewPlan || creator === loggedInUsername ? (
+          {isNewPlan || creator === loggedInUsername || isSharedToUser ? (
             <select value={plan.recipe} onChange={onChange}>
               <option value={plan.recipe}>{plan.recipe}</option>
               {plan.alternateRecipes.map((alternateRecipe, index) => (
@@ -233,6 +261,7 @@ const PlanSection = ({
             key={`${plan.recipe}-${ingredient.item}-${index}`}
             creator={creator}
             isNewPlan={isNewPlan}
+            isSharedToUser={isSharedToUser}
           />
         ))}
       </div>
@@ -327,19 +356,64 @@ const RightSidePanel = ({ plan }) => {
   );
 };
 
-const ShareModal = ({ isShareModalShow, sharePlan, shareError }) => {
-  const [username, setUsername] = useState("");
+const ShareModal = ({
+  isShareModalShow,
+  setIsShareModalShow,
+  planId,
+  creator,
+}) => {
+  const { loggedInUsername, setIsLoginModalShow, setLoginModalMessage } =
+    useAuthContext();
+
   const [isError, setIsError] = useState(false);
+  const [inputAccount, setInputAccount] = useState("");
+  const [shareError, setShareError] = useState("");
+  const [sharedTo, setSharedTo] = useState([]);
   const modalRef = useRef(null);
 
   useEffect(() => {
+    (async () => {
+      try {
+        setSharedTo(await getPlanSharedTo(planId));
+      } catch (error) {
+        setIsLoginModalShow(true);
+        setLoginModalMessage(error.message);
+      }
+    })();
     document.addEventListener("keydown", onEscapeKeyDown);
     return () => document.removeEventListener("keydown", onEscapeKeyDown);
   }, []);
 
+  const sharePlan = async () => {
+    if (inputAccount === creator) {
+      setIsError(true);
+      setShareError("Can't share to creator of plan");
+      return;
+    }
+    try {
+      await putSharedPlan(planId, inputAccount);
+      isError && setIsError(false);
+      setSharedTo(await getPlanSharedTo(planId));
+    } catch (error) {
+      setIsLoginModalShow(true);
+      setLoginModalMessage(error.message);
+    }
+  };
+
+  const removeShare = async (usernameToRemove) => {
+    try {
+      await putSharedPlan(planId, usernameToRemove);
+      setSharedTo(sharedTo.filter((username) => username !== usernameToRemove));
+    } catch (error) {
+      setIsLoginModalShow(true);
+      setLoginModalMessage(error.message);
+    }
+  };
+
   const hide = () => {
     modalRef.current.close();
-    setUsername("");
+    setIsShareModalShow(false);
+    setInputAccount("");
   };
 
   const onEscapeKeyDown = (event) => event.key === "Escape" && hide();
@@ -351,17 +425,32 @@ const ShareModal = ({ isShareModalShow, sharePlan, shareError }) => {
   return (
     <dialog ref={modalRef} open={false} className={styles.shareModal}>
       <div>
+        {isError && <p className={styles.error}>{shareError}</p>}
         <Input
           type="text"
           placeholder="Username"
           size={"large"}
-          value={username}
-          setValue={setUsername}
+          value={inputAccount}
+          setValue={setInputAccount}
         />
         <Button size={"small"} color={"tertiary"} onClick={sharePlan}>
           Share
         </Button>
-        {isError && <p className={styles.error}>{shareError}</p>}
+        {sharedTo?.map((username, index) => (
+          <div key={index} className={styles.sharedTo}>
+            {username}
+            <Button
+              size={"small"}
+              color={"red"}
+              onClick={() => removeShare(username)}
+            >
+              Remove
+            </Button>
+          </div>
+        ))}
+        <Button size="small" color="tertiary" onClick={hide}>
+          Close
+        </Button>
       </div>
     </dialog>
   );
@@ -378,7 +467,9 @@ export const Plan = () => {
   const [isPublic, setIsPublic] = useState(false);
   const [creator, setCreator] = useState("");
   const [isShareModalShow, setIsShareModalShow] = useState(false);
-  const [shareError, setShareError] = useState("");
+  const [isPlanFavourited, setIsPlanFavourited] = useState(false);
+  const [originalPlan, setOriginalPlan] = useState({});
+  const [isSharedToUser, setIsSharedToUser] = useState(false);
 
   const fetchPlan = (product, amount) => {
     (async () => {
@@ -401,13 +492,25 @@ export const Plan = () => {
       setPlanId(id);
       (async () => {
         try {
-          const { name, description, isPublic, creator, plan } =
+          const { name, description, isPublic, creator, plan, sharedPlan } =
             await getPlanById(id);
           setPlan(plan);
           setInputName(name);
           setDescription(description);
           setIsPublic(isPublic);
           setCreator(creator);
+          setIsSharedToUser(sharedPlan);
+          setOriginalPlan({
+            plan: JSON.stringify(plan),
+            name,
+            description,
+            isPublic,
+          });
+
+          if (loggedInUsername) {
+            const result = await getPlanFavourite(id);
+            result?.favourite && setIsPlanFavourited(result.favourite);
+          }
         } catch (error) {
           setIsLoginModalShow(true);
           setLoginModalMessage(error.message);
@@ -462,6 +565,13 @@ export const Plan = () => {
         description,
         isPublic
       );
+      !isSharedToUser && setCreator(loggedInUsername);
+      setOriginalPlan({
+        plan: JSON.stringify(plan),
+        name: inputName,
+        description,
+        isPublic,
+      });
     } catch (error) {
       setIsLoginModalShow(true);
       setLoginModalMessage(error.message);
@@ -480,17 +590,11 @@ export const Plan = () => {
   const favouritePlan = async () => {
     try {
       await putFavouritePlan(planId);
+      setIsPlanFavourited(isPlanFavourited ? false : true);
     } catch (error) {
       setIsLoginModalShow(true);
       setLoginModalMessage(error.message);
     }
-  };
-
-  const sharePlan = async () => {
-    try {
-      await putSharedPlan(planId, account);
-      isShareModalShow(false);
-    } catch (error) {}
   };
 
   return (
@@ -511,6 +615,9 @@ export const Plan = () => {
           deletePlan={deletePlan}
           favouritePlan={favouritePlan}
           setIsShareModalShow={setIsShareModalShow}
+          isSharedToUser={isSharedToUser}
+          isPlanFavourited={isPlanFavourited}
+          originalPlan={originalPlan}
         />
       )}
       <div className={styles.planView}>
@@ -521,15 +628,19 @@ export const Plan = () => {
             updatePlan={updatePlan}
             creator={creator}
             isNewPlan={!id}
+            isSharedToUser={isSharedToUser}
           />
         )}
       </div>
       {plan && <RightSidePanel plan={plan} />}
-      <ShareModal
-        isShareModalShow={isShareModalShow}
-        sharePlan={sharePlan}
-        shareError={shareError}
-      />
+      {plan && loggedInUsername === creator && !isSharedToUser && (
+        <ShareModal
+          isShareModalShow={isShareModalShow}
+          setIsShareModalShow={setIsShareModalShow}
+          planId={planId}
+          creator={creator}
+        />
+      )}
     </main>
   );
 };

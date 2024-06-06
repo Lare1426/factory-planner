@@ -34,21 +34,11 @@ export const selectAll = async () => {
   return rows;
 };
 
-// export const selectExists = async ({ id }) => {
-//   const [[row]] = await executeQuery(
-//     "SELECT * FROM plan WHERE EXISTS (SELECT * FROM plan WHERE id = ?)",
-//     [id]
-//   );
-//   console.log(row);
-// };
-
-// selectExists({ id: "5459f124-6a18-45fc-ab04-7ba125032e18" });
-
 export const update = ({ id, values }) => {
   return updateSpecificFields(
     "plan",
     id,
-    ["name", "description", "product", "amount", "public"],
+    ["name", "description", "product", "amount", "isPublic"],
     values
   );
 };

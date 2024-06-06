@@ -13,6 +13,27 @@ export const insert = async ({
   return result;
 };
 
+export const select = async ({ accountId, planId }) => {
+  let result;
+  if (!accountId) {
+    [result] = await executeQuery(
+      "SELECT * FROM account_plan WHERE planId = ?;",
+      [planId]
+    );
+  } else if (!planId) {
+    [result] = await executeQuery(
+      "SELECT * FROM account_plan WHERE accountId = ?;",
+      [accountId]
+    );
+  } else {
+    [[result]] = await executeQuery(
+      `SELECT * FROM account_plan WHERE accountId = ? AND planId = ?;`,
+      [accountId, planId]
+    );
+  }
+  return result;
+};
+
 export const del = async ({ accountId, planId }) => {
   const [result] = await executeQuery(
     "DELETE FROM account_plan WHERE accountId = ? AND planId = ?;",
@@ -21,18 +42,12 @@ export const del = async ({ accountId, planId }) => {
   return result;
 };
 
-export const update = async ({ accountId, planId, type }) => {
+export const update = async ({ accountId, planId, field, value }) => {
   const [result] = await executeQuery(
-    "UPDATE account_plan SET type = ? WHERE accountId = ? AND planId = ?;",
-    [type, accountId, planId]
+    `UPDATE account_plan SET ${field} = ? WHERE accountId = ? AND planId = ?;`,
+    [value, accountId, planId]
   );
   return result;
-  // return updateSpecificFields(
-  //   "account_plan",
-  //   id,
-  //   ["name", "description", "product", "amount", "public"],
-  //   values
-  // );
 };
 
-export default { insert, del, update };
+export default { insert, select, del, update };

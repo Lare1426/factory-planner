@@ -49,7 +49,7 @@ export const putPlan = async (
   const response = await authenticationRequiredApi(
     `/api/plan/${username}/${id}`,
     {
-      method: "POST",
+      method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         plan,
@@ -82,8 +82,38 @@ export const putFavouritePlan = async (planId) => {
   }
 };
 
+export const getPlanFavourite = async (planId) => {
+  const response = await authenticationRequiredApi(
+    `/api/plan/favourite/${planId}`,
+    { method: "GET" }
+  );
+  if (response.status === 403) {
+    throw new Error("Wrong account");
+  } else if (response.status === 404) {
+    return;
+  } else {
+    return response.json();
+  }
+};
+
 export const putSharedPlan = async (planId, username) => {
   const response = await authenticationRequiredApi(
-    `/api/plan/${planId}?username=${username}`
+    `/api/plan/shared/${planId}?username=${username}`,
+    { method: "PUT" }
   );
+  if (response.status === 403) {
+    throw new Error("Wrong account");
+  }
+};
+
+export const getPlanSharedTo = async (planId) => {
+  const response = await authenticationRequiredApi(
+    `/api/plan/shared/${planId}`,
+    { method: "GET" }
+  );
+  if (response.status === 403) {
+    throw new Error("Wrong account");
+  } else {
+    return response.json();
+  }
 };

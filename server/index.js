@@ -26,6 +26,8 @@ server.use(express.json());
 const apiRouter = express.Router();
 
 apiRouter.post("/authorise", async (req, res) => {
+  console.log("post/authorize");
+
   const { username, password } = req.body;
   const account = await accountRdb.select({ username });
 
@@ -43,22 +45,37 @@ apiRouter.post("/authorise", async (req, res) => {
 });
 
 apiRouter.get("/plan/new/:product/:recipe?", async (req, res) => {
+  console.log("get/plan/new");
+
   const { product, recipe } = req.params;
   const { amount } = req.query;
   res.json(await generate(product, Number(amount), recipe));
 });
 
 apiRouter.get("/plan/:id", async (req, res) => {
+  console.log("get/plan/id");
+
   const { id } = req.params;
   const { name, description, isPublic, creator } = await plansRdb.select({
     id,
   });
 
+  let sharedPlan = false;
+
   if (!isPublic) {
     const username = auhtenticateToken(req);
-    if (username !== creator) {
+    if (!username) {
+      return res.sendStatus(401);
+    }
+    const { id: accountId } = await accountRdb.select({ username });
+    const accountPlanRdbResult = await accountPlanRdb.select({
+      accountId,
+      planId: id,
+    });
+    if (username !== creator && accountPlanRdbResult?.shared !== 1) {
       return res.sendStatus(username ? 403 : 401);
     }
+    sharedPlan = true;
   }
 
   const planJson = await plansCdb.get(id);
@@ -69,41 +86,191 @@ apiRouter.get("/plan/:id", async (req, res) => {
     creator,
     isPublic: isPublic && true,
     plan: planJson,
+    sharedPlan,
   });
 });
 
 apiRouter.get("/products", async (req, res) => {
+  console.log("get/products");
+
   res.json(Object.keys(await getProducts()));
 });
 
 apiRouter.use(authenticateTokenMiddleware);
 
 apiRouter.get("/authenticate", async (req, res) => {
+  console.log("get/authenticate");
+
   res.json(req.username).status(200);
 });
 
-apiRouter.post("/plan/:username/:id", async (req, res) => {
+apiRouter.get("/plan/favourite/:id", async (req, res) => {
+  console.log("get/plan/favourite");
+
+  const { id } = req.params;
+
+  const { isPublic, creator } = await plansRdb.select({ id });
+  const { id: accountId } = await accountRdb.select({ username: req.username });
+  const accountPlanRdbResult = await accountPlanRdb.select({
+    accountId,
+    planId: id,
+  });
+
+  if (
+    !isPublic &&
+    req.username !== creator &&
+    accountPlanRdbResult?.shared !== 1
+  ) {
+    return res.sendStatus(403);
+  }
+
+  if (!accountPlanRdbResult) {
+    return res.sendStatus(404);
+  }
+
+  res.json({ favourite: accountPlanRdbResult.favourite ? true : false });
+});
+
+apiRouter.put("/plan/favourite/:id", async (req, res) => {
+  console.log("put/plan/favourite");
+
+  const { id } = req.params;
+  const { isPublic, creator } = await plansRdb.select({
+    id,
+  });
+
+  const { id: accountId } = await accountRdb.select({ username: req.username });
+  const accountPlanRdbResult = await accountPlanRdb.select({
+    accountId,
+    planId: id,
+  });
+
+  if (
+    !isPublic &&
+    req.username !== creator &&
+    accountPlanRdbResult?.shared !== 1
+  ) {
+    return res.sendStatus(403);
+  }
+
+  if (accountPlanRdbResult) {
+    const result = await accountPlanRdb.update({
+      accountId,
+      planId: id,
+      field: "favourite",
+      value: accountPlanRdbResult.favourite ? 0 : 1,
+    });
+  } else {
+    const result = await accountPlanRdb.insert({
+      accountId,
+      planId: id,
+      favourite: 1,
+      shared: 0,
+    });
+  }
+  res.sendStatus(200);
+});
+
+apiRouter.get("/plan/shared/:id", async (req, res) => {
+  console.log("get/plan/shared");
+
+  const { id } = req.params;
+
+  const { creator } = await plansRdb.select({ id });
+
+  if (req.username !== creator) {
+    return res.sendStatus(403);
+  }
+
+  const result = await accountPlanRdb.select({ planId: id });
+  const sharedTo = await Promise.all(
+    result
+      .filter((entry) => entry.shared === 1)
+      .map(async (entry) => {
+        const { username } = await accountRdb.select({ id: entry.accountId });
+        return username;
+      })
+  );
+  res.json(sharedTo);
+});
+
+apiRouter.put("/plan/shared/:id?", async (req, res) => {
+  console.log("put/plan/shared");
+
+  const { id } = req.params;
+  const { username } = req.query;
+
+  const { id: accountId } = await accountRdb.select({ username: username });
+  const { creator } = await plansRdb.select({ id });
+  const accountPlanRdbResult = await accountPlanRdb.select({
+    accountId,
+    planId: id,
+  });
+
+  if (req.username !== creator) {
+    return res.sendStatus(403);
+  }
+
+  if (accountPlanRdbResult) {
+    const result = await accountPlanRdb.update({
+      accountId,
+      planId: id,
+      field: "shared",
+      value: accountPlanRdbResult.shared ? 0 : 1,
+    });
+  } else {
+    const result = await accountPlanRdb.insert({
+      accountId,
+      planId: id,
+      shared: 1,
+    });
+  }
+  res.sendStatus(200);
+});
+
+apiRouter.put("/plan/:username/:id", async (req, res) => {
+  console.log("put/plan");
+
   const { name, description, plan, isPublic } = req.body;
   const { username, id } = req.params;
-  console.log("id:", id);
 
-  const rdbResponse = await plansRdb.insert({
-    id,
-    name,
-    description,
-    product: plan.item,
-    amount: plan.amount,
-    isPublic,
-    creator: username,
-  });
-  const putResult = await plansCdb.put(id, plan);
-  res.json({
-    rdbResponse,
-    putResult,
-  });
+  const rdbResult = await plansRdb.select({ id });
+
+  if (rdbResult) {
+    const redResponse = await plansRdb.update({
+      id,
+      values: {
+        name,
+        description,
+        product: plan.item,
+        amount: plan.amount,
+        ispublic: isPublic,
+      },
+    });
+    const rev = await plansCdb.getRevision(id);
+    const cdbResponse = await plansCdb.put(id, plan, rev);
+  } else {
+    const rdbResponse = await plansRdb.insert({
+      id,
+      name,
+      description,
+      product: plan.item,
+      amount: plan.amount,
+      isPublic,
+      creator: username,
+    });
+    const cdbResponse = await plansCdb.put(id, plan);
+    // res.json({
+    //   rdbResponse,
+    //   cdbResponse,
+    // });
+  }
+  res.sendStatus(200);
 });
 
 apiRouter.delete("/plan/:id", async (req, res) => {
+  console.log("delete/plan");
+
   const { id } = req.params;
   const { creator } = await plansRdb.select({
     id,
@@ -115,48 +282,6 @@ apiRouter.delete("/plan/:id", async (req, res) => {
 
   const rdbDeleteResult = await plansRdb.del({ id });
   const cdbDeleteResult = await plansCdb.del(id);
-  res.sendStatus(200);
-});
-
-apiRouter.put("/plan/favourite/:id", async (req, res) => {
-  const { id } = req.params;
-  const { isPublic } = await plansRdb.select({
-    id,
-  });
-
-  if (!isPublic) {
-    res.sendStatus(403);
-  }
-
-  const { id: accountId } = await accountRdb.select({ username: req.username });
-  const result = await accountPlanRdb.insert({
-    accountId,
-    planId: id,
-    favourite: 1,
-    shared: 0,
-  });
-  res.sendStatus(200);
-});
-
-apiRouter.put("/plan/shared/:id?", async (req, res) => {
-  const { id } = req.params;
-  const { username } = req.query;
-
-  const { creator } = await plansRdb.select({ id });
-
-  if (req.username !== creator) {
-    res.sendStatus(403);
-  }
-
-  const { id: accountId } = await accountRdb.select({ username: username });
-
-  console.log(accountId);
-
-  const result = await accountPlanRdb.insert({
-    accountId,
-    planId: id,
-    shader: 1,
-  });
   res.sendStatus(200);
 });
 
