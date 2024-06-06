@@ -1,4 +1,4 @@
-import { executeQuery, updateSpecificFields } from "./rdb.js";
+import { executeQuery } from "./rdb.js";
 
 export const insert = async ({
   accountId,
@@ -7,8 +7,8 @@ export const insert = async ({
   favourite = 0,
 }) => {
   const [result] = await executeQuery(
-    "INSERT INTO account_plan (accountId, planId, shared, favourite) VALUES (?, ?, ?, ?);",
-    [accountId, planId, shared, favourite]
+    "INSERT INTO account_plan (accountId, planId, shared, favourite) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE shared=?, favourite=?;",
+    [accountId, planId, shared, favourite, shared, favourite]
   );
   return result;
 };
@@ -42,12 +42,4 @@ export const del = async ({ accountId, planId }) => {
   return result;
 };
 
-export const update = async ({ accountId, planId, field, value }) => {
-  const [result] = await executeQuery(
-    `UPDATE account_plan SET ${field} = ? WHERE accountId = ? AND planId = ?;`,
-    [value, accountId, planId]
-  );
-  return result;
-};
-
-export default { insert, select, del, update };
+export default { insert, select, del };

@@ -271,27 +271,44 @@ const PlanSection = ({
 
 const findTotalAmounts = (plan) => {
   const totalAmounts = {
-    [plan.item]: {
-      amount: plan.amount,
-      count: 1,
+    items: {
+      [plan.item]: {
+        amount: plan.amount,
+        count: 1,
+      },
     },
+    buildings: {},
   };
+
+  if (plan.producedIn) {
+    totalAmounts.buildings[plan.producedIn] = plan.buildingCount;
+  }
 
   if (plan.ingredients) {
     for (const ingredient of plan.ingredients) {
       const returnedTotalAmounts = findTotalAmounts(ingredient);
 
       for (const [item, { amount, count }] of Object.entries(
-        returnedTotalAmounts
+        returnedTotalAmounts.items
       )) {
-        if (item in totalAmounts) {
-          totalAmounts[item].amount += amount;
-          totalAmounts[item].count += count;
+        if (item in totalAmounts.items) {
+          totalAmounts.items[item].amount += amount;
+          totalAmounts.items[item].count += count;
         } else {
-          totalAmounts[item] = {
+          totalAmounts.items[item] = {
             amount,
             count,
           };
+        }
+      }
+
+      for (const [building, amount] of Object.entries(
+        returnedTotalAmounts.buildings
+      )) {
+        if (building in totalAmounts.buildings) {
+          totalAmounts.buildings[building] += amount;
+        } else {
+          totalAmounts.buildings[building] = amount;
         }
       }
     }
@@ -315,6 +332,7 @@ const updatePlanAmounts = async (plan, amount) => {
 const RightSidePanel = ({ plan }) => {
   const [totalOres, setTotalOres] = useState({});
   const [allProducts, setAllProducts] = useState({});
+  const [totalBuildings, setTotalBuildings] = useState({});
 
   useEffect(() => {
     const totalAmounts = findTotalAmounts(plan);
@@ -322,10 +340,14 @@ const RightSidePanel = ({ plan }) => {
     const preTotalOres = {};
     const preAllProducts = {};
 
-    for (const [item, { amount, count }] of Object.entries(totalAmounts)) {
+    setTotalBuildings(totalAmounts.buildings);
+
+    for (const [item, { amount, count }] of Object.entries(
+      totalAmounts.items
+    )) {
       if (ores.includes(item)) {
         preTotalOres[item] = amount;
-      } else if (count > 1) {
+      } else {
         preAllProducts[item] = amount;
       }
     }
@@ -338,19 +360,33 @@ const RightSidePanel = ({ plan }) => {
     <aside className={styles.sidePanel}>
       <ul>
         <div className={styles.title}>Total ores:</div>
-        {Object.entries(totalOres).map(([ore, amount], index) => (
-          <li key={`${ore}${index}`}>
-            {ore}: {round(amount, 4)}/min
-          </li>
-        ))}
+        {Object.entries(totalOres)
+          .toSorted((a, b) => b[1] - a[1])
+          .map(([ore, amount], index) => (
+            <li key={`${ore}${index}`}>
+              {ore}: {round(amount, 4)}/min
+            </li>
+          ))}
       </ul>
       <ul>
-        <div className={styles.title}>Common products:</div>
-        {Object.entries(allProducts).map(([item, amount], index) => (
-          <li key={`${item}${index}`}>
-            {item}: {round(amount, 4)}/min
-          </li>
-        ))}
+        <div className={styles.title}>Total products:</div>
+        {Object.entries(allProducts)
+          .toSorted((a, b) => b[1] - a[1])
+          .map(([item, amount], index) => (
+            <li key={`${item}${index}`}>
+              {item}: {round(amount, 4)}/min
+            </li>
+          ))}
+      </ul>
+      <ul>
+        <div className={styles.title}>Total buildings:</div>
+        {Object.entries(totalBuildings)
+          .toSorted((a, b) => b[1] - a[1])
+          .map(([building, amount], index) => (
+            <li key={`${building}${index}`}>
+              {building}: {round(amount, 4)}/min
+            </li>
+          ))}
       </ul>
     </aside>
   );
