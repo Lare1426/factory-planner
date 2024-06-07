@@ -384,7 +384,7 @@ const RightSidePanel = ({ plan }) => {
           .toSorted((a, b) => b[1] - a[1])
           .map(([building, amount], index) => (
             <li key={`${building}${index}`}>
-              {building}: {round(amount, 4)}/min
+              {building}: {round(amount, 4)}
             </li>
           ))}
       </ul>

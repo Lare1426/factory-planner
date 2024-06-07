@@ -1,7 +1,8 @@
 import {
-  redirect,
   createBrowserRouter,
   RouterProvider,
+  createRoutesFromElements,
+  Route,
 } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Header } from "@/components";
@@ -9,33 +10,16 @@ import { Home, Create, Plan } from "@/routes";
 import { AuthContext } from "./utils/AuthContext";
 import { authenticate } from "./utils/api";
 
-const router = createBrowserRouter([
-  {
-    element: <Header />,
-    children: [
-      {
-        path: "/",
-        element: <Home />,
-      },
-      {
-        path: "/create",
-        element: <Create />,
-      },
-      {
-        path: "/plan/new",
-        element: <Plan />,
-      },
-      {
-        path: "/plan/:id",
-        element: <Plan />,
-      },
-      {
-        path: "*",
-        loader: () => redirect("/"),
-      },
-    ],
-  },
-]);
+const router = createBrowserRouter(
+  createRoutesFromElements(
+    <Route element={<Header />}>
+      <Route path="/" element={<Home />} />
+      <Route path="/create" element={<Create />} />
+      <Route path="/plan/new" element={<Plan />} />
+      <Route path="/plan/:id" element={<Plan />} />
+    </Route>
+  )
+);
 
 export const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
