@@ -76,6 +76,7 @@ const LeftSidePanel = ({
             placeholder="Plan name"
             value={inputName}
             setValue={setInputName}
+            characterLimit={30}
             disabled={
               !isNewPlan && creator !== loggedInUsername && !isSharedToUser
             }
@@ -344,9 +345,7 @@ const RightSidePanel = ({ plan }) => {
 
     setTotalBuildings(totalAmounts.buildings);
 
-    for (const [item, { amount, count }] of Object.entries(
-      totalAmounts.items
-    )) {
+    for (const [item, { amount }] of Object.entries(totalAmounts.items)) {
       if (ores.includes(item)) {
         preTotalOres[item] = amount;
       } else {
@@ -400,8 +399,7 @@ const ShareModal = ({
   planId,
   creator,
 }) => {
-  const { loggedInUsername, setIsLoginModalShow, setLoginModalMessage } =
-    useAuthContext();
+  const { setIsLoginModalShow, setLoginModalMessage } = useAuthContext();
 
   const [isError, setIsError] = useState(false);
   const [inputAccount, setInputAccount] = useState("");
@@ -432,6 +430,7 @@ const ShareModal = ({
       await putSharedPlan(planId, inputAccount);
       isError && setIsError(false);
       setSharedTo(await getPlanSharedTo(planId));
+      setInputAccount("");
     } catch (error) {
       setIsLoginModalShow(true);
       setLoginModalMessage(error.message);
@@ -474,6 +473,7 @@ const ShareModal = ({
         <Button size={"small"} color={"tertiary"} onClick={sharePlan}>
           Share
         </Button>
+        <div>Shared to users:</div>
         {sharedTo?.map((username, index) => (
           <div key={index} className={styles.sharedTo}>
             {username}
@@ -530,14 +530,14 @@ export const Plan = () => {
       setPlanId(id);
       (async () => {
         try {
-          const { name, description, isPublic, creator, plan, sharedPlan } =
+          const { name, description, isPublic, creator, plan, isSharedTo } =
             await getPlanById(id);
           setPlan(plan);
           setInputName(name);
           setDescription(description);
           setIsPublic(isPublic);
           setCreator(creator);
-          setIsSharedToUser(sharedPlan);
+          setIsSharedToUser(isSharedTo);
           setOriginalPlan({
             plan: JSON.stringify(plan),
             name,

@@ -60,7 +60,7 @@ apiRouter.get("/plan/:id", async (req, res) => {
     id,
   });
 
-  let sharedPlan = false;
+  let isSharedTo = false;
 
   if (!isPublic) {
     const username = auhtenticateToken(req);
@@ -76,7 +76,7 @@ apiRouter.get("/plan/:id", async (req, res) => {
       return res.sendStatus(username ? 403 : 401);
     }
     if (accountPlanRdbResult.shared === 1) {
-      sharedPlan = true;
+      isSharedTo = true;
     }
   }
 
@@ -88,7 +88,7 @@ apiRouter.get("/plan/:id", async (req, res) => {
     creator,
     isPublic: isPublic && true,
     plan: planJson,
-    sharedPlan,
+    isSharedTo,
   });
 });
 
@@ -226,7 +226,7 @@ apiRouter.put("/plan/:username/:id", async (req, res) => {
   const rdbResult = await plansRdb.select({ id });
 
   if (rdbResult) {
-    const redResponse = await plansRdb.update({
+    const rdbResponse = await plansRdb.update({
       id,
       values: {
         name,

@@ -13,6 +13,7 @@ export const Input = ({
   shadow,
   customList,
   disabled,
+  characterLimit = 30,
 }) => {
   const [isInputFocused, setIsInputFocused] = useState(false);
   const inputRef = useRef(null);
@@ -27,7 +28,8 @@ export const Input = ({
       };
       reader.readAsText(event.target.files[0]);
     } else {
-      event.target.value.length < 31 && setValue(event.target.value);
+      event.target.value.length <= characterLimit &&
+        setValue(event.target.value);
     }
   };
 
