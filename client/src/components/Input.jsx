@@ -10,6 +10,7 @@ export const Input = ({
   setValue,
   value,
   list,
+  shadow,
   customList,
   disabled,
 }) => {
@@ -26,7 +27,7 @@ export const Input = ({
       };
       reader.readAsText(event.target.files[0]);
     } else {
-      setValue(event.target.value);
+      event.target.value.length < 31 && setValue(event.target.value);
     }
   };
 
@@ -68,7 +69,9 @@ export const Input = ({
       {type === "file" && (
         <label
           htmlFor="fileInput"
-          className={`primary-button-style ${styles.fileInputLabel}`}
+          className={`primary-button-style ${styles.fileInputLabel} ${
+            shadow === "drop" && styles.dropShadow
+          }`}
         >
           Import
         </label>

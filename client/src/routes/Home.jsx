@@ -76,7 +76,12 @@ export const Home = () => {
           </Link>
         </div>
         <div className={styles.buttons}>
-          <Input size="large" type="file" setValue={navigatePlan} />
+          <Input
+            size="large"
+            type="file"
+            shadow="drop"
+            setValue={navigatePlan}
+          />
         </div>
       </div>
     </main>

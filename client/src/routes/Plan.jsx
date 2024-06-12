@@ -69,16 +69,18 @@ const LeftSidePanel = ({
   return (
     <aside className={styles.sidePanel}>
       <>
-        <Input
-          size="large"
-          type="text"
-          placeholder="Plan name"
-          value={inputName}
-          setValue={setInputName}
-          disabled={
-            !isNewPlan && creator !== loggedInUsername && !isSharedToUser
-          }
-        />
+        <div>
+          <Input
+            size="large"
+            type="text"
+            placeholder="Plan name"
+            value={inputName}
+            setValue={setInputName}
+            disabled={
+              !isNewPlan && creator !== loggedInUsername && !isSharedToUser
+            }
+          />
+        </div>
         <div>
           <label>Description</label>
           <textarea
