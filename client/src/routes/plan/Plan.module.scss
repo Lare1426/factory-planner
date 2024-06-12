@@ -1,0 +1,10 @@
+.plan {
+  width: 100%;
+  height: calc(100% - var(--header-height));
+  display: grid;
+  grid-template-columns: min-content 1fr max-content;
+
+  .plan-view {
+    overflow-y: auto;
+  }
+}
