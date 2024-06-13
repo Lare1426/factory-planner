@@ -100,6 +100,11 @@ apiRouter.get("/products", async (req, res) => {
 
 apiRouter.use(authenticateTokenMiddleware);
 
+apiRouter.delete("/deauthorise", async (req, res) => {
+  res.clearCookie("authToken");
+  res.end();
+});
+
 apiRouter.get("/authenticate", async (req, res) => {
   console.log("get/authenticate");
 

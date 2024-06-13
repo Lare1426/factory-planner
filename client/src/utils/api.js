@@ -22,6 +22,11 @@ export const authorise = async (username, password) => {
   return response.ok;
 };
 
+export const deauthorise = async () => {
+  const response = await fetch("/api/deauthorise", { method: "DELETE" });
+  return;
+};
+
 const authenticationRequiredApi = async (path, headers) => {
   const response = await fetch(path, headers);
   if (response.status === 401) {

@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import styles from "./Account.module.scss";
 import { useAuthContext } from "@/utils/AuthContext";
 import { Button, Input } from "@/components";
-import { getAccountPlans } from "@/utils/api";
+import { getAccountPlans, deauthorise } from "@/utils/api";
 
 const PlanList = ({ name, list }) => {
   const navigate = useNavigate();
@@ -29,8 +29,13 @@ const PlanList = ({ name, list }) => {
 };
 
 export const Account = () => {
-  const { loggedInUsername, setIsLoginModalShow, setLoginModalMessage } =
-    useAuthContext();
+  const {
+    loggedInUsername,
+    setIsLoginModalShow,
+    setLoginModalMessage,
+    setIsLoggedIn,
+    setLoggedInUsername,
+  } = useAuthContext();
 
   const [accountPlans, setAccountPlans] = useState();
 
@@ -54,6 +59,13 @@ export const Account = () => {
     });
   };
 
+  const logOut = async () => {
+    await deauthorise();
+    navigate("/");
+    setIsLoggedIn(false);
+    setLoggedInUsername("");
+  };
+
   return (
     <main className={styles.account}>
       <div className={styles.topBar}>
@@ -70,6 +82,9 @@ export const Account = () => {
             shadow="drop"
             setValue={navigatePlan}
           />
+          <Button size="large" color="primary" shadow="drop" onClick={logOut}>
+            Log out
+          </Button>
         </div>
       </div>
       {accountPlans && (
