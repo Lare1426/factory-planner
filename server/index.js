@@ -270,6 +270,38 @@ apiRouter.delete("/plan/:id", async (req, res) => {
   res.sendStatus(200);
 });
 
+apiRouter.get("/account/plan", async (req, res) => {
+  console.log("get/account/plan");
+
+  const plansRdbResult = await plansRdb.selectWhere({
+    field: "creator",
+    value: req.username,
+  });
+  const { id: accountId } = await accountRdb.select({ username: req.username });
+  const accountPlanRdbResult = await accountPlanRdb.select({
+    accountId: accountId,
+  });
+
+  const favourite = [];
+  const shared = [];
+
+  accountPlanRdbResult.forEach((plan) => {
+    if (plan.shared) {
+      shared.push(plansRdb.select({ id: plan.planId }));
+    }
+    if (plan.favourite) {
+      favourite.push(plansRdb.select({ id: plan.planId }));
+    }
+  });
+
+  res.json({
+    public: plansRdbResult.filter((plan) => plan.isPublic),
+    private: plansRdbResult.filter((plan) => !plan.isPublic),
+    favourite: await Promise.all(favourite),
+    shared: await Promise.all(shared),
+  });
+});
+
 server.use("/api", apiRouter);
 
 if (process.env.NODE_ENV === "production") {

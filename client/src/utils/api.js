@@ -117,3 +117,10 @@ export const getPlanSharedTo = async (planId) => {
     return response.json();
   }
 };
+
+export const getAccountPlans = async () => {
+  const response = await authenticationRequiredApi("/api/account/plan", {
+    method: "GET",
+  });
+  return response.json();
+};

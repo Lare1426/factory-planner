@@ -29,6 +29,13 @@ export const select = async ({ id }) => {
   return plan;
 };
 
+export const selectWhere = async ({ field, value }) => {
+  const [rows] = await executeQuery(`SELECT * FROM plan WHERE ${field} = ?`, [
+    value,
+  ]);
+  return rows;
+};
+
 export const selectAll = async () => {
   const [rows] = await executeQuery("SELECT * FROM plan");
   return rows;
@@ -48,4 +55,4 @@ export const del = async ({ id }) => {
   return result;
 };
 
-export default { insert, select, selectAll, update, del };
+export default { insert, select, selectWhere, selectAll, update, del };
