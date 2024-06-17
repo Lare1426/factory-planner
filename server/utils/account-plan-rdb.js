@@ -7,7 +7,9 @@ export const insert = async ({
   favourite = 0,
 }) => {
   const [result] = await executeQuery(
-    "INSERT INTO account_plan (accountId, planId, shared, favourite) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE shared=?, favourite=?;",
+    `INSERT INTO account_plan (accountId, planId, shared, favourite) 
+    VALUES (?, ?, ?, ?) 
+    ON DUPLICATE KEY UPDATE shared=?, favourite=?;`,
     [accountId, planId, shared, favourite, shared, favourite]
   );
   return result;

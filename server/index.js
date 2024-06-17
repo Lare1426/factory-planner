@@ -62,11 +62,8 @@ apiRouter.get("/plan/:id", async (req, res) => {
 
   let isSharedTo = false;
 
-  if (!isPublic) {
-    const username = auhtenticateToken(req);
-    if (!username) {
-      return res.sendStatus(401);
-    }
+  const username = auhtenticateToken(req);
+  if (username) {
     const { id: accountId } = await accountRdb.select({ username });
     const accountPlanRdbResult = await accountPlanRdb.select({
       accountId,
@@ -78,6 +75,10 @@ apiRouter.get("/plan/:id", async (req, res) => {
     if (accountPlanRdbResult.shared === 1) {
       isSharedTo = true;
     }
+  }
+
+  if (!isPublic && !isSharedTo && creator !== username) {
+    return res.sendStatus(401);
   }
 
   const planJson = await plansCdb.get(id);
@@ -222,39 +223,43 @@ apiRouter.put("/plan/shared/:id?", async (req, res) => {
   res.sendStatus(200);
 });
 
-apiRouter.put("/plan/:username/:id", async (req, res) => {
+apiRouter.put("/plan/:id", async (req, res) => {
   console.log("put/plan");
 
-  const { name, description, plan, isPublic } = req.body;
-  const { username, id } = req.params;
+  const { name, description, creator, plan, isPublic } = req.body;
+  const { id } = req.params;
 
   const rdbResult = await plansRdb.select({ id });
+  const { id: accountId } = await accountRdb.select({ username: req.username });
+  const accountPlanRdbResult = await accountPlanRdb.select({
+    accountId,
+    planId: id,
+  });
 
-  if (rdbResult) {
-    const rdbResponse = await plansRdb.update({
-      id,
-      values: {
-        name,
-        description,
-        product: plan.item,
-        amount: plan.amount,
-        ispublic: isPublic,
-      },
-    });
+  if (
+    rdbResult?.creator !== creator ||
+    !(req.username === rdbResult?.creator || accountPlanRdbResult?.shared === 1)
+  ) {
+    res.sendStatus(403);
+  }
+
+  const cdbResult = await plansCdb.get(id);
+
+  if (!cdbResult || JSON.stringify(cdbResult) !== JSON.stringify(plan)) {
     const rev = await plansCdb.getRevision(id);
     const cdbResponse = await plansCdb.put(id, plan, rev);
-  } else {
-    const rdbResponse = await plansRdb.insert({
-      id,
-      name,
-      description,
-      product: plan.item,
-      amount: plan.amount,
-      isPublic,
-      creator: username,
-    });
-    const cdbResponse = await plansCdb.put(id, plan);
   }
+
+  const rdbResponse = await plansRdb.insert({
+    id,
+    creator,
+    name,
+    description,
+    product: plan.item,
+    amount: plan.amount,
+    isPublic,
+  });
+
   res.sendStatus(200);
 });
 
