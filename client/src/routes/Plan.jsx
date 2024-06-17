@@ -595,15 +595,15 @@ export const Plan = () => {
 
   const savePlan = async () => {
     try {
+      !creator && setCreator(loggedInUsername);
       await putPlan(
         plan,
-        loggedInUsername,
+        creator || loggedInUsername,
         planId,
         inputName,
         description,
         isPublic
       );
-      !isSharedToUser && setCreator(loggedInUsername);
       setOriginalPlan({
         plan: JSON.stringify(plan),
         name: inputName,

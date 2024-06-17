@@ -45,25 +45,23 @@ export const authenticate = async () => {
 
 export const putPlan = async (
   plan,
-  username,
+  creator,
   id,
   name,
   description,
   isPublic
 ) => {
-  const response = await authenticationRequiredApi(
-    `/api/plan/${username}/${id}`,
-    {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        plan,
-        name,
-        description,
-        isPublic,
-      }),
-    }
-  );
+  const response = await authenticationRequiredApi(`/api/plan/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      plan,
+      name,
+      creator,
+      description,
+      isPublic,
+    }),
+  });
 
   return response;
 };
