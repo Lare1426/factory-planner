@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { Navigate, useLocation, useParams } from "react-router-dom";
+import { Navigate, redirect, useLocation, useParams } from "react-router-dom";
 import { v4 as uuidv4 } from "uuid";
 import styles from "./Plan.module.scss";
 import { Button, Input } from "@/components";
@@ -595,7 +595,6 @@ export const Plan = () => {
 
   const savePlan = async () => {
     try {
-      !creator && setCreator(loggedInUsername);
       await putPlan(
         plan,
         creator || loggedInUsername,
@@ -604,12 +603,7 @@ export const Plan = () => {
         description,
         isPublic
       );
-      setOriginalPlan({
-        plan: JSON.stringify(plan),
-        name: inputName,
-        description,
-        isPublic,
-      });
+      redirect(`/plan/${planId}`);
     } catch (error) {
       setIsLoginModalShow(true);
       setLoginModalMessage(error.message);

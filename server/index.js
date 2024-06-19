@@ -72,7 +72,7 @@ apiRouter.get("/plan/:id", async (req, res) => {
     if (username !== creator && accountPlanRdbResult?.shared !== 1) {
       return res.sendStatus(username ? 403 : 401);
     }
-    if (accountPlanRdbResult.shared === 1) {
+    if (accountPlanRdbResult?.shared === 1) {
       isSharedTo = true;
     }
   }
@@ -237,8 +237,8 @@ apiRouter.put("/plan/:id", async (req, res) => {
   });
 
   if (
-    rdbResult?.creator !== creator ||
-    !(req.username === rdbResult?.creator || accountPlanRdbResult?.shared === 1)
+    (rdbResult && req.username !== rdbResult?.creator) ||
+    accountPlanRdbResult?.shared === 0
   ) {
     res.sendStatus(403);
   }
