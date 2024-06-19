@@ -9,7 +9,7 @@ export const PlanSection = ({
   path = [],
   creator,
   isNewPlan,
-  isSharedToUser,
+  hasEditAccess,
 }) => {
   const { loggedInUsername } = useAuthContext();
 
@@ -32,7 +32,7 @@ export const PlanSection = ({
       {plan.recipe && (
         <div>
           Recipe:
-          {isNewPlan || creator === loggedInUsername || isSharedToUser ? (
+          {isNewPlan || creator === loggedInUsername || hasEditAccess ? (
             <select value={plan.recipe} onChange={onChange}>
               <option value={plan.recipe}>{plan.recipe}</option>
               {plan.alternateRecipes.map((alternateRecipe, index) => (
@@ -62,7 +62,7 @@ export const PlanSection = ({
             key={`${plan.recipe}-${ingredient.item}-${index}`}
             creator={creator}
             isNewPlan={isNewPlan}
-            isSharedToUser={isSharedToUser}
+            hasEditAccess={hasEditAccess}
           />
         ))}
       </div>

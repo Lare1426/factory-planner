@@ -26,12 +26,15 @@ export const select = async ({ accountId, planId }) => {
       [accountId]
     );
   } else {
-    [[result]] = await executeQuery(
+    [result] = await executeQuery(
       `SELECT * FROM account_plan WHERE accountId = ? AND planId = ?;`,
       [accountId, planId]
     );
   }
-  return result;
+  return result.map((row) => {
+    row.shared = !!row.shared;
+    row.favourite = !!row.favourite;
+  });
 };
 
 export const del = async ({ accountId, planId }) => {

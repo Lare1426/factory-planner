@@ -1,10 +1,15 @@
 import { useEffect, useState } from "react";
-import { Navigate, useLocation, useParams } from "react-router-dom";
-import { v4 as uuidv4 } from "uuid";
+import {
+  Navigate,
+  useLocation,
+  useParams,
+  useNavigate,
+} from "react-router-dom";
 import styles from "./Plan.module.scss";
 import {
   getNewPlan,
   getPlanById,
+  postPlan,
   putPlan,
   deletePlanApi,
   putFavouritePlan,
@@ -34,7 +39,7 @@ export const Plan = () => {
     useAuthContext();
 
   const [plan, setPlan] = useState();
-  const [planId, setPlanId] = useState(uuidv4());
+  const [planId, setPlanId] = useState("");
   const [inputName, setInputName] = useState("");
   const [description, setDescription] = useState("");
   const [isPublic, setIsPublic] = useState(false);
@@ -42,7 +47,9 @@ export const Plan = () => {
   const [isShareModalShow, setIsShareModalShow] = useState(false);
   const [isPlanFavourited, setIsPlanFavourited] = useState(false);
   const [originalPlan, setOriginalPlan] = useState({});
-  const [isSharedToUser, setIsSharedToUser] = useState(false);
+  const [hasEditAccess, setHasEditAccess] = useState(false);
+
+  const navigate = useNavigate();
 
   const fetchPlan = (product, amount) => {
     (async () => {
@@ -62,17 +69,17 @@ export const Plan = () => {
 
   useEffect(() => {
     if (id) {
-      setPlanId(id);
       (async () => {
         try {
-          const { name, description, isPublic, creator, plan, isSharedTo } =
+          const { name, description, isPublic, creator, plan, hasEditAccess } =
             await getPlanById(id);
+          setPlanId(id);
           setPlan(plan);
           setInputName(name);
           setDescription(description);
           setIsPublic(isPublic);
           setCreator(creator);
-          setIsSharedToUser(isSharedTo);
+          setHasEditAccess(hasEditAccess);
           setOriginalPlan({
             plan: JSON.stringify(plan),
             name,
@@ -130,15 +137,19 @@ export const Plan = () => {
 
   const savePlan = async () => {
     try {
-      await putPlan(
-        plan,
-        loggedInUsername,
-        planId,
-        inputName,
-        description,
-        isPublic
-      );
-      !isSharedToUser && setCreator(loggedInUsername);
+      if (!planId) {
+        const { planId } = await postPlan(
+          plan,
+          inputName,
+          description,
+          isPublic
+        );
+        setPlanId(planId);
+        !creator && setCreator(loggedInUsername);
+        navigate(`/plan/${planId}`, { replace: true });
+      } else {
+        await putPlan(plan, planId, inputName, description, isPublic);
+      }
       setOriginalPlan({
         plan: JSON.stringify(plan),
         name: inputName,
@@ -188,7 +199,7 @@ export const Plan = () => {
           deletePlan={deletePlan}
           favouritePlan={favouritePlan}
           setIsShareModalShow={setIsShareModalShow}
-          isSharedToUser={isSharedToUser}
+          hasEditAccess={hasEditAccess}
           isPlanFavourited={isPlanFavourited}
           originalPlan={originalPlan}
         />
@@ -201,12 +212,12 @@ export const Plan = () => {
             updatePlan={updatePlan}
             creator={creator}
             isNewPlan={!id}
-            isSharedToUser={isSharedToUser}
+            hasEditAccess={hasEditAccess}
           />
         )}
       </div>
       {plan && <RightSidePanel plan={plan} />}
-      {plan && loggedInUsername === creator && !isSharedToUser && (
+      {plan && loggedInUsername === creator && !hasEditAccess && (
         <ShareModal
           isShareModalShow={isShareModalShow}
           setIsShareModalShow={setIsShareModalShow}

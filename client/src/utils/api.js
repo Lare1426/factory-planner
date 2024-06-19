@@ -5,10 +5,13 @@ export const getNewPlan = async (product, amount) => {
 
 export const getPlanById = async (id) => {
   const response = await fetch(`/api/plan/${id}`);
-  if (response.status === 401) {
-    throw new Error("Not logged in");
-  } else if (response.status === 403) {
-    throw new Error("Wrong account");
+  switch (response.status) {
+    case 401:
+      throw new Error("Not logged in");
+    case 403:
+      throw new Error("Wrong account");
+    case 404:
+      throw new Error("Plan not found");
   }
   return response.json();
 };
@@ -38,27 +41,32 @@ export const authenticate = async () => {
   return response;
 };
 
-export const putPlan = async (
-  plan,
-  username,
-  id,
-  name,
-  description,
-  isPublic
-) => {
-  const response = await authenticationRequiredApi(
-    `/api/plan/${username}/${id}`,
-    {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        plan,
-        name,
-        description,
-        isPublic,
-      }),
-    }
-  );
+export const postPlan = async (plan, name, description, isPublic) => {
+  const response = await authenticationRequiredApi("/api/plan", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      plan,
+      name,
+      description,
+      isPublic,
+    }),
+  });
+
+  return response.json();
+};
+
+export const putPlan = async (plan, id, name, description, isPublic) => {
+  const response = await authenticationRequiredApi(`/api/plan/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      plan,
+      name,
+      description,
+      isPublic,
+    }),
+  });
 
   return response;
 };
@@ -72,9 +80,9 @@ export const deletePlanApi = async (planId) => {
 
 export const putFavouritePlan = async (planId) => {
   const response = await authenticationRequiredApi(
-    `/api/plan/favourite/${planId}`,
+    `/api/plan/toggle-favourite/${planId}`,
     {
-      method: "PUT",
+      method: "POST",
     }
   );
   if (response.status === 403) {

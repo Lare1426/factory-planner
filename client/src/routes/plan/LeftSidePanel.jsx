@@ -18,7 +18,7 @@ export const LeftSidePanel = ({
   deletePlan,
   favouritePlan,
   setIsShareModalShow,
-  isSharedToUser,
+  hasEditAccess,
   isPlanFavourited,
   originalPlan,
 }) => {
@@ -44,7 +44,7 @@ export const LeftSidePanel = ({
 
   const isSaveDisabled =
     !isLoggedIn ||
-    (!isNewPlan && loggedInUsername !== creator && !isSharedToUser) ||
+    (!isNewPlan && loggedInUsername !== creator && !hasEditAccess) ||
     !(
       originalPlan.name !== inputName ||
       originalPlan.description !== description ||
@@ -64,7 +64,7 @@ export const LeftSidePanel = ({
             setValue={setInputName}
             characterLimit={30}
             disabled={
-              !isNewPlan && creator !== loggedInUsername && !isSharedToUser
+              !isNewPlan && creator !== loggedInUsername && !hasEditAccess
             }
           />
         </div>
@@ -76,7 +76,7 @@ export const LeftSidePanel = ({
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             disabled={
-              !isNewPlan && creator !== loggedInUsername && !isSharedToUser
+              !isNewPlan && creator !== loggedInUsername && !hasEditAccess
             }
           ></textarea>
         </div>
@@ -89,7 +89,7 @@ export const LeftSidePanel = ({
             setValue={setInputProduct}
             customList={products}
             disabled={
-              !isNewPlan && creator !== loggedInUsername && !isSharedToUser
+              !isNewPlan && creator !== loggedInUsername && !hasEditAccess
             }
           />
         </div>
@@ -106,7 +106,7 @@ export const LeftSidePanel = ({
               setInputAmount(parseInt(value));
             }}
             disabled={
-              !isNewPlan && creator !== loggedInUsername && !isSharedToUser
+              !isNewPlan && creator !== loggedInUsername && !hasEditAccess
             }
           />
         </div>
@@ -162,7 +162,7 @@ export const LeftSidePanel = ({
             disabled={
               isNewPlan ||
               !isLoggedIn ||
-              !(loggedInUsername === creator || isSharedToUser)
+              !(loggedInUsername === creator || hasEditAccess)
             }
             onClick={favouritePlan}
           >

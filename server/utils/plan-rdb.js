@@ -18,14 +18,29 @@ export const insert = async ({
       amount,
       isPublic, 
       creator
-    ) VALUES (?, ?, ?, ?, ?, ?, ?);`,
-    [id, name, description, product, amount, isPublic, creator]
+    ) VALUES (?, ?, ?, ?, ?, ?, ?) 
+     ON DUPLICATE KEY UPDATE name=?, description=?, product=?, amount=?, isPublic=?;`,
+    [
+      id,
+      name,
+      description,
+      product,
+      amount,
+      isPublic,
+      creator,
+      name,
+      description,
+      product,
+      amount,
+      isPublic,
+    ]
   );
   return result;
 };
 
 export const select = async ({ id }) => {
   const [[plan]] = await executeQuery(`SELECT * FROM plan WHERE id = ?`, [id]);
+  plan.isPublic = !!plan.isPublic;
   return plan;
 };
 
