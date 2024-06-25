@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import styles from "./ShareModal.module.scss";
 import { Button, Input } from "@/components";
-import { putSharedPlan, getPlanSharedTo } from "@/utils/api";
+import { postToggleSharedPlan, getPlanSharedTo } from "@/utils/api";
 import { useAuthContext } from "@/utils/AuthContext";
 
 export const ShareModal = ({
@@ -38,9 +38,9 @@ export const ShareModal = ({
       return;
     }
     try {
-      await putSharedPlan(planId, inputAccount);
+      await postToggleSharedPlan(planId, inputAccount);
       isError && setIsError(false);
-      setSharedTo(await getPlanSharedTo(planId));
+      setSharedTo([...sharedTo, inputAccount]);
       setInputAccount("");
     } catch (error) {
       setIsLoginModalShow(true);
@@ -50,7 +50,7 @@ export const ShareModal = ({
 
   const removeShare = async (usernameToRemove) => {
     try {
-      await putSharedPlan(planId, usernameToRemove);
+      await postToggleSharedPlan(planId, usernameToRemove);
       setSharedTo(sharedTo.filter((username) => username !== usernameToRemove));
     } catch (error) {
       setIsLoginModalShow(true);

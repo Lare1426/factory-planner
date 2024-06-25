@@ -45,6 +45,7 @@ export const LeftSidePanel = ({
   const isSaveDisabled =
     !isLoggedIn ||
     (!isNewPlan && loggedInUsername !== creator && !hasEditAccess) ||
+    !inputName ||
     !(
       originalPlan.name !== inputName ||
       originalPlan.description !== description ||

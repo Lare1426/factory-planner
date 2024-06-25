@@ -78,7 +78,7 @@ export const deletePlanApi = async (planId) => {
   }
 };
 
-export const putFavouritePlan = async (planId) => {
+export const postToggleFavouritePlan = async (planId) => {
   const response = await authenticationRequiredApi(
     `/api/plan/toggle-favourite/${planId}`,
     {
@@ -104,10 +104,10 @@ export const getPlanFavourite = async (planId) => {
   }
 };
 
-export const putSharedPlan = async (planId, username) => {
+export const postToggleSharedPlan = async (planId, username) => {
   const response = await authenticationRequiredApi(
-    `/api/plan/shared/${planId}?username=${username}`,
-    { method: "PUT" }
+    `/api/plan/toggle-shared/${planId}?username=${username}`,
+    { method: "POST" }
   );
   if (response.status === 403) {
     throw new Error("Wrong account");

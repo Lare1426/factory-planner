@@ -12,7 +12,7 @@ import {
   postPlan,
   putPlan,
   deletePlanApi,
-  putFavouritePlan,
+  postToggleFavouritePlan,
   getPlanFavourite,
 } from "@/utils/api";
 import { useAuthContext } from "@/utils/AuthContext";
@@ -165,6 +165,7 @@ export const Plan = () => {
   const deletePlan = async () => {
     try {
       await deletePlanApi(planId);
+      navigate("/");
     } catch (error) {
       setIsLoginModalShow(true);
       setLoginModalMessage(error.message);
@@ -173,7 +174,7 @@ export const Plan = () => {
 
   const favouritePlan = async () => {
     try {
-      await putFavouritePlan(planId);
+      await postToggleFavouritePlan(planId);
       setIsPlanFavourited(isPlanFavourited ? false : true);
     } catch (error) {
       setIsLoginModalShow(true);
@@ -217,7 +218,7 @@ export const Plan = () => {
         )}
       </div>
       {plan && <RightSidePanel plan={plan} />}
-      {plan && loggedInUsername === creator && !hasEditAccess && (
+      {plan && loggedInUsername === creator && (
         <ShareModal
           isShareModalShow={isShareModalShow}
           setIsShareModalShow={setIsShareModalShow}
