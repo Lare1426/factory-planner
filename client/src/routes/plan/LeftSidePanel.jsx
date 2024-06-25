@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import { Button, Input } from "@/components";
 import { useAuthContext } from "@/utils/AuthContext";
+import { getPlanFavourite, postToggleFavouritePlan } from "@/utils/api";
 import styles from "./LeftSidePanel.module.scss";
+import { ShareModal } from "./ShareModal";
 
 export const LeftSidePanel = ({
   fetchPlan,
   plan,
+  planId,
   isNewPlan,
   inputName,
   setInputName,
@@ -16,24 +19,48 @@ export const LeftSidePanel = ({
   creator,
   savePlan,
   deletePlan,
-  favouritePlan,
-  setIsShareModalShow,
   hasEditAccess,
-  isPlanFavourited,
   originalPlan,
 }) => {
-  const { isLoggedIn, loggedInUsername } = useAuthContext();
+  const {
+    isLoggedIn,
+    loggedInUsername,
+    setIsLoginModalShow,
+    setLoginModalMessage,
+  } = useAuthContext();
 
   const [inputProduct, setInputProduct] = useState(plan.item);
   const [inputAmount, setInputAmount] = useState(plan.amount);
   const [products, setProducts] = useState([]);
+  const [isPlanFavourited, setIsPlanFavourited] = useState(false);
+  const [stringifiedPlan, setStringifiedPlan] = useState(JSON.stringify(plan));
+  const [isShareModalShow, setIsShareModalShow] = useState(false);
 
   useEffect(() => {
     (async () => {
       const response = await fetch("/api/products");
       setProducts(await response.json());
+      if (loggedInUsername) {
+        const result = await getPlanFavourite(planId);
+        result?.favourite && setIsPlanFavourited(result.favourite);
+      }
     })();
   }, []);
+
+  useEffect(() => {
+    console.log("stringifying plan");
+    setStringifiedPlan(JSON.stringify(plan));
+  }, [plan]);
+
+  const favouritePlan = async () => {
+    try {
+      await postToggleFavouritePlan(planId);
+      setIsPlanFavourited(isPlanFavourited ? false : true);
+    } catch (error) {
+      setIsLoginModalShow(true);
+      setLoginModalMessage(error.message);
+    }
+  };
 
   const isApplyDisabled = !(
     (inputProduct !== plan.item || inputAmount !== plan.amount) &&
@@ -50,7 +77,7 @@ export const LeftSidePanel = ({
       originalPlan.name !== inputName ||
       originalPlan.description !== description ||
       originalPlan.isPublic !== isPublic ||
-      originalPlan.plan !== JSON.stringify(plan)
+      originalPlan.plan !== stringifiedPlan
     );
 
   return (
@@ -187,6 +214,14 @@ export const LeftSidePanel = ({
           </Button>
         </div>
       </>
+      {plan && loggedInUsername === creator && (
+        <ShareModal
+          isShareModalShow={isShareModalShow}
+          setIsShareModalShow={setIsShareModalShow}
+          planId={planId}
+          creator={creator}
+        />
+      )}
     </aside>
   );
 };

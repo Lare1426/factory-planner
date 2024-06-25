@@ -32,7 +32,8 @@ export const PlanSection = ({
       {plan.recipe && (
         <div>
           Recipe:
-          {isNewPlan || creator === loggedInUsername || hasEditAccess ? (
+          {(isNewPlan || creator === loggedInUsername || hasEditAccess) &&
+          plan.alternateRecipes.length ? (
             <select value={plan.recipe} onChange={onChange}>
               <option value={plan.recipe}>{plan.recipe}</option>
               {plan.alternateRecipes.map((alternateRecipe, index) => (

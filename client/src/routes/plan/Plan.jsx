@@ -12,14 +12,12 @@ import {
   postPlan,
   putPlan,
   deletePlanApi,
-  postToggleFavouritePlan,
-  getPlanFavourite,
 } from "@/utils/api";
 import { useAuthContext } from "@/utils/AuthContext";
 import { round } from "../../../../shared/round";
 import { LeftSidePanel } from "./LeftSidePanel";
 import { RightSidePanel } from "./RightSidePanel";
-import { ShareModal } from "./ShareModal";
+
 import { PlanSection } from "./PlanSection";
 
 const updatePlanAmounts = async (plan, amount) => {
@@ -44,8 +42,6 @@ export const Plan = () => {
   const [description, setDescription] = useState("");
   const [isPublic, setIsPublic] = useState(false);
   const [creator, setCreator] = useState("");
-  const [isShareModalShow, setIsShareModalShow] = useState(false);
-  const [isPlanFavourited, setIsPlanFavourited] = useState(false);
   const [originalPlan, setOriginalPlan] = useState({});
   const [hasEditAccess, setHasEditAccess] = useState(false);
 
@@ -86,11 +82,6 @@ export const Plan = () => {
             description,
             isPublic,
           });
-
-          if (loggedInUsername) {
-            const result = await getPlanFavourite(id);
-            result?.favourite && setIsPlanFavourited(result.favourite);
-          }
         } catch (error) {
           setIsLoginModalShow(true);
           setLoginModalMessage(error.message);
@@ -109,6 +100,12 @@ export const Plan = () => {
     return <Navigate to="/" replace />;
   }
 
+  /**
+   * Recursive function that will recurse the plan until finds the correct ingredient to update with new object
+   * @param {Array} path - list of items that form a path as ingredients to desired place to update
+   * @param {object} newNode - new object to update width
+   * @param {*} parent - plan of current item and its ingredients
+   */
   const updatePlan = (path, newNode, parent = null) => {
     const node = parent ?? { ...plan };
 
@@ -172,22 +169,13 @@ export const Plan = () => {
     }
   };
 
-  const favouritePlan = async () => {
-    try {
-      await postToggleFavouritePlan(planId);
-      setIsPlanFavourited(isPlanFavourited ? false : true);
-    } catch (error) {
-      setIsLoginModalShow(true);
-      setLoginModalMessage(error.message);
-    }
-  };
-
   return (
     <main className={styles.plan}>
       {plan && (
         <LeftSidePanel
           fetchPlan={fetchPlan}
           plan={plan}
+          planId={planId}
           isNewPlan={!id}
           inputName={inputName}
           setInputName={setInputName}
@@ -198,10 +186,7 @@ export const Plan = () => {
           creator={creator}
           savePlan={savePlan}
           deletePlan={deletePlan}
-          favouritePlan={favouritePlan}
-          setIsShareModalShow={setIsShareModalShow}
           hasEditAccess={hasEditAccess}
-          isPlanFavourited={isPlanFavourited}
           originalPlan={originalPlan}
         />
       )}
@@ -218,14 +203,6 @@ export const Plan = () => {
         )}
       </div>
       {plan && <RightSidePanel plan={plan} />}
-      {plan && loggedInUsername === creator && (
-        <ShareModal
-          isShareModalShow={isShareModalShow}
-          setIsShareModalShow={setIsShareModalShow}
-          planId={planId}
-          creator={creator}
-        />
-      )}
     </main>
   );
 };
