@@ -79,7 +79,7 @@ apiRouter.get("/plan/:id", async (req, res) => {
     if (username !== creator && !accountPlanRdbResult?.sharedTo) {
       return res.sendStatus(username ? 403 : 401);
     }
-    if (accountPlanRdbResult?.sharedTo) {
+    if (accountPlanRdbResult?.sharedTo || username === creator) {
       hasEditAccess = true;
     }
     if (accountPlanRdbResult?.favourited) {

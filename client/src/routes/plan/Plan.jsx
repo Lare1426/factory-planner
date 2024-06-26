@@ -11,7 +11,6 @@ import { useAuthContext } from "@/utils/AuthContext";
 import { round } from "../../../../shared/round";
 import { LeftSidePanel } from "./LeftSidePanel";
 import { RightSidePanel } from "./RightSidePanel";
-
 import { PlanSection } from "./PlanSection";
 
 const updatePlanAmounts = async (plan, amount) => {
@@ -31,6 +30,7 @@ export const Plan = () => {
     useAuthContext();
 
   const [plan, setPlan] = useState();
+  const [planCopy, setPlanCopy] = useState();
   const [planId, setPlanId] = useState("");
   const [inputName, setInputName] = useState("");
   const [description, setDescription] = useState("");
@@ -90,32 +90,13 @@ export const Plan = () => {
     }
   }, [loggedInUsername]);
 
+  useEffect(() => {
+    setPlanCopy({ ...plan });
+  }, [plan]);
+
   if (!state && !id) {
     return <Navigate to="/" replace />;
   }
-
-  /**
-   * Uses indexes of path to find correct ingredient and update last one
-   * @param {int[]} path - ingredient index list
-   * @param {object} newNode - new node to update with
-   */
-  const updatePlan = (path, newNode) => {
-    if (!path.length) {
-      return setPlan(newNode);
-    }
-
-    const planCopy = { ...plan };
-    let ingredientToUpdate = planCopy;
-
-    for (let i = 0; i < path.length; i++) {
-      if (i === path.length - 1) {
-        ingredientToUpdate.ingredients[path[i]] = newNode;
-      } else {
-        ingredientToUpdate = ingredientToUpdate.ingredients[path[i]];
-      }
-    }
-    setPlan(planCopy);
-  };
 
   const savePlan = async () => {
     try {
@@ -167,10 +148,10 @@ export const Plan = () => {
       <div className={styles.planView}>
         {plan && (
           <PlanSection
-            plan={plan}
+            fullPlanCopy={planCopy}
+            plan={planCopy}
+            setPlan={setPlan}
             layer={1}
-            updatePlan={updatePlan}
-            creator={creator}
             isNewPlan={!id}
             hasEditAccess={hasEditAccess}
           />

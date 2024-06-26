@@ -1,26 +1,30 @@
 import styles from "./PlanSection.module.scss";
-import { useAuthContext } from "@/utils/AuthContext";
 import { getItemRecipe } from "@/utils/api";
 import { round } from "../../../../shared/round";
 
 export const PlanSection = ({
+  fullPlanCopy,
   plan,
+  setPlan,
   layer,
-  updatePlan,
   path = [],
-  creator,
   isNewPlan,
   hasEditAccess,
 }) => {
-  const { loggedInUsername } = useAuthContext();
-
   const layerColor = `layer${layer}`;
 
   const onChange = async (e) => {
     const recipe = e.target.value;
     if (recipe !== plan.recipe) {
       const newPlan = await getItemRecipe(plan.item, recipe, plan.amount);
-      updatePlan(path, newPlan);
+
+      plan.buildingCount = newPlan.buildingCount;
+      plan.recipe = newPlan.recipe;
+      plan.alternateRecipes = newPlan.alternateRecipes;
+      plan.producedIn = newPlan.producedIn;
+      plan.ingredients = newPlan.ingredients;
+
+      setPlan(fullPlanCopy);
     }
   };
 
@@ -30,8 +34,7 @@ export const PlanSection = ({
       {plan.recipe && (
         <div>
           Recipe:
-          {(isNewPlan || creator === loggedInUsername || hasEditAccess) &&
-          plan.alternateRecipes.length ? (
+          {(isNewPlan || hasEditAccess) && plan.alternateRecipes.length ? (
             <select value={plan.recipe} onChange={onChange}>
               <option value={plan.recipe}>{plan.recipe}</option>
               {plan.alternateRecipes.map((alternateRecipe, index) => (
@@ -54,12 +57,12 @@ export const PlanSection = ({
       <div className={styles.ingredients}>
         {plan.ingredients?.map((ingredient, index) => (
           <PlanSection
+            fullPlanCopy={fullPlanCopy}
             plan={ingredient}
+            setPlan={setPlan}
             layer={layer % 10 === 0 ? 1 : layer + 1}
-            updatePlan={updatePlan}
             path={[...path, index]}
             key={`${plan.recipe}-${ingredient.item}-${index}`}
-            creator={creator}
             isNewPlan={isNewPlan}
             hasEditAccess={hasEditAccess}
           />

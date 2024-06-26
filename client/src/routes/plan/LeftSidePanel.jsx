@@ -84,7 +84,7 @@ export const LeftSidePanel = ({
 
   const isSaveDisabled =
     !isLoggedIn ||
-    (!isNewPlan && loggedInUsername !== creator && !hasEditAccess) ||
+    (!isNewPlan && !hasEditAccess) ||
     !inputName ||
     !(
       originalPlan.name !== inputName ||
@@ -104,9 +104,7 @@ export const LeftSidePanel = ({
             value={inputName}
             setValue={setInputName}
             characterLimit={30}
-            disabled={
-              !isNewPlan && creator !== loggedInUsername && !hasEditAccess
-            }
+            disabled={!isNewPlan && !hasEditAccess}
           />
         </div>
         <div>
@@ -116,9 +114,7 @@ export const LeftSidePanel = ({
             cols="27"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            disabled={
-              !isNewPlan && creator !== loggedInUsername && !hasEditAccess
-            }
+            disabled={!isNewPlan && !hasEditAccess}
           ></textarea>
         </div>
         <div>
@@ -129,9 +125,7 @@ export const LeftSidePanel = ({
             value={inputProduct}
             setValue={setInputProduct}
             customList={products}
-            disabled={
-              !isNewPlan && creator !== loggedInUsername && !hasEditAccess
-            }
+            disabled={!isNewPlan && !hasEditAccess}
           />
         </div>
         <div>
@@ -146,9 +140,7 @@ export const LeftSidePanel = ({
             setValue={(value) => {
               setInputAmount(parseInt(value));
             }}
-            disabled={
-              !isNewPlan && creator !== loggedInUsername && !hasEditAccess
-            }
+            disabled={!isNewPlan && !hasEditAccess}
           />
         </div>
         <div>
