@@ -1,5 +1,6 @@
 import styles from "./PlanSection.module.scss";
 import { useAuthContext } from "@/utils/AuthContext";
+import { getItemRecipe } from "@/utils/api";
 import { round } from "../../../../shared/round";
 
 export const PlanSection = ({
@@ -18,10 +19,7 @@ export const PlanSection = ({
   const onChange = async (e) => {
     const recipe = e.target.value;
     if (recipe !== plan.recipe) {
-      const response = await fetch(
-        `/api/plan/new/${plan.item}/${recipe}?amount=${plan.amount}`
-      );
-      const newPlan = await response.json();
+      const newPlan = await getItemRecipe(plan.item, recipe, plan.amount);
       updatePlan(path, newPlan);
     }
   };
@@ -59,7 +57,7 @@ export const PlanSection = ({
             plan={ingredient}
             layer={layer % 10 === 0 ? 1 : layer + 1}
             updatePlan={updatePlan}
-            path={[...path, ingredient.item]}
+            path={[...path, index]}
             key={`${plan.recipe}-${ingredient.item}-${index}`}
             creator={creator}
             isNewPlan={isNewPlan}

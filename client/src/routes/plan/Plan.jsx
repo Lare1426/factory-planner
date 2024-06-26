@@ -6,13 +6,7 @@ import {
   useNavigate,
 } from "react-router-dom";
 import styles from "./Plan.module.scss";
-import {
-  getNewPlan,
-  getPlanById,
-  postPlan,
-  putPlan,
-  deletePlanApi,
-} from "@/utils/api";
+import { getNewPlan, getPlanById, postPlan, putPlan } from "@/utils/api";
 import { useAuthContext } from "@/utils/AuthContext";
 import { round } from "../../../../shared/round";
 import { LeftSidePanel } from "./LeftSidePanel";
@@ -101,35 +95,26 @@ export const Plan = () => {
   }
 
   /**
-   * Recursive function that will recurse the plan until finds the correct ingredient to update with new object
-   * @param {Array} path - list of items that form a path as ingredients to desired place to update
-   * @param {object} newNode - new object to update width
-   * @param {*} parent - plan of current item and its ingredients
+   * Uses indexes of path to find correct ingredient and update last one
+   * @param {int[]} path - ingredient index list
+   * @param {object} newNode - new node to update with
    */
-  const updatePlan = (path, newNode, parent = null) => {
-    const node = parent ?? { ...plan };
-
-    if (path.length) {
-      const nextStep = path.shift();
-      for (const [index, child] of node.ingredients.entries()) {
-        if (child.item === nextStep) {
-          if (!path.length) {
-            node.ingredients[index] = newNode;
-          } else {
-            updatePlan(path, newNode, child);
-          }
-
-          if (!parent) {
-            setPlan(node);
-            break;
-          } else {
-            return;
-          }
-        }
-      }
-    } else {
-      setPlan(newNode);
+  const updatePlan = (path, newNode) => {
+    if (!path.length) {
+      return setPlan(newNode);
     }
+
+    const planCopy = { ...plan };
+    let ingredientToUpdate = planCopy;
+
+    for (let i = 0; i < path.length; i++) {
+      if (i === path.length - 1) {
+        ingredientToUpdate.ingredients[path[i]] = newNode;
+      } else {
+        ingredientToUpdate = ingredientToUpdate.ingredients[path[i]];
+      }
+    }
+    setPlan(planCopy);
   };
 
   const savePlan = async () => {
@@ -159,16 +144,6 @@ export const Plan = () => {
     }
   };
 
-  const deletePlan = async () => {
-    try {
-      await deletePlanApi(planId);
-      navigate("/");
-    } catch (error) {
-      setIsLoginModalShow(true);
-      setLoginModalMessage(error.message);
-    }
-  };
-
   return (
     <main className={styles.plan}>
       {plan && (
@@ -185,7 +160,6 @@ export const Plan = () => {
           setIsPublic={setIsPublic}
           creator={creator}
           savePlan={savePlan}
-          deletePlan={deletePlan}
           hasEditAccess={hasEditAccess}
           originalPlan={originalPlan}
         />

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "./Home.module.scss";
 import { Button, Input } from "@/components";
+import { getProducts } from "@/utils/api";
 
 export const Home = () => {
   const [inputProduct, setInputProduct] = useState("");
@@ -17,8 +18,7 @@ export const Home = () => {
 
   useEffect(() => {
     (async () => {
-      const response = await fetch("/api/products");
-      setProducts(await response.json());
+      setProducts(await getProducts());
     })();
   }, []);
 

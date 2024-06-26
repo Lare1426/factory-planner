@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
 import { Button, Input } from "@/components";
 import { useAuthContext } from "@/utils/AuthContext";
-import { getPlanFavourite, postToggleFavouritePlan } from "@/utils/api";
+import {
+  getPlanFavourite,
+  postToggleFavouritePlan,
+  deletePlanApi,
+  getProducts,
+} from "@/utils/api";
 import styles from "./LeftSidePanel.module.scss";
 import { ShareModal } from "./ShareModal";
 
@@ -18,7 +23,6 @@ export const LeftSidePanel = ({
   setIsPublic,
   creator,
   savePlan,
-  deletePlan,
   hasEditAccess,
   originalPlan,
 }) => {
@@ -38,9 +42,9 @@ export const LeftSidePanel = ({
 
   useEffect(() => {
     (async () => {
-      const response = await fetch("/api/products");
-      setProducts(await response.json());
-      if (loggedInUsername) {
+      setProducts(await getProducts());
+
+      if (loggedInUsername && planId) {
         const result = await getPlanFavourite(planId);
         result?.favourite && setIsPlanFavourited(result.favourite);
       }
@@ -48,7 +52,6 @@ export const LeftSidePanel = ({
   }, []);
 
   useEffect(() => {
-    console.log("stringifying plan");
     setStringifiedPlan(JSON.stringify(plan));
   }, [plan]);
 
@@ -56,6 +59,16 @@ export const LeftSidePanel = ({
     try {
       await postToggleFavouritePlan(planId);
       setIsPlanFavourited(isPlanFavourited ? false : true);
+    } catch (error) {
+      setIsLoginModalShow(true);
+      setLoginModalMessage(error.message);
+    }
+  };
+
+  const deletePlan = async () => {
+    try {
+      await deletePlanApi(planId);
+      navigate("/");
     } catch (error) {
       setIsLoginModalShow(true);
       setLoginModalMessage(error.message);

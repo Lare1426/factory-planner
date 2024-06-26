@@ -1,5 +1,17 @@
+export const getProducts = async () => {
+  const response = await fetch("/api/products");
+  return response.json();
+};
+
 export const getNewPlan = async (product, amount) => {
   const response = await fetch(`/api/plan/new/${product}?amount=${amount}`);
+  return response.json();
+};
+
+export const getItemRecipe = async (item, recipe, amount) => {
+  const response = await fetch(
+    `/api/plan/new/${item}/${recipe}?amount=${amount}`
+  );
   return response.json();
 };
 
