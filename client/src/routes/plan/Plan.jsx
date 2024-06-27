@@ -26,7 +26,6 @@ export const Plan = () => {
     useAuthContext();
 
   const [plan, setPlan] = useState();
-  const [planCopy, setPlanCopy] = useState();
   const [planId, setPlanId] = useState("");
   const [inputName, setInputName] = useState("");
   const [description, setDescription] = useState("");
@@ -102,9 +101,28 @@ export const Plan = () => {
     }
   }, [loggedInUsername]);
 
-  useEffect(() => {
-    setPlanCopy({ ...plan });
-  }, [plan]);
+  /**
+   * Navigate through the plan using the indexPath, replacing the target ingredient node
+   * @param {int[]} indexPath - A list of indexes to navigate through nested ingredient arrays
+   * @param {object} newNode - A New node to update with
+   */
+  const updatePlan = (indexPath, newNode) => {
+    if (!indexPath.length) {
+      return setPlan(newNode);
+    }
+
+    const destinationIndex = indexPath.pop();
+    const updatedPlan = { ...plan };
+
+    let currentIngredient = updatedPlan;
+    for (const index of indexPath) {
+      currentIngredient = currentIngredient.ingredients[index];
+    }
+
+    currentIngredient.ingredients[destinationIndex] = newNode;
+
+    setPlan(updatedPlan);
+  };
 
   const savePlan = async () => {
     try {
@@ -141,7 +159,7 @@ export const Plan = () => {
           <Button
             size={"large"}
             color={"primary"}
-            onClick={() => navigate("/")} // Should I just automatically navigate to home or do it this way
+            onClick={() => navigate("/")}
           >
             Return home
           </Button>
@@ -170,9 +188,8 @@ export const Plan = () => {
             />
             <div className={styles.planView}>
               <PlanSection
-                fullPlanCopy={planCopy}
-                plan={planCopy}
-                setPlan={setPlan}
+                plan={{ ...plan }}
+                updatePlan={updatePlan}
                 layer={1}
                 isNewPlan={!id}
                 hasEditAccess={hasEditAccess}
