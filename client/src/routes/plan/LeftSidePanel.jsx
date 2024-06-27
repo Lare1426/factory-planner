@@ -34,11 +34,10 @@ export const LeftSidePanel = ({
     setLoginModalMessage,
   } = useAuthContext();
 
-  const [inputProduct, setInputProduct] = useState(plan.item);
-  const [inputAmount, setInputAmount] = useState(plan.amount);
+  const [inputProduct, setInputProduct] = useState();
+  const [inputAmount, setInputAmount] = useState();
   const [products, setProducts] = useState([]);
-
-  const [stringifiedPlan, setStringifiedPlan] = useState(JSON.stringify(plan));
+  const [stringifiedPlan, setStringifiedPlan] = useState();
   const [isShareModalShow, setIsShareModalShow] = useState(false);
 
   useEffect(() => {
@@ -48,7 +47,11 @@ export const LeftSidePanel = ({
   }, []);
 
   useEffect(() => {
-    setStringifiedPlan(JSON.stringify(plan));
+    if (plan) {
+      setStringifiedPlan(JSON.stringify(plan));
+      setInputProduct(plan.item);
+      setInputAmount(plan.amount);
+    }
   }, [plan]);
 
   const favouritePlan = async () => {
@@ -72,6 +75,7 @@ export const LeftSidePanel = ({
   };
 
   const isApplyDisabled = !(
+    plan &&
     (inputProduct !== plan.item || inputAmount !== plan.amount) &&
     inputAmount > 0 &&
     inputAmount < 50001 &&
@@ -167,13 +171,15 @@ export const LeftSidePanel = ({
           </Button>
           <a
             href={URL.createObjectURL(
-              new Blob([JSON.stringify(plan)], {
+              new Blob([stringifiedPlan], {
                 type: "application/json",
               })
             )}
-            download={`${plan.item}.json`}
+            download={`${plan?.item}.json`}
             onClick={() => {}}
-            className={`primary-button-style ${styles.exportLink}`}
+            className={`primary-button-style ${styles.exportLink} ${
+              plan ? "" : styles.disabled
+            }`}
           >
             Export
           </a>

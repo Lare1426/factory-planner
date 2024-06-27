@@ -52,6 +52,13 @@
       min-width: 100px;
       line-height: 40px;
       font-size: 22px;
+
+      &.disabled {
+        pointer-events: none;
+        color: #797979;
+        filter: brightness(0.9);
+        cursor: not-allowed;
+      }
     }
   }
 }

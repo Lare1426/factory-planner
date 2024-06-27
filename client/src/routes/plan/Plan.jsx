@@ -166,26 +166,26 @@ export const Plan = () => {
         </main>
       )}
       <main className={styles.plan}>
+        <LeftSidePanel
+          fetchPlan={fetchPlan}
+          plan={plan}
+          planId={planId}
+          isNewPlan={!id}
+          inputName={inputName}
+          setInputName={setInputName}
+          description={description}
+          setDescription={setDescription}
+          isPublic={isPublic}
+          setIsPublic={setIsPublic}
+          creator={creator}
+          savePlan={savePlan}
+          hasEditAccess={hasEditAccess}
+          originalPlan={originalPlan}
+          isPlanFavourited={isPlanFavourited}
+          setIsPlanFavourited={setIsPlanFavourited}
+        />
         {plan && (
           <>
-            <LeftSidePanel
-              fetchPlan={fetchPlan}
-              plan={plan}
-              planId={planId}
-              isNewPlan={!id}
-              inputName={inputName}
-              setInputName={setInputName}
-              description={description}
-              setDescription={setDescription}
-              isPublic={isPublic}
-              setIsPublic={setIsPublic}
-              creator={creator}
-              savePlan={savePlan}
-              hasEditAccess={hasEditAccess}
-              originalPlan={originalPlan}
-              isPlanFavourited={isPlanFavourited}
-              setIsPlanFavourited={setIsPlanFavourited}
-            />
             <div className={styles.planView}>
               <PlanSection
                 plan={{ ...plan }}
