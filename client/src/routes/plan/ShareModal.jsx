@@ -1,6 +1,6 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import styles from "./ShareModal.module.scss";
-import { Button, Input } from "@/components";
+import { Button, Input, Modal } from "@/components";
 import { postToggleSharedPlan, getPlanSharedTo } from "@/utils/api";
 import { useAuthContext } from "@/utils/AuthContext";
 
@@ -16,7 +16,6 @@ export const ShareModal = ({
   const [inputAccount, setInputAccount] = useState("");
   const [shareError, setShareError] = useState("");
   const [sharedTo, setSharedTo] = useState([]);
-  const modalRef = useRef(null);
 
   useEffect(() => {
     (async () => {
@@ -27,8 +26,6 @@ export const ShareModal = ({
         setLoginModalMessage(error.message);
       }
     })();
-    document.addEventListener("keydown", onEscapeKeyDown);
-    return () => document.removeEventListener("keydown", onEscapeKeyDown);
   }, []);
 
   const sharePlan = async () => {
@@ -59,20 +56,13 @@ export const ShareModal = ({
   };
 
   const hide = () => {
-    modalRef.current.close();
     setIsShareModalShow(false);
     setInputAccount("");
   };
 
-  const onEscapeKeyDown = (event) => event.key === "Escape" && hide();
-
-  if (isShareModalShow && !modalRef.current.open) {
-    modalRef.current.showModal();
-  }
-
   return (
-    <dialog ref={modalRef} open={false} className={styles.shareModal}>
-      <div>
+    <Modal open={isShareModalShow} hide={hide}>
+      <div className={styles.shareModal}>
         {isError && <p className={styles.error}>{shareError}</p>}
         <Input
           type="text"
@@ -101,6 +91,6 @@ export const ShareModal = ({
           Close
         </Button>
       </div>
-    </dialog>
+    </Modal>
   );
 };

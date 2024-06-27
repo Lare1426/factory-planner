@@ -1,28 +1,17 @@
-.login-modal {
-  background-color: var(--primary);
-  color: var(--text);
-  border: none;
-  border-radius: 20px;
+.modal-components {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 
-  div {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-
-    .error {
-      color: #ff7852;
-      font-size: 30px;
-      margin: 0;
-    }
-
-    &.buttons {
-      display: flex;
-      flex-direction: row;
-    }
+  .error {
+    color: #ff7852;
+    font-size: 30px;
+    margin: 0;
   }
 
-  &::backdrop {
-    opacity: 0.5;
-    background-color: black;
+  .buttons {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
   }
 }

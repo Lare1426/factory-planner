@@ -1,0 +1,11 @@
+.modal {
+  background-color: var(--primary);
+  color: var(--text);
+  border: none;
+  border-radius: 20px;
+
+  &::backdrop {
+    opacity: 0.5;
+    background-color: black;
+  }
+}
