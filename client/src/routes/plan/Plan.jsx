@@ -8,6 +8,7 @@ import {
 import styles from "./Plan.module.scss";
 import { getNewPlan, getPlanById, postPlan, putPlan } from "@/utils/api";
 import { useAuthContext } from "@/utils/AuthContext";
+import { Button } from "@/components";
 import { round } from "../../../../shared/round";
 import { LeftSidePanel } from "./LeftSidePanel";
 import { RightSidePanel } from "./RightSidePanel";
@@ -39,6 +40,7 @@ export const Plan = () => {
   const [originalPlan, setOriginalPlan] = useState({});
   const [hasEditAccess, setHasEditAccess] = useState(false);
   const [isPlanFavourited, setIsPlanFavourited] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const navigate = useNavigate();
 
@@ -86,8 +88,12 @@ export const Plan = () => {
             isPublic,
           });
         } catch (error) {
-          setIsLoginModalShow(true);
-          setLoginModalMessage(error.message);
+          if (error.status === 404) {
+            setErrorMessage(error.message);
+          } else {
+            setIsLoginModalShow(true);
+            setLoginModalMessage(error.message);
+          }
         }
       })();
     } else if (state) {
@@ -135,40 +141,54 @@ export const Plan = () => {
   };
 
   return (
-    <main className={styles.plan}>
-      {plan && (
-        <LeftSidePanel
-          fetchPlan={fetchPlan}
-          plan={plan}
-          planId={planId}
-          isNewPlan={!id}
-          inputName={inputName}
-          setInputName={setInputName}
-          description={description}
-          setDescription={setDescription}
-          isPublic={isPublic}
-          setIsPublic={setIsPublic}
-          creator={creator}
-          savePlan={savePlan}
-          hasEditAccess={hasEditAccess}
-          originalPlan={originalPlan}
-          isPlanFavourited={isPlanFavourited}
-          setIsPlanFavourited={setIsPlanFavourited}
-        />
+    <>
+      {errorMessage && (
+        <main className={styles.error}>
+          <h2 className={styles.message}>{errorMessage}</h2>
+          <Button
+            size={"large"}
+            color={"primary"}
+            onClick={() => navigate("/")}
+          >
+            Return home
+          </Button>
+        </main>
       )}
-      <div className={styles.planView}>
+      <main className={styles.plan}>
         {plan && (
-          <PlanSection
-            fullPlanCopy={planCopy}
-            plan={planCopy}
-            setPlan={setPlan}
-            layer={1}
-            isNewPlan={!id}
-            hasEditAccess={hasEditAccess}
-          />
+          <>
+            <LeftSidePanel
+              fetchPlan={fetchPlan}
+              plan={plan}
+              planId={planId}
+              isNewPlan={!id}
+              inputName={inputName}
+              setInputName={setInputName}
+              description={description}
+              setDescription={setDescription}
+              isPublic={isPublic}
+              setIsPublic={setIsPublic}
+              creator={creator}
+              savePlan={savePlan}
+              hasEditAccess={hasEditAccess}
+              originalPlan={originalPlan}
+              isPlanFavourited={isPlanFavourited}
+              setIsPlanFavourited={setIsPlanFavourited}
+            />
+            <div className={styles.planView}>
+              <PlanSection
+                fullPlanCopy={planCopy}
+                plan={planCopy}
+                setPlan={setPlan}
+                layer={1}
+                isNewPlan={!id}
+                hasEditAccess={hasEditAccess}
+              />
+            </div>
+            <RightSidePanel plan={plan} />
+          </>
         )}
-      </div>
-      {plan && <RightSidePanel plan={plan} />}
-    </main>
+      </main>
+    </>
   );
 };

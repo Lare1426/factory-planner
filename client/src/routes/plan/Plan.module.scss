@@ -8,3 +8,15 @@
     overflow-y: auto;
   }
 }
+
+.error {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  gap: 20px;
+
+  .message {
+    margin: 0;
+    font-size: 40px;
+  }
+}
