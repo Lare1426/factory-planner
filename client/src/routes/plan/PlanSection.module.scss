@@ -1,0 +1,68 @@
+.plan-section {
+  width: fit-content;
+  height: max-content;
+  padding: 8px 13px;
+  border-radius: 20px;
+  margin: 15px;
+
+  .ingredients {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  select {
+    border: none;
+    background-color: var(--tertiary);
+    color: var(--text);
+    height: 20px;
+    padding-right: 5px;
+    margin-left: 10px;
+    font-size: 16px;
+
+    &:focus {
+      outline: 2px solid var(--accent);
+    }
+  }
+
+  $light-background-colors: (
+    #57c6fd,
+    #64f564,
+    #9f9ff1,
+    #bef354,
+    #f8a149,
+    #53f7a5,
+    #5facfa,
+    #f17ef1,
+    #8cfafa,
+    #f87474
+  );
+
+  $dark-background-colors: (
+    #006699,
+    #339933,
+    #666699,
+    #669900,
+    #cc6600,
+    #339966,
+    #993399,
+    #004d99,
+    #669999,
+    #993333
+  );
+
+  // light
+  @for $i from 1 through 10 {
+    &.layer#{$i} {
+      background-color: nth($light-background-colors, $i);
+    }
+  }
+
+  // dark
+  @media (prefers-color-scheme: dark) {
+    @for $i from 1 through 10 {
+      &.layer#{$i} {
+        background-color: nth($dark-background-colors, $i);
+      }
+    }
+  }
+}

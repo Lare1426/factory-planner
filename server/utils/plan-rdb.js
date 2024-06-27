@@ -40,6 +40,9 @@ export const insert = async ({
 
 export const select = async ({ id }) => {
   const [[plan]] = await executeQuery(`SELECT * FROM plan WHERE id = ?`, [id]);
+  if (plan) {
+    plan.isPublic = !!plan.isPublic;
+  }
   return plan;
 };
 
