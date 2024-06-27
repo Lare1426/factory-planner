@@ -17,15 +17,6 @@ export const PlanSection = ({
     if (recipe !== plan.recipe) {
       const newPlan = await getItemRecipe(plan.item, recipe, plan.amount);
 
-      // relies on the fact that plan isn't part of the plan state variable but
-      // is a copy. Maybe rename variable better
-      // here it is already in the correct part the plan so why pass in path to
-      //another function that has to make a copy of the plan and iterate until
-      // finding this same location in that object
-
-      // Would there be better way to override plan because just resetting the
-      // variable won't modify the object
-
       plan.buildingCount = newPlan.buildingCount;
       plan.recipe = newPlan.recipe;
       plan.alternateRecipes = newPlan.alternateRecipes;

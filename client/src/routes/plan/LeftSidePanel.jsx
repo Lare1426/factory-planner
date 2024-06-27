@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Button, Input } from "@/components";
 import { useAuthContext } from "@/utils/AuthContext";
 import {
-  getPlanFavourite,
   postToggleFavouritePlan,
   deletePlanApi,
   getProducts,
