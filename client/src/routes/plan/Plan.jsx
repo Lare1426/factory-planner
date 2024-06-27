@@ -141,7 +141,7 @@ export const Plan = () => {
           <Button
             size={"large"}
             color={"primary"}
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/")} // Should I just automatically navigate to home or do it this way
           >
             Return home
           </Button>
