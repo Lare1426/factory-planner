@@ -91,8 +91,8 @@ export const Account = () => {
         <div className={styles.planLists}>
           <PlanList name={"Public"} list={accountPlans.public} />
           <PlanList name={"Private"} list={accountPlans.private} />
-          <PlanList name={"Favourited"} list={accountPlans.favourite} />
-          <PlanList name={"Shared"} list={accountPlans.shared} />
+          <PlanList name={"Favourited"} list={accountPlans.favourited} />
+          <PlanList name={"Shared"} list={accountPlans.sharedTo} />
         </div>
       )}
     </main>

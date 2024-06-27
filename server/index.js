@@ -87,11 +87,7 @@ apiRouter.get("/plan/:id", async (req, res) => {
     }
   }
 
-  if (!isPublic && !hasEditAccess && creator !== username) {
-    return res.sendStatus(401);
-  }
-
-  if (!isPublic && !isSharedTo && creator !== username) {
+  if (!isPublic && !hasEditAccess) {
     return res.sendStatus(401);
   }
 
@@ -345,23 +341,23 @@ apiRouter.get("/account/plan", async (req, res) => {
     accountId: accountId,
   });
 
-  const favourite = [];
-  const shared = [];
+  const favourited = [];
+  const sharedTo = [];
 
   accountPlanRdbResult.forEach((plan) => {
-    if (plan.shared) {
-      shared.push(plansRdb.select({ id: plan.planId }));
+    if (plan.sharedTo) {
+      sharedTo.push(plansRdb.select({ id: plan.planId }));
     }
-    if (plan.favourite) {
-      favourite.push(plansRdb.select({ id: plan.planId }));
+    if (plan.favourited) {
+      favourited.push(plansRdb.select({ id: plan.planId }));
     }
   });
 
   res.json({
     public: plansRdbResult.filter((plan) => plan.isPublic),
     private: plansRdbResult.filter((plan) => !plan.isPublic),
-    favourite: await Promise.all(favourite),
-    shared: await Promise.all(shared),
+    favourited: await Promise.all(favourited),
+    sharedTo: await Promise.all(sharedTo),
   });
 });
 

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button, Input } from "@/components";
 import { useAuthContext } from "@/utils/AuthContext";
 import {
@@ -41,6 +42,8 @@ export const LeftSidePanel = ({
   const [isShareModalShow, setIsShareModalShow] = useState(false);
   const [isPlanFavourited, setIsPlanFavourited] = useState(false);
   const [originalPlan, setOriginalPlan] = useState({});
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     (async () => {
@@ -106,6 +109,7 @@ export const LeftSidePanel = ({
         );
         setPlanId(planId);
         !creator && setCreator(loggedInUsername);
+        setHasEditAccess(true);
         navigate(`/plan/${planId}`, { replace: true });
       } else {
         await putPlan(plan, planId, inputName, description, isPublic);
