@@ -1,10 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  Navigate,
-  useLocation,
-  useParams,
-  useNavigate,
-} from "react-router-dom";
+import { useLocation, useParams, useNavigate } from "react-router-dom";
 import styles from "./Plan.module.scss";
 import { getNewPlan, getPlanById, postPlan, putPlan } from "@/utils/api";
 import { useAuthContext } from "@/utils/AuthContext";
@@ -88,11 +83,11 @@ export const Plan = () => {
             isPublic,
           });
         } catch (error) {
-          if (error.status === 404) {
-            setErrorMessage(error.message);
-          } else {
+          if (error.status === 403 || error.status === 401) {
             setIsLoginModalShow(true);
             setLoginModalMessage(error.message);
+          } else {
+            setErrorMessage(error.message);
           }
         }
       })();
@@ -102,16 +97,14 @@ export const Plan = () => {
       } else {
         fetchPlan(state.inputProduct, state.inputAmount);
       }
+    } else {
+      navigate("/");
     }
   }, [loggedInUsername]);
 
   useEffect(() => {
     setPlanCopy({ ...plan });
   }, [plan]);
-
-  if (!state && !id) {
-    return <Navigate to="/" replace />;
-  }
 
   const savePlan = async () => {
     try {

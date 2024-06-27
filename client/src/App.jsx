@@ -3,6 +3,7 @@ import {
   RouterProvider,
   createRoutesFromElements,
   Route,
+  Navigate,
 } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Header } from "@/components";
@@ -17,6 +18,7 @@ const router = createBrowserRouter(
       <Route path="/create" element={<Create />} />
       <Route path="/plan/new" element={<Plan />} />
       <Route path="/plan/:id" element={<Plan />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Route>
   )
 );
