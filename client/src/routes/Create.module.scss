@@ -28,6 +28,13 @@
         line-height: 40px;
         font-size: 22px;
         padding: 0 15px;
+
+        &.disabled-link {
+          pointer-events: none;
+          color: #797979;
+          filter: brightness(0.9);
+          cursor: not-allowed;
+        }
       }
     }
 

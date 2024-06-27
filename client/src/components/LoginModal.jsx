@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { Input, Button } from "@/components";
+import { useState } from "react";
+import { Input, Button, Modal } from "@/components";
 import { authorise } from "@/utils/api";
 import { useAuthContext } from "@/utils/AuthContext";
 import styles from "./LoginModal.module.scss";
@@ -16,12 +16,6 @@ export const LoginModal = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isCredentialError, setIsCredentialError] = useState(false);
-  const modalRef = useRef(null);
-
-  useEffect(() => {
-    document.addEventListener("keydown", onEscapeKeyDown);
-    return () => document.removeEventListener("keydown", onEscapeKeyDown);
-  }, []);
 
   const authoriseUser = async () => {
     if (await authorise(username, password)) {
@@ -34,22 +28,15 @@ export const LoginModal = () => {
   };
 
   const hide = () => {
-    modalRef.current.close();
     setUsername("");
     setPassword("");
     setIsCredentialError(false);
     setIsLoginModalShow(false);
   };
 
-  if (isLoginModalShow && !modalRef.current.open) {
-    modalRef.current.showModal();
-  }
-
-  const onEscapeKeyDown = (event) => event.key === "Escape" && hide();
-
   return (
-    <dialog ref={modalRef} open={false} className={styles.loginModal}>
-      <div>
+    <Modal hide={hide} open={isLoginModalShow}>
+      <div className={styles.modalComponents}>
         {loginModalMessage && (
           <label className={styles.error}>{loginModalMessage}</label>
         )}
@@ -80,6 +67,6 @@ export const LoginModal = () => {
           </Button>
         </div>
       </div>
-    </dialog>
+    </Modal>
   );
 };

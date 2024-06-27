@@ -1,0 +1,24 @@
+.share-modal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+
+  .error {
+    color: #ff7852;
+    font-size: 25px;
+    margin: 0;
+  }
+
+  .shared-to {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: var(--accent);
+    color: black;
+    font-size: 20px;
+    width: 80%;
+    padding: 10px;
+    border-radius: 20px;
+  }
+}

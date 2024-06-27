@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { getProducts } from "@/utils/api";
 import styles from "./Create.module.scss";
 import { Input, Button } from "@/components";
 
@@ -53,8 +54,7 @@ export const Create = () => {
 
   useEffect(() => {
     (async () => {
-      const response = await fetch("/api/products");
-      setProducts(await response.json());
+      setProducts(await getProducts());
     })();
   }, []);
 
@@ -89,7 +89,9 @@ export const Create = () => {
           <Link
             to="/plan/new"
             state={{ inputProduct, inputAmount }}
-            className={`primary-button-style ${styles.customLink}`}
+            className={`primary-button-style ${styles.customLink} ${
+              isGeneratePlanDisabled ? styles.disabledLink : ""
+            }`}
           >
             Generate plan
           </Link>
