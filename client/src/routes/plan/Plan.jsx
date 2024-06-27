@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
 import styles from "./Plan.module.scss";
-import { getNewPlan, getPlanById, postPlan, putPlan } from "@/utils/api";
-import { useAuthContext } from "@/utils/AuthContext";
+import { getNewPlan } from "@/utils/api";
 import { Button } from "@/components";
 import { round } from "../../../../shared/round";
 import { LeftSidePanel } from "./LeftSidePanel";
@@ -22,18 +21,8 @@ const updatePlanAmounts = async (plan, amount) => {
 };
 
 export const Plan = () => {
-  const { loggedInUsername, setIsLoginModalShow, setLoginModalMessage } =
-    useAuthContext();
-
   const [plan, setPlan] = useState();
-  const [planId, setPlanId] = useState("");
-  const [inputName, setInputName] = useState("");
-  const [description, setDescription] = useState("");
-  const [isPublic, setIsPublic] = useState(false);
-  const [creator, setCreator] = useState("");
-  const [originalPlan, setOriginalPlan] = useState({});
   const [hasEditAccess, setHasEditAccess] = useState(false);
-  const [isPlanFavourited, setIsPlanFavourited] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   const navigate = useNavigate();
@@ -55,51 +44,14 @@ export const Plan = () => {
   const { id } = useParams();
 
   useEffect(() => {
-    if (id) {
-      (async () => {
-        try {
-          const {
-            name,
-            description,
-            isPublic,
-            creator,
-            plan,
-            hasEditAccess,
-            isFavourite,
-          } = await getPlanById(id);
-          setPlanId(id);
-          setPlan(plan);
-          setInputName(name);
-          setDescription(description);
-          setIsPublic(isPublic);
-          setCreator(creator);
-          setHasEditAccess(hasEditAccess);
-          setIsPlanFavourited(isFavourite);
-          setOriginalPlan({
-            plan: JSON.stringify(plan),
-            name,
-            description,
-            isPublic,
-          });
-        } catch (error) {
-          if (error.status === 403 || error.status === 401) {
-            setIsLoginModalShow(true);
-            setLoginModalMessage(error.message);
-          } else {
-            setErrorMessage(error.message);
-          }
-        }
-      })();
-    } else if (state) {
+    if (state) {
       if (state.plan) {
         setPlan(state.plan);
       } else {
         fetchPlan(state.inputProduct, state.inputAmount);
       }
-    } else {
-      navigate("/");
     }
-  }, [loggedInUsername]);
+  }, []);
 
   /**
    * Navigate through the plan using the indexPath, replacing the target ingredient node
@@ -124,36 +76,9 @@ export const Plan = () => {
     setPlan(updatedPlan);
   };
 
-  const savePlan = async () => {
-    try {
-      if (!planId) {
-        const { planId } = await postPlan(
-          plan,
-          inputName,
-          description,
-          isPublic
-        );
-        setPlanId(planId);
-        !creator && setCreator(loggedInUsername);
-        navigate(`/plan/${planId}`, { replace: true });
-      } else {
-        await putPlan(plan, planId, inputName, description, isPublic);
-      }
-      setOriginalPlan({
-        plan: JSON.stringify(plan),
-        name: inputName,
-        description,
-        isPublic,
-      });
-    } catch (error) {
-      setIsLoginModalShow(true);
-      setLoginModalMessage(error.message);
-    }
-  };
-
   return (
     <>
-      {errorMessage && (
+      {errorMessage ? (
         <main className={styles.error}>
           <h2 className={styles.message}>{errorMessage}</h2>
           <Button
@@ -164,41 +89,34 @@ export const Plan = () => {
             Return home
           </Button>
         </main>
+      ) : (
+        <main className={styles.plan}>
+          <LeftSidePanel
+            fetchPlan={fetchPlan}
+            idParam={id}
+            plan={plan}
+            setPlan={setPlan}
+            isNewPlan={!id}
+            hasEditAccess={hasEditAccess}
+            setHasEditAccess={setHasEditAccess}
+            setErrorMessage={setErrorMessage}
+          />
+          {plan && (
+            <>
+              <div className={styles.planView}>
+                <PlanSection
+                  plan={{ ...plan }}
+                  updatePlan={updatePlan}
+                  layer={1}
+                  isNewPlan={!id}
+                  hasEditAccess={hasEditAccess}
+                />
+              </div>
+              <RightSidePanel plan={plan} />
+            </>
+          )}
+        </main>
       )}
-      <main className={styles.plan}>
-        <LeftSidePanel
-          fetchPlan={fetchPlan}
-          plan={plan}
-          planId={planId}
-          isNewPlan={!id}
-          inputName={inputName}
-          setInputName={setInputName}
-          description={description}
-          setDescription={setDescription}
-          isPublic={isPublic}
-          setIsPublic={setIsPublic}
-          creator={creator}
-          savePlan={savePlan}
-          hasEditAccess={hasEditAccess}
-          originalPlan={originalPlan}
-          isPlanFavourited={isPlanFavourited}
-          setIsPlanFavourited={setIsPlanFavourited}
-        />
-        {plan && (
-          <>
-            <div className={styles.planView}>
-              <PlanSection
-                plan={{ ...plan }}
-                updatePlan={updatePlan}
-                layer={1}
-                isNewPlan={!id}
-                hasEditAccess={hasEditAccess}
-              />
-            </div>
-            <RightSidePanel plan={plan} />
-          </>
-        )}
-      </main>
     </>
   );
 };

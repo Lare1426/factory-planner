@@ -5,27 +5,22 @@ import {
   postToggleFavouritePlan,
   deletePlanApi,
   getProducts,
+  getPlanById,
+  postPlan,
+  putPlan,
 } from "@/utils/api";
 import styles from "./LeftSidePanel.module.scss";
 import { ShareModal } from "./ShareModal";
 
 export const LeftSidePanel = ({
   fetchPlan,
+  idParam,
   plan,
-  planId,
+  setPlan,
   isNewPlan,
-  inputName,
-  setInputName,
-  description,
-  setDescription,
-  isPublic,
-  setIsPublic,
-  creator,
-  savePlan,
   hasEditAccess,
-  originalPlan,
-  isPlanFavourited,
-  setIsPlanFavourited,
+  setHasEditAccess,
+  setErrorMessage,
 }) => {
   const {
     isLoggedIn,
@@ -34,11 +29,18 @@ export const LeftSidePanel = ({
     setLoginModalMessage,
   } = useAuthContext();
 
-  const [inputProduct, setInputProduct] = useState();
-  const [inputAmount, setInputAmount] = useState();
+  const [planId, setPlanId] = useState("");
+  const [inputName, setInputName] = useState("");
+  const [description, setDescription] = useState("");
+  const [inputProduct, setInputProduct] = useState("");
+  const [inputAmount, setInputAmount] = useState(0);
+  const [isPublic, setIsPublic] = useState(false);
+  const [creator, setCreator] = useState("");
   const [products, setProducts] = useState([]);
   const [stringifiedPlan, setStringifiedPlan] = useState();
   const [isShareModalShow, setIsShareModalShow] = useState(false);
+  const [isPlanFavourited, setIsPlanFavourited] = useState(false);
+  const [originalPlan, setOriginalPlan] = useState({});
 
   useEffect(() => {
     (async () => {
@@ -47,12 +49,78 @@ export const LeftSidePanel = ({
   }, []);
 
   useEffect(() => {
+    if (idParam) {
+      (async () => {
+        try {
+          const {
+            name,
+            description,
+            isPublic,
+            creator,
+            plan,
+            hasEditAccess,
+            isFavourite,
+          } = await getPlanById(idParam);
+          setPlanId(idParam);
+          setPlan(plan);
+          setInputName(name);
+          setDescription(description);
+          setIsPublic(isPublic);
+          setCreator(creator);
+          setHasEditAccess(hasEditAccess);
+          setIsPlanFavourited(isFavourite);
+          setOriginalPlan({
+            plan: JSON.stringify(plan),
+            name,
+            description,
+            isPublic,
+          });
+        } catch (error) {
+          if (error.status === 403 || error.status === 401) {
+            setIsLoginModalShow(true);
+            setLoginModalMessage(error.message);
+          } else {
+            setErrorMessage(error.message);
+          }
+        }
+      })();
+    }
+  }, [loggedInUsername]);
+
+  useEffect(() => {
     if (plan) {
       setStringifiedPlan(JSON.stringify(plan));
       setInputProduct(plan.item);
       setInputAmount(plan.amount);
     }
   }, [plan]);
+
+  const savePlan = async () => {
+    try {
+      if (!planId) {
+        const { planId } = await postPlan(
+          plan,
+          inputName,
+          description,
+          isPublic
+        );
+        setPlanId(planId);
+        !creator && setCreator(loggedInUsername);
+        navigate(`/plan/${planId}`, { replace: true });
+      } else {
+        await putPlan(plan, planId, inputName, description, isPublic);
+      }
+      setOriginalPlan({
+        plan: JSON.stringify(plan),
+        name: inputName,
+        description,
+        isPublic,
+      });
+    } catch (error) {
+      setIsLoginModalShow(true);
+      setLoginModalMessage(error.message);
+    }
+  };
 
   const favouritePlan = async () => {
     try {

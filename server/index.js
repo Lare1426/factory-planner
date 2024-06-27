@@ -282,11 +282,8 @@ apiRouter.put("/plan/:id", async (req, res) => {
     planId: id,
   });
 
-  if (
-    (rdbResult && req.username !== rdbResult?.creator) ||
-    !accountPlanRdbResult?.sharedTo
-  ) {
-    res.sendStatus(403);
+  if (!accountPlanRdbResult?.created && !accountPlanRdbResult?.sharedTo) {
+    return res.sendStatus(403);
   }
 
   const cdbResult = await plansCdb.get(id);
