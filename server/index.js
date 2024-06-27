@@ -100,6 +100,7 @@ apiRouter.get("/plan/:id", async (req, res) => {
     isPublic,
     plan: planJson,
     hasEditAccess,
+    isFavourite,
   });
 });
 

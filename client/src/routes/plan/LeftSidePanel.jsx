@@ -25,6 +25,8 @@ export const LeftSidePanel = ({
   savePlan,
   hasEditAccess,
   originalPlan,
+  isPlanFavourited,
+  setIsPlanFavourited,
 }) => {
   const {
     isLoggedIn,
@@ -36,18 +38,13 @@ export const LeftSidePanel = ({
   const [inputProduct, setInputProduct] = useState(plan.item);
   const [inputAmount, setInputAmount] = useState(plan.amount);
   const [products, setProducts] = useState([]);
-  const [isPlanFavourited, setIsPlanFavourited] = useState(false);
+
   const [stringifiedPlan, setStringifiedPlan] = useState(JSON.stringify(plan));
   const [isShareModalShow, setIsShareModalShow] = useState(false);
 
   useEffect(() => {
     (async () => {
       setProducts(await getProducts());
-
-      if (loggedInUsername && planId) {
-        const result = await getPlanFavourite(planId);
-        result?.favourite && setIsPlanFavourited(result.favourite);
-      }
     })();
   }, []);
 
@@ -58,7 +55,7 @@ export const LeftSidePanel = ({
   const favouritePlan = async () => {
     try {
       await postToggleFavouritePlan(planId);
-      setIsPlanFavourited(isPlanFavourited ? false : true);
+      setIsPlanFavourited(!isPlanFavourited);
     } catch (error) {
       setIsLoginModalShow(true);
       setLoginModalMessage(error.message);

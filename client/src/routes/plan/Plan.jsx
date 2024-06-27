@@ -38,6 +38,7 @@ export const Plan = () => {
   const [creator, setCreator] = useState("");
   const [originalPlan, setOriginalPlan] = useState({});
   const [hasEditAccess, setHasEditAccess] = useState(false);
+  const [isPlanFavourited, setIsPlanFavourited] = useState(false);
 
   const navigate = useNavigate();
 
@@ -61,8 +62,15 @@ export const Plan = () => {
     if (id) {
       (async () => {
         try {
-          const { name, description, isPublic, creator, plan, hasEditAccess } =
-            await getPlanById(id);
+          const {
+            name,
+            description,
+            isPublic,
+            creator,
+            plan,
+            hasEditAccess,
+            isFavourite,
+          } = await getPlanById(id);
           setPlanId(id);
           setPlan(plan);
           setInputName(name);
@@ -70,6 +78,7 @@ export const Plan = () => {
           setIsPublic(isPublic);
           setCreator(creator);
           setHasEditAccess(hasEditAccess);
+          setIsPlanFavourited(isFavourite);
           setOriginalPlan({
             plan: JSON.stringify(plan),
             name,
@@ -143,6 +152,8 @@ export const Plan = () => {
           savePlan={savePlan}
           hasEditAccess={hasEditAccess}
           originalPlan={originalPlan}
+          isPlanFavourited={isPlanFavourited}
+          setIsPlanFavourited={setIsPlanFavourited}
         />
       )}
       <div className={styles.planView}>
