@@ -15,6 +15,7 @@ import plansCdb from "./utils/plans-db.js";
 import plansRdb from "./utils/plan-rdb.js";
 import accountPlanRdb from "./utils/account-plan-rdb.js";
 import accountRdb from "./utils/account-rdb.js";
+import { executeQuery } from "./utils/rdb.js";
 
 const PORT = process.env.PORT ?? 3000;
 const IP = process.env.IP;
@@ -332,32 +333,20 @@ apiRouter.delete("/plan/:id", async (req, res) => {
 apiRouter.get("/account/plan", async (req, res) => {
   console.log("get/account/plan");
 
-  const plansRdbResult = await plansRdb.selectWhere({
-    field: "creator",
-    value: req.username,
-  });
-  const { id: accountId } = await accountRdb.select({ username: req.username });
-  const accountPlanRdbResult = await accountPlanRdb.select({
-    accountId: accountId,
-  });
-
-  const favourited = [];
-  const sharedTo = [];
-
-  accountPlanRdbResult.forEach((plan) => {
-    if (plan.sharedTo) {
-      sharedTo.push(plansRdb.select({ id: plan.planId }));
-    }
-    if (plan.favourited) {
-      favourited.push(plansRdb.select({ id: plan.planId }));
-    }
-  });
+  const [rdbResult] = await executeQuery(`
+    SELECT plan.name, plan.description, plan.id, plan.product, plan.amount, plan.isPublic, plan.creator, account_plan.sharedTo, account_plan.favourited, account_plan.created
+    FROM account 
+    INNER JOIN account_plan 
+    ON account.id=account_plan.accountId 
+    INNER JOIN plan
+    ON account_plan.planId=plan.id
+    WHERE username="${req.username}";`);
 
   res.json({
-    public: plansRdbResult.filter((plan) => plan.isPublic),
-    private: plansRdbResult.filter((plan) => !plan.isPublic),
-    favourited: await Promise.all(favourited),
-    sharedTo: await Promise.all(sharedTo),
+    public: rdbResult.filter((plan) => plan.created && plan.isPublic),
+    private: rdbResult.filter((plan) => plan.created && !plan.isPublic),
+    favourited: rdbResult.filter((plan) => plan.favourited),
+    sharedTo: rdbResult.filter((plan) => plan.sharedTo),
   });
 });
 

@@ -50,5 +50,29 @@
         }
       }
     }
+
+    .modal-components {
+      width: 500px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+
+      h2 {
+        font-weight: 500;
+        font-size: 40px;
+        margin: 0;
+      }
+
+      label {
+        font-size: 25px;
+      }
+
+      .checkbox {
+        width: 25px;
+        height: 25px;
+        margin: 0 20px 2px;
+        vertical-align: bottom;
+      }
+    }
   }
 }
