@@ -3,14 +3,45 @@ import { useState, useEffect } from "react";
 import styles from "./Account.module.scss";
 import { useAuthContext } from "@/utils/AuthContext";
 import { Button, Input, Modal } from "@/components";
-import { getAccountPlans, deauthorise } from "@/utils/api";
+import {
+  getAccountPlans,
+  deauthorise,
+  postToggleFavouritePlan,
+} from "@/utils/api";
 
-const PlanList = ({ name, list }) => {
+const PlanList = ({ name, list, setAccountPlans }) => {
+  const { setIsLoginModalShow, setLoginModalMessage } = useAuthContext();
+
   const [isPlanModalShow, setIsPlanModalShow] = useState(false);
-  const [isPublic, setIsPublic] = useState(false);
   const [planForModal, setPlanForModal] = useState();
+  const [isPublic, setIsPublic] = useState(false);
+  const [isModalPlanFavourited, setIsModalPlanFavourited] = useState(false);
+
+  useEffect(() => {
+    if (planForModal && planForModal.favourited !== isModalPlanFavourited) {
+      (async () => {
+        try {
+          const result = await getAccountPlans();
+          setAccountPlans(result);
+        } catch (error) {
+          setIsLoginModalShow(true);
+          setLoginModalMessage(error.message);
+        }
+      })();
+    }
+  }, [isPlanModalShow]);
 
   const navigate = useNavigate();
+
+  const favouritePlan = async () => {
+    try {
+      await postToggleFavouritePlan(planForModal.id);
+      setIsModalPlanFavourited(!isModalPlanFavourited);
+    } catch (error) {
+      setIsLoginModalShow(true);
+      setLoginModalMessage(error.message);
+    }
+  };
 
   return (
     <>
@@ -22,6 +53,7 @@ const PlanList = ({ name, list }) => {
             onClick={() => {
               setPlanForModal(plan);
               setIsPublic(plan.isPublic);
+              plan.favourited && setIsModalPlanFavourited(plan.favourited);
               setIsPlanModalShow(true);
             }}
             key={`${plan.name}${index}`}
@@ -38,18 +70,34 @@ const PlanList = ({ name, list }) => {
           setIsPlanModalShow(false);
         }}
       >
-        {(planForModal?.created || planForModal?.sharedTo) && (
+        {planForModal && (
           <div className={styles.modalComponents}>
             <h2>{planForModal.name}</h2>
-            <div>
-              <label>Public</label>
-              <input
-                type="checkbox"
-                className={styles.checkbox}
-                checked={isPublic}
-                onChange={(e) => setIsPublic(e.target.checked)}
-              />
-            </div>
+            {planForModal?.created || planForModal?.sharedTo ? (
+              <div>
+                <label>Public</label>
+                <input
+                  type="checkbox"
+                  className={styles.checkbox}
+                  checked={isPublic}
+                  onChange={(e) => setIsPublic(e.target.checked)}
+                />
+              </div>
+            ) : (
+              <>
+                <label>Creator: {planForModal.creator}</label>
+              </>
+            )}
+            <Button
+              size="large"
+              color="tertiary"
+              onClick={() => navigate(`/plan/${planForModal.id}`)}
+            >
+              View
+            </Button>
+            <Button size="large" color="tertiary" onClick={favouritePlan}>
+              {isModalPlanFavourited ? "Unfavourite" : "Favourite"}
+            </Button>
           </div>
         )}
       </Modal>
@@ -118,10 +166,26 @@ export const Account = () => {
       </div>
       {accountPlans && (
         <div className={styles.planLists}>
-          <PlanList name={"Public"} list={accountPlans.public} />
-          <PlanList name={"Private"} list={accountPlans.private} />
-          <PlanList name={"Favourited"} list={accountPlans.favourited} />
-          <PlanList name={"Shared"} list={accountPlans.sharedTo} />
+          <PlanList
+            name={"Public"}
+            list={accountPlans.public}
+            setAccountPlans={setAccountPlans}
+          />
+          <PlanList
+            name={"Private"}
+            list={accountPlans.private}
+            setAccountPlans={setAccountPlans}
+          />
+          <PlanList
+            name={"Favourited"}
+            list={accountPlans.favourited}
+            setAccountPlans={setAccountPlans}
+          />
+          <PlanList
+            name={"Shared"}
+            list={accountPlans.sharedTo}
+            setAccountPlans={setAccountPlans}
+          />
         </div>
       )}
     </main>

@@ -333,7 +333,7 @@ apiRouter.delete("/plan/:id", async (req, res) => {
 apiRouter.get("/account/plan", async (req, res) => {
   console.log("get/account/plan");
 
-  const [rdbResult] = await executeQuery(`
+  let [rdbResult] = await executeQuery(`
     SELECT plan.name, plan.description, plan.id, plan.product, plan.amount, plan.isPublic, plan.creator, account_plan.sharedTo, account_plan.favourited, account_plan.created
     FROM account 
     INNER JOIN account_plan 
@@ -341,6 +341,13 @@ apiRouter.get("/account/plan", async (req, res) => {
     INNER JOIN plan
     ON account_plan.planId=plan.id
     WHERE username="${req.username}";`);
+
+  rdbResult = rdbResult.map((row) => {
+    row.sharedTo = !!row.sharedTo;
+    row.favourited = !!row.favourited;
+    row.created = !!row.created;
+    return row;
+  });
 
   res.json({
     public: rdbResult.filter((plan) => plan.created && plan.isPublic),
