@@ -2,122 +2,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import styles from "./Account.module.scss";
 import { useAuthContext } from "@/utils/AuthContext";
-import { Button, Input, Modal } from "@/components";
-import {
-  getAccountPlans,
-  deauthorise,
-  postToggleFavouritePlan,
-  postToggleIsPublicPlan,
-} from "@/utils/api";
-
-const PlanModal = ({
-  isPlanModalShow,
-  setIsPlanModalShow,
-  planForModal,
-  setAccountPlans,
-}) => {
-  const { setIsLoginModalShow, setLoginModalMessage } = useAuthContext();
-
-  const [isPublic, setIsPublic] = useState(false);
-  const [isModalPlanFavourited, setIsModalPlanFavourited] = useState(false);
-
-  useEffect(() => {
-    if (planForModal) {
-      setIsPublic(planForModal.isPublic);
-      setIsModalPlanFavourited(planForModal.favourited);
-    }
-  }, [planForModal]);
-
-  useEffect(() => {
-    if (
-      planForModal &&
-      (planForModal.favourited !== isModalPlanFavourited ||
-        isPublic !== planForModal.isPublic)
-    ) {
-      (async () => {
-        try {
-          const result = await getAccountPlans();
-          setAccountPlans(result);
-        } catch (error) {
-          setIsLoginModalShow(true);
-          setLoginModalMessage(error.message);
-        }
-      })();
-    }
-  }, [isPlanModalShow]);
-
-  useEffect(() => {
-    if (planForModal && isPublic !== planForModal.isPublic) {
-      try {
-        postToggleIsPublicPlan(planForModal.id);
-      } catch (error) {
-        setIsLoginModalShow(true);
-        setLoginModalMessage(error.message);
-      }
-    }
-  }, [isPublic]);
-
-  const navigate = useNavigate();
-
-  const favouritePlan = async () => {
-    try {
-      await postToggleFavouritePlan(planForModal.id);
-      setIsModalPlanFavourited(!isModalPlanFavourited);
-    } catch (error) {
-      setIsLoginModalShow(true);
-      setLoginModalMessage(error.message);
-    }
-  };
-
-  return (
-    <Modal
-      open={isPlanModalShow}
-      hide={() => {
-        setIsPlanModalShow(false);
-      }}
-    >
-      {planForModal && (
-        <div className={styles.modalComponents}>
-          <h2>{planForModal.name}</h2>
-          {planForModal?.created ? (
-            <div>
-              <label>Public</label>
-              <input
-                type="checkbox"
-                className={styles.checkbox}
-                checked={isPublic}
-                onChange={(e) => setIsPublic(e.target.checked)}
-              />
-            </div>
-          ) : (
-            <>
-              <label>Creator: {planForModal.creator}</label>
-            </>
-          )}
-          <Button
-            size="small"
-            color="tertiary"
-            onClick={() => navigate(`/plan/${planForModal.id}`)}
-          >
-            View
-          </Button>
-          <Button size="small" color="tertiary" onClick={favouritePlan}>
-            {isModalPlanFavourited ? "Unfavourite" : "Favourite"}
-          </Button>
-          <Button
-            size="small"
-            color="tertiary"
-            onClick={() => {
-              setIsPlanModalShow(false);
-            }}
-          >
-            Close
-          </Button>
-        </div>
-      )}
-    </Modal>
-  );
-};
+import { Button, Input, EditAndShareModal } from "@/components";
+import { getAccountPlans, deauthorise } from "@/utils/api";
 
 const PlanList = ({ name, list, setPlanForModal, setIsPlanModalShow }) => {
   return (
@@ -232,11 +118,13 @@ export const Account = () => {
               setIsPlanModalShow={setIsPlanModalShow}
             />
           </div>
-          <PlanModal
-            isPlanModalShow={isPlanModalShow}
-            setIsPlanModalShow={setIsPlanModalShow}
-            planForModal={planForModal}
+          <EditAndShareModal
+            isModalShow={isPlanModalShow}
+            setIsModalShow={setIsPlanModalShow}
+            plan={planForModal}
             setAccountPlans={setAccountPlans}
+            edit={true}
+            share={planForModal?.created}
           />
         </>
       )}

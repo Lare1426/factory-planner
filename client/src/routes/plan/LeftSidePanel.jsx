@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button, Input } from "@/components";
+import { Button, Input, EditAndShareModal } from "@/components";
 import { useAuthContext } from "@/utils/AuthContext";
 import {
   postToggleFavouritePlan,
@@ -11,7 +11,6 @@ import {
   putPlan,
 } from "@/utils/api";
 import styles from "./LeftSidePanel.module.scss";
-import { ShareModal } from "./ShareModal";
 
 export const LeftSidePanel = ({
   fetchPlan,
@@ -294,11 +293,11 @@ export const LeftSidePanel = ({
         </div>
       </>
       {plan && loggedInUsername === creator && (
-        <ShareModal
-          isShareModalShow={isShareModalShow}
-          setIsShareModalShow={setIsShareModalShow}
-          planId={planId}
-          creator={creator}
+        <EditAndShareModal
+          isModalShow={isShareModalShow}
+          setIsModalShow={setIsShareModalShow}
+          plan={{ id: planId, creator }}
+          share={true}
         />
       )}
     </aside>

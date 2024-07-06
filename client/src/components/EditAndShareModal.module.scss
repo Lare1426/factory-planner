@@ -1,4 +1,5 @@
-.share-modal {
+.modal {
+  width: max-content;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -20,5 +21,22 @@
     width: 80%;
     padding: 10px;
     border-radius: 20px;
+  }
+
+  h2 {
+    font-weight: 500;
+    font-size: 40px;
+    margin: 0;
+  }
+
+  label {
+    font-size: 25px;
+  }
+
+  .checkbox {
+    width: 25px;
+    height: 25px;
+    margin: 0 20px 2px;
+    vertical-align: bottom;
   }
 }
