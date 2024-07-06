@@ -165,8 +165,8 @@ export const LeftSidePanel = ({
     );
 
   return (
-    <aside className={styles.sidePanel}>
-      <>
+    <>
+      <aside className={styles.sidePanel}>
         <div>
           <Input
             size="large"
@@ -291,7 +291,7 @@ export const LeftSidePanel = ({
             Delete
           </Button>
         </div>
-      </>
+      </aside>
       {plan && loggedInUsername === creator && (
         <EditAndShareModal
           isModalShow={isShareModalShow}
@@ -300,6 +300,6 @@ export const LeftSidePanel = ({
           share={true}
         />
       )}
-    </aside>
+    </>
   );
 };

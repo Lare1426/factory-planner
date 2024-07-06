@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 
-export const generateToken = (username) => {
-  return jwt.sign({ username }, process.env.JWT_SECRET_KEY, {
+export const generateToken = (name, id) => {
+  return jwt.sign({ user: { name, id } }, process.env.JWT_SECRET_KEY, {
     expiresIn: process.env.TOKEN_LIFETIME,
   });
 };
@@ -17,18 +17,18 @@ export const auhtenticateToken = (req) => {
   }
 
   try {
-    return jwt.verify(token, process.env.JWT_SECRET_KEY).username;
+    return jwt.verify(token, process.env.JWT_SECRET_KEY).user;
   } catch (error) {
     return null;
   }
 };
 
 export const authenticateTokenMiddleware = (req, res, next) => {
-  const username = auhtenticateToken(req);
+  const user = auhtenticateToken(req);
 
-  if (!username) {
+  if (!user) {
     return res.sendStatus(401);
   }
-  req.username = username;
+  req.user = user;
   next();
 };

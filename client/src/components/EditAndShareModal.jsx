@@ -41,9 +41,6 @@ export const EditAndShareModal = ({
         }
       })();
     }
-  }, []);
-
-  useEffect(() => {
     if (edit && plan) {
       setIsPublic(plan.isPublic);
       setIsPlanFavourited(plan.favourited);
@@ -54,6 +51,7 @@ export const EditAndShareModal = ({
     if (
       edit &&
       plan &&
+      !isModalShow &&
       (plan.favourited !== isPlanFavourited || isPublic !== plan.isPublic)
     ) {
       (async () => {
@@ -159,9 +157,9 @@ export const EditAndShareModal = ({
             </Button>
           </>
         )}
-        {share && edit && <label>Share:</label>}
         {share && (
           <>
+            <label>Share plan:</label>
             {isError && <p className={styles.error}>{shareError}</p>}
             <Input
               type="text"

@@ -29,7 +29,7 @@ const PlanList = ({ name, list, setPlanForModal, setIsPlanModalShow }) => {
               size="small"
               color="primary"
               onClick={() => {
-                if (pageIndex >= 0 && pageIndex < Math.ceil(list.length / 5))
+                if (pageIndex >= 0 && pageIndex < Math.floor(list.length / 5))
                   setPageIndex(pageIndex + 1);
               }}
             >

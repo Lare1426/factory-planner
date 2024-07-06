@@ -15,7 +15,7 @@ import plansCdb from "./utils/plans-db.js";
 import plansRdb from "./utils/plan-rdb.js";
 import accountPlanRdb from "./utils/account-plan-rdb.js";
 import accountRdb from "./utils/account-rdb.js";
-import { executeQuery } from "./utils/rdb.js";
+import { selectAccountPlans, selectPlanMetadata } from "./utils/queries.js";
 
 const PORT = process.env.PORT ?? 3000;
 const IP = process.env.IP;
@@ -34,7 +34,7 @@ apiRouter.post("/authorise", async (req, res) => {
   const account = await accountRdb.select({ username });
 
   if (account && password === account.password) {
-    const token = generateToken(username);
+    const token = generateToken(username, account.id);
     res.cookie("authToken", token, {
       maxAge: process.env.TOKEN_LIFETIME,
       httpOnly: true,
@@ -70,7 +70,7 @@ apiRouter.get("/plan/:id", async (req, res) => {
   let hasEditAccess = false;
   let isFavourite = false;
 
-  const username = auhtenticateToken(req);
+  const { name: username } = auhtenticateToken(req);
   if (username) {
     const { id: accountId } = await accountRdb.select({ username });
     const [accountPlanRdbResult] = await accountPlanRdb.select({
@@ -121,7 +121,7 @@ apiRouter.delete("/deauthorise", async (req, res) => {
 apiRouter.get("/authenticate", async (req, res) => {
   console.log("get/authenticate");
 
-  res.json(req.username).status(200);
+  res.json(req.user.name).status(200);
 });
 
 apiRouter.get("/plan/favourite/:id", async (req, res) => {
@@ -130,7 +130,9 @@ apiRouter.get("/plan/favourite/:id", async (req, res) => {
   const { id } = req.params;
 
   const { isPublic, creator } = await plansRdb.select({ id });
-  const { id: accountId } = await accountRdb.select({ username: req.username });
+  const { id: accountId } = await accountRdb.select({
+    username: req.user.name,
+  });
   const [accountPlanRdbResult] = await accountPlanRdb.select({
     accountId,
     planId: id,
@@ -138,7 +140,7 @@ apiRouter.get("/plan/favourite/:id", async (req, res) => {
 
   if (
     !isPublic &&
-    req.username !== creator &&
+    req.user.name !== creator &&
     !accountPlanRdbResult?.sharedTo
   ) {
     return res.sendStatus(403);
@@ -159,7 +161,9 @@ apiRouter.post("/plan/toggle-favourite/:planId", async (req, res) => {
     id: planId,
   });
 
-  const { id: accountId } = await accountRdb.select({ username: req.username });
+  const { id: accountId } = await accountRdb.select({
+    username: req.user.name,
+  });
   const [accountPlanRdbResult] = await accountPlanRdb.select({
     accountId,
     planId,
@@ -167,7 +171,7 @@ apiRouter.post("/plan/toggle-favourite/:planId", async (req, res) => {
 
   if (
     !isPublic &&
-    req.username !== creator &&
+    req.user.name !== creator &&
     !accountPlanRdbResult?.sharedTo
   ) {
     return res.sendStatus(403);
@@ -197,7 +201,7 @@ apiRouter.get("/plan/shared/:id", async (req, res) => {
 
   const { creator } = await plansRdb.select({ id });
 
-  if (req.username !== creator) {
+  if (req.user.name !== creator) {
     return res.sendStatus(403);
   }
 
@@ -226,7 +230,7 @@ apiRouter.post("/plan/toggle-shared/:planId?", async (req, res) => {
     planId,
   });
 
-  if (req.username !== creator) {
+  if (req.user.name !== creator) {
     return res.sendStatus(403);
   }
 
@@ -252,14 +256,7 @@ apiRouter.post("/plan/toggle-isPublic/:planId", async (req, res) => {
 
   const { planId } = req.params;
 
-  const [[rdbResult]] = await executeQuery(`
-    SELECT account_plan.sharedTo, account_plan.created, plan.isPublic
-    FROM plan
-    INNER JOIN account_plan
-    ON plan.id=account_plan.planId
-    INNER JOIN account 
-    ON account_plan.accountId=account.id 
-    WHERE account.username="${req.username}" AND account_plan.planId="${planId}";`);
+  const rdbResult = await selectPlanMetadata(req.user.id, planId);
 
   if (rdbResult.sharedTo || rdbResult.created) {
     const plansRdbResult = await plansRdb.update({
@@ -279,12 +276,14 @@ apiRouter.post("/plan", async (req, res) => {
 
   const planId = uuidv4();
 
-  const { id: accountId } = await accountRdb.select({ username: req.username });
+  const { id: accountId } = await accountRdb.select({
+    username: req.user.name,
+  });
 
   const cdbResult = await plansCdb.put(planId, plan);
   const plansRdbResult = await plansRdb.insert({
     id: planId,
-    creator: req.username,
+    creator: req.user.name,
     name,
     description,
     product: plan.item,
@@ -307,7 +306,9 @@ apiRouter.put("/plan/:id", async (req, res) => {
   const { id } = req.params;
 
   const rdbResult = await plansRdb.select({ id });
-  const { id: accountId } = await accountRdb.select({ username: req.username });
+  const { id: accountId } = await accountRdb.select({
+    username: req.user.name,
+  });
   const [accountPlanRdbResult] = await accountPlanRdb.select({
     accountId,
     planId: id,
@@ -326,7 +327,7 @@ apiRouter.put("/plan/:id", async (req, res) => {
 
   const rdbResponse = await plansRdb.insert({
     id,
-    creator: req.username,
+    creator: req.user.name,
     name,
     description,
     product: plan.item,
@@ -345,7 +346,7 @@ apiRouter.delete("/plan/:id", async (req, res) => {
     id,
   });
 
-  if (req.username !== creator) {
+  if (req.user.name !== creator) {
     res.sendStatus(403);
   }
 
@@ -358,21 +359,7 @@ apiRouter.delete("/plan/:id", async (req, res) => {
 apiRouter.get("/account/plan", async (req, res) => {
   console.log("get/account/plan");
 
-  let [rdbResult] = await executeQuery(`
-    SELECT plan.name, plan.description, plan.id, plan.product, plan.amount, plan.isPublic, plan.creator, account_plan.sharedTo, account_plan.favourited, account_plan.created
-    FROM account 
-    INNER JOIN account_plan 
-    ON account.id=account_plan.accountId 
-    INNER JOIN plan
-    ON account_plan.planId=plan.id
-    WHERE username="${req.username}";`);
-
-  rdbResult = rdbResult.map((row) => {
-    row.sharedTo = !!row.sharedTo;
-    row.favourited = !!row.favourited;
-    row.created = !!row.created;
-    return row;
-  });
+  const rdbResult = await selectAccountPlans(req.user.id);
 
   res.json({
     public: rdbResult.filter((plan) => plan.created && plan.isPublic),
