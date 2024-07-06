@@ -10,13 +10,23 @@ import {
   postToggleIsPublicPlan,
 } from "@/utils/api";
 
-const PlanList = ({ name, list, setAccountPlans }) => {
+const PlanModal = ({
+  isPlanModalShow,
+  setIsPlanModalShow,
+  planForModal,
+  setAccountPlans,
+}) => {
   const { setIsLoginModalShow, setLoginModalMessage } = useAuthContext();
 
-  const [isPlanModalShow, setIsPlanModalShow] = useState(false);
-  const [planForModal, setPlanForModal] = useState();
   const [isPublic, setIsPublic] = useState(false);
   const [isModalPlanFavourited, setIsModalPlanFavourited] = useState(false);
+
+  useEffect(() => {
+    if (planForModal) {
+      setIsPublic(planForModal.isPublic);
+      setIsModalPlanFavourited(planForModal.favourited);
+    }
+  }, [planForModal]);
 
   useEffect(() => {
     if (
@@ -60,6 +70,57 @@ const PlanList = ({ name, list, setAccountPlans }) => {
   };
 
   return (
+    <Modal
+      open={isPlanModalShow}
+      hide={() => {
+        setIsPlanModalShow(false);
+      }}
+    >
+      {planForModal && (
+        <div className={styles.modalComponents}>
+          <h2>{planForModal.name}</h2>
+          {planForModal?.created ? (
+            <div>
+              <label>Public</label>
+              <input
+                type="checkbox"
+                className={styles.checkbox}
+                checked={isPublic}
+                onChange={(e) => setIsPublic(e.target.checked)}
+              />
+            </div>
+          ) : (
+            <>
+              <label>Creator: {planForModal.creator}</label>
+            </>
+          )}
+          <Button
+            size="small"
+            color="tertiary"
+            onClick={() => navigate(`/plan/${planForModal.id}`)}
+          >
+            View
+          </Button>
+          <Button size="small" color="tertiary" onClick={favouritePlan}>
+            {isModalPlanFavourited ? "Unfavourite" : "Favourite"}
+          </Button>
+          <Button
+            size="small"
+            color="tertiary"
+            onClick={() => {
+              setIsPlanModalShow(false);
+            }}
+          >
+            Close
+          </Button>
+        </div>
+      )}
+    </Modal>
+  );
+};
+
+const PlanList = ({ name, list, setPlanForModal, setIsPlanModalShow }) => {
+  return (
     <>
       <div className={styles.planList}>
         <label>{name}</label>
@@ -68,8 +129,6 @@ const PlanList = ({ name, list, setAccountPlans }) => {
             className={styles.plan}
             onClick={() => {
               setPlanForModal(plan);
-              setIsPublic(plan.isPublic);
-              plan.favourited && setIsModalPlanFavourited(plan.favourited);
               setIsPlanModalShow(true);
             }}
             key={`${plan.name}${index}`}
@@ -80,52 +139,6 @@ const PlanList = ({ name, list, setAccountPlans }) => {
           </div>
         ))}
       </div>
-      <Modal
-        open={isPlanModalShow}
-        hide={() => {
-          setIsPlanModalShow(false);
-        }}
-      >
-        {planForModal && (
-          <div className={styles.modalComponents}>
-            <h2>{planForModal.name}</h2>
-            {planForModal?.created || planForModal?.sharedTo ? (
-              <div>
-                <label>Public</label>
-                <input
-                  type="checkbox"
-                  className={styles.checkbox}
-                  checked={isPublic}
-                  onChange={(e) => setIsPublic(e.target.checked)}
-                />
-              </div>
-            ) : (
-              <>
-                <label>Creator: {planForModal.creator}</label>
-              </>
-            )}
-            <Button
-              size="small"
-              color="tertiary"
-              onClick={() => navigate(`/plan/${planForModal.id}`)}
-            >
-              View
-            </Button>
-            <Button size="small" color="tertiary" onClick={favouritePlan}>
-              {isModalPlanFavourited ? "Unfavourite" : "Favourite"}
-            </Button>
-            <Button
-              size="small"
-              color="tertiary"
-              onClick={() => {
-                setIsPlanModalShow(false);
-              }}
-            >
-              Close
-            </Button>
-          </div>
-        )}
-      </Modal>
     </>
   );
 };
@@ -140,6 +153,8 @@ export const Account = () => {
   } = useAuthContext();
 
   const [accountPlans, setAccountPlans] = useState();
+  const [isPlanModalShow, setIsPlanModalShow] = useState(false);
+  const [planForModal, setPlanForModal] = useState();
 
   useEffect(() => {
     (async () => {
@@ -190,28 +205,40 @@ export const Account = () => {
         </div>
       </div>
       {accountPlans && (
-        <div className={styles.planLists}>
-          <PlanList
-            name={"Public"}
-            list={accountPlans.public}
+        <>
+          <div className={styles.planLists}>
+            <PlanList
+              name={"Public"}
+              list={accountPlans.public}
+              setPlanForModal={setPlanForModal}
+              setIsPlanModalShow={setIsPlanModalShow}
+            />
+            <PlanList
+              name={"Private"}
+              list={accountPlans.private}
+              setPlanForModal={setPlanForModal}
+              setIsPlanModalShow={setIsPlanModalShow}
+            />
+            <PlanList
+              name={"Favourited"}
+              list={accountPlans.favourited}
+              setPlanForModal={setPlanForModal}
+              setIsPlanModalShow={setIsPlanModalShow}
+            />
+            <PlanList
+              name={"Shared"}
+              list={accountPlans.sharedTo}
+              setPlanForModal={setPlanForModal}
+              setIsPlanModalShow={setIsPlanModalShow}
+            />
+          </div>
+          <PlanModal
+            isPlanModalShow={isPlanModalShow}
+            setIsPlanModalShow={setIsPlanModalShow}
+            planForModal={planForModal}
             setAccountPlans={setAccountPlans}
           />
-          <PlanList
-            name={"Private"}
-            list={accountPlans.private}
-            setAccountPlans={setAccountPlans}
-          />
-          <PlanList
-            name={"Favourited"}
-            list={accountPlans.favourited}
-            setAccountPlans={setAccountPlans}
-          />
-          <PlanList
-            name={"Shared"}
-            list={accountPlans.sharedTo}
-            setAccountPlans={setAccountPlans}
-          />
-        </div>
+        </>
       )}
     </main>
   );
