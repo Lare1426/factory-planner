@@ -23,7 +23,7 @@
       flex-grow: 1;
       flex-basis: 0;
       background-color: var(--secondary);
-      padding: 20px;
+      padding: 10px 20px;
       border-radius: 20px;
       font-size: 40px;
       display: flex;
@@ -40,7 +40,7 @@
         font-size: 18px;
 
         .name {
-          font-size: 25px;
+          font-size: 23px;
           margin-bottom: 7px;
           font-weight: 600;
         }
@@ -49,6 +49,12 @@
           cursor: pointer;
         }
       }
+    }
+
+    .nav-buttons {
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
     }
   }
 }

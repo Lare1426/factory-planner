@@ -6,11 +6,38 @@ import { Button, Input, EditAndShareModal } from "@/components";
 import { getAccountPlans, deauthorise } from "@/utils/api";
 
 const PlanList = ({ name, list, setPlanForModal, setIsPlanModalShow }) => {
+  const [pageIndex, setPageIndex] = useState(0);
+
   return (
     <>
       <div className={styles.planList}>
         <label>{name}</label>
-        {list.map((plan, index) => (
+        {list.length > 5 && (
+          <div className={styles.navButtons}>
+            <Button
+              size="small"
+              color="primary"
+              onClick={() => {
+                if (pageIndex > 0 && pageIndex <= Math.ceil(list.length / 5))
+                  setPageIndex(pageIndex - 1);
+              }}
+            >
+              {"<"}
+            </Button>
+            {pageIndex + 1}
+            <Button
+              size="small"
+              color="primary"
+              onClick={() => {
+                if (pageIndex >= 0 && pageIndex < Math.ceil(list.length / 5))
+                  setPageIndex(pageIndex + 1);
+              }}
+            >
+              {">"}
+            </Button>
+          </div>
+        )}
+        {list.slice(0 + pageIndex * 5, 5 + pageIndex * 5).map((plan, index) => (
           <div
             className={styles.plan}
             onClick={() => {

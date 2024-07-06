@@ -41,6 +41,9 @@ export const EditAndShareModal = ({
         }
       })();
     }
+  }, []);
+
+  useEffect(() => {
     if (edit && plan) {
       setIsPublic(plan.isPublic);
       setIsPlanFavourited(plan.favourited);
