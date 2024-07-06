@@ -7,6 +7,7 @@ import {
   getAccountPlans,
   deauthorise,
   postToggleFavouritePlan,
+  postToggleIsPublicPlan,
 } from "@/utils/api";
 
 const PlanList = ({ name, list, setAccountPlans }) => {
@@ -18,7 +19,11 @@ const PlanList = ({ name, list, setAccountPlans }) => {
   const [isModalPlanFavourited, setIsModalPlanFavourited] = useState(false);
 
   useEffect(() => {
-    if (planForModal && planForModal.favourited !== isModalPlanFavourited) {
+    if (
+      planForModal &&
+      (planForModal.favourited !== isModalPlanFavourited ||
+        isPublic !== planForModal.isPublic)
+    ) {
       (async () => {
         try {
           const result = await getAccountPlans();
@@ -30,6 +35,17 @@ const PlanList = ({ name, list, setAccountPlans }) => {
       })();
     }
   }, [isPlanModalShow]);
+
+  useEffect(() => {
+    if (planForModal && isPublic !== planForModal.isPublic) {
+      try {
+        postToggleIsPublicPlan(planForModal.id);
+      } catch (error) {
+        setIsLoginModalShow(true);
+        setLoginModalMessage(error.message);
+      }
+    }
+  }, [isPublic]);
 
   const navigate = useNavigate();
 
@@ -89,14 +105,23 @@ const PlanList = ({ name, list, setAccountPlans }) => {
               </>
             )}
             <Button
-              size="large"
+              size="small"
               color="tertiary"
               onClick={() => navigate(`/plan/${planForModal.id}`)}
             >
               View
             </Button>
-            <Button size="large" color="tertiary" onClick={favouritePlan}>
+            <Button size="small" color="tertiary" onClick={favouritePlan}>
               {isModalPlanFavourited ? "Unfavourite" : "Favourite"}
+            </Button>
+            <Button
+              size="small"
+              color="tertiary"
+              onClick={() => {
+                setIsPlanModalShow(false);
+              }}
+            >
+              Close
             </Button>
           </div>
         )}

@@ -247,6 +247,31 @@ apiRouter.post("/plan/toggle-shared/:planId?", async (req, res) => {
   res.sendStatus(200);
 });
 
+apiRouter.post("/plan/toggle-isPublic/:planId", async (req, res) => {
+  console.log("/post/plan/toggle-isPublic");
+
+  const { planId } = req.params;
+
+  const [[rdbResult]] = await executeQuery(`
+    SELECT account_plan.sharedTo, account_plan.created, plan.isPublic
+    FROM plan
+    INNER JOIN account_plan
+    ON plan.id=account_plan.planId
+    INNER JOIN account 
+    ON account_plan.accountId=account.id 
+    WHERE account.username="${req.username}" AND account_plan.planId="${planId}";`);
+
+  if (rdbResult.sharedTo || rdbResult.created) {
+    const plansRdbResult = await plansRdb.update({
+      id: planId,
+      values: { isPublic: !rdbResult.isPublic },
+    });
+    res.sendStatus(200);
+  } else {
+    res.sendStatus(403);
+  }
+});
+
 apiRouter.post("/plan", async (req, res) => {
   console.log("post/plan");
 

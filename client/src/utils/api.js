@@ -152,6 +152,18 @@ export const getPlanSharedTo = async (planId) => {
   }
 };
 
+export const postToggleIsPublicPlan = async (planId) => {
+  const response = await authenticationRequiredApi(
+    `/api/plan/toggle-isPublic/${planId}`,
+    {
+      method: "POST",
+    }
+  );
+  if (response.status === 403) {
+    throw new ApiError("Wrong account", 403);
+  }
+};
+
 export const getAccountPlans = async () => {
   const response = await authenticationRequiredApi("/api/account/plan", {
     method: "GET",
