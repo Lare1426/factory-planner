@@ -21,6 +21,29 @@ export const selectAccountPlans = async (accountId) => {
   return rdbResult;
 };
 
+export const selectSharedPlans = async (accountId) => {
+  const [rdbResult] = await executeQuery(
+    `
+    SELECT B.planId, account.username
+    FROM account_plan A, account_plan B
+    INNER JOIN account
+    ON B.accountId=account.id
+    WHERE A.accountId=? AND A.created=1 AND B.planId=A.planId AND B.sharedTo=1 AND B.created=0
+    ORDER BY B.planId;
+    `,
+    [accountId]
+  );
+
+  return rdbResult.reduce((acc, { planId, username }) => {
+    if (!acc[planId]) {
+      acc[planId] = [username];
+    } else {
+      acc[planId].push(username);
+    }
+    return acc;
+  }, {});
+};
+
 export const selectPlanMetadata = async (accountId, planId) => {
   const [[rdbResult]] = await executeQuery(
     `

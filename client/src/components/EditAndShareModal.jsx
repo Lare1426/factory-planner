@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import styles from "./EditAndShareModal.module.scss";
 import { Button, Input, Modal } from "@/components";
 import {
@@ -31,7 +31,7 @@ export const EditAndShareModal = ({
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (share && plan) {
+    if (share && !edit) {
       (async () => {
         try {
           setSharedTo(await getPlanSharedTo(plan.id));
@@ -41,41 +41,18 @@ export const EditAndShareModal = ({
         }
       })();
     }
+  }, []);
+
+  useEffect(() => {
     if (edit && plan) {
       setIsPublic(plan.isPublic);
       setIsPlanFavourited(plan.favourited);
-    }
-  }, [plan]);
 
-  useEffect(() => {
-    if (
-      edit &&
-      plan &&
-      !isModalShow &&
-      (plan.favourited !== isPlanFavourited || isPublic !== plan.isPublic)
-    ) {
-      (async () => {
-        try {
-          const result = await getAccountPlans();
-          setAccountPlans(result);
-        } catch (error) {
-          setIsLoginModalShow(true);
-          setLoginModalMessage(error.message);
-        }
-      })();
-    }
-  }, [isModalShow]);
-
-  useEffect(() => {
-    if (edit && plan && isPublic !== plan.isPublic) {
-      try {
-        postToggleIsPublicPlan(plan.id);
-      } catch (error) {
-        setIsLoginModalShow(true);
-        setLoginModalMessage(error.message);
+      if (share) {
+        setSharedTo(plan.shared);
       }
     }
-  }, [isPublic]);
+  }, [plan]);
 
   const sharePlan = async () => {
     if (inputAccount === plan.creator) {
@@ -106,7 +83,7 @@ export const EditAndShareModal = ({
 
   const favouritePlan = async () => {
     try {
-      await postToggleFavouritePlan(planForModal.id);
+      await postToggleFavouritePlan(plan.id);
       setIsPlanFavourited(!isPlanFavourited);
     } catch (error) {
       setIsLoginModalShow(true);
@@ -120,7 +97,27 @@ export const EditAndShareModal = ({
       setInputAccount("");
       setIsError(false);
       setShareError("");
-      setSharedTo([]);
+    }
+
+    const hasShareListChanged = !!plan.shared
+      .filter((user) => !sharedTo.includes(user))
+      .concat(sharedTo.filter((user) => !plan.shared.includes(user))).length;
+
+    if (
+      edit &&
+      (plan.favourited !== isPlanFavourited ||
+        isPublic !== plan.isPublic ||
+        hasShareListChanged)
+    ) {
+      (async () => {
+        try {
+          const result = await getAccountPlans();
+          setAccountPlans(result);
+        } catch (error) {
+          setIsLoginModalShow(true);
+          setLoginModalMessage(error.message);
+        }
+      })();
     }
   };
 
@@ -137,7 +134,17 @@ export const EditAndShareModal = ({
                   type="checkbox"
                   className={styles.checkbox}
                   checked={isPublic}
-                  onChange={(e) => setIsPublic(e.target.checked)}
+                  onChange={(e) => {
+                    if (edit && plan && e.target.checked !== plan.isPublic) {
+                      try {
+                        postToggleIsPublicPlan(plan.id);
+                      } catch (error) {
+                        setIsLoginModalShow(true);
+                        setLoginModalMessage(error.message);
+                      }
+                    }
+                    setIsPublic(e.target.checked);
+                  }}
                 />
               </div>
             ) : (
@@ -172,7 +179,7 @@ export const EditAndShareModal = ({
               Share
             </Button>
             <div>Shared to users:</div>
-            {sharedTo?.map((username, index) => (
+            {sharedTo?.toSorted().map((username, index) => (
               <div key={index} className={styles.sharedTo}>
                 {username}
                 <Button

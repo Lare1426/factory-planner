@@ -15,7 +15,12 @@ import plansCdb from "./utils/plans-db.js";
 import plansRdb from "./utils/plan-rdb.js";
 import accountPlanRdb from "./utils/account-plan-rdb.js";
 import accountRdb from "./utils/account-rdb.js";
-import { selectAccountPlans, selectPlanMetadata } from "./utils/queries.js";
+import {
+  selectAccountPlans,
+  selectPlanMetadata,
+  selectSharedPlans,
+} from "./utils/queries.js";
+import { readdir } from "fs";
 
 const PORT = process.env.PORT ?? 3000;
 const IP = process.env.IP;
@@ -209,10 +214,6 @@ apiRouter.post("/plan/toggle-shared/:planId?", async (req, res) => {
     planId,
   });
 
-  if (!accountPlanRdbResult.created) {
-    return res.sendStatus(403);
-  }
-
   if (
     accountPlanRdbResult?.sharedTo &&
     !accountPlanRdbResult?.favourited &&
@@ -331,13 +332,19 @@ apiRouter.delete("/plan/:id", async (req, res) => {
 apiRouter.get("/account/plan", async (req, res) => {
   console.log("get/account/plan");
 
-  const rdbResult = await selectAccountPlans(req.user.id);
+  const accountPlans = await selectAccountPlans(req.user.id);
+  const SharedPlans = await selectSharedPlans(req.user.id);
 
+  accountPlans.map((plan) => {
+    plan.shared = SharedPlans[plan.id] ?? [];
+    return plan;
+  });
+  7;
   res.json({
-    public: rdbResult.filter((plan) => plan.created && plan.isPublic),
-    private: rdbResult.filter((plan) => plan.created && !plan.isPublic),
-    favourited: rdbResult.filter((plan) => plan.favourited),
-    sharedTo: rdbResult.filter((plan) => plan.sharedTo),
+    public: accountPlans.filter((plan) => plan.created && plan.isPublic),
+    private: accountPlans.filter((plan) => plan.created && !plan.isPublic),
+    favourited: accountPlans.filter((plan) => plan.favourited),
+    sharedTo: accountPlans.filter((plan) => plan.sharedTo),
   });
 });
 
