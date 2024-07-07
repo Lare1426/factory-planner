@@ -46,6 +46,11 @@ export const authorise = async (username, password) => {
   return response.ok;
 };
 
+export const deauthorise = async () => {
+  const response = await fetch("/api/deauthorise", { method: "DELETE" });
+  return;
+};
+
 const authenticationRequiredApi = async (path, headers) => {
   const response = await fetch(path, headers);
   if (response.status === 401) {
@@ -111,20 +116,6 @@ export const postToggleFavouritePlan = async (planId) => {
   }
 };
 
-export const getPlanFavourite = async (planId) => {
-  const response = await authenticationRequiredApi(
-    `/api/plan/favourite/${planId}`,
-    { method: "GET" }
-  );
-  if (response.status === 403) {
-    throw new Error("Wrong account");
-  } else if (response.status === 404) {
-    return;
-  } else {
-    return response.json();
-  }
-};
-
 export const postToggleSharedPlan = async (planId, username) => {
   const response = await authenticationRequiredApi(
     `/api/plan/toggle-shared/${planId}?username=${username}`,
@@ -145,4 +136,23 @@ export const getPlanSharedTo = async (planId) => {
   } else {
     return response.json();
   }
+};
+
+export const postToggleIsPublicPlan = async (planId) => {
+  const response = await authenticationRequiredApi(
+    `/api/plan/toggle-isPublic/${planId}`,
+    {
+      method: "POST",
+    }
+  );
+  if (response.status === 403) {
+    throw new ApiError("Wrong account", 403);
+  }
+};
+
+export const getAccountPlans = async () => {
+  const response = await authenticationRequiredApi("/api/account/plan", {
+    method: "GET",
+  });
+  return response.json();
 };

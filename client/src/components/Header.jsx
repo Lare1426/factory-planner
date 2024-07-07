@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Outlet, Link } from "react-router-dom";
+import { Outlet, Link, useNavigate } from "react-router-dom";
 import { logoPng } from "@/assets";
 import { Button, Input, LoginModal } from "@/components";
 import { useAuthContext } from "@/utils/AuthContext";
@@ -9,6 +9,7 @@ export const Header = () => {
   const { isLoggedIn, setIsLoginModalShow } = useAuthContext();
 
   const [searchValue, setSearchValue] = useState("");
+  const navigate = useNavigate();
 
   return (
     <>
@@ -28,9 +29,11 @@ export const Header = () => {
             value={searchValue}
           />
           <Button
-            size="small"
+            size="medium"
             color="tertiary"
-            onClick={() => !isLoggedIn && setIsLoginModalShow(true)}
+            onClick={() =>
+              isLoggedIn ? navigate("/account") : setIsLoginModalShow(true)
+            }
           >
             {isLoggedIn ? "Account" : "Login"}
           </Button>

@@ -19,7 +19,7 @@ export const executeQuery = async (queryString, queryParams) => {
  * @param {string} id - unique id of row to update
  * @param {string[]} fields - possible fields to update
  * @param {object} valuesObject - keys are fields which represent values to update with
- * @returns {mysql.ResultSetHeader[]}
+ * @returns {Promise<mysql.ResultSetHeader[]>}
  */
 export const updateSpecificFields = async (
   tableName,

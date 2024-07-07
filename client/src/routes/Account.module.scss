@@ -1,0 +1,68 @@
+.account {
+  width: 100%;
+  height: calc(100% - var(--header-height));
+
+  .top-bar {
+    font-size: 30px;
+    padding: 20px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    .buttons {
+      display: flex;
+      justify-content: space-between;
+      gap: 100px;
+    }
+  }
+
+  .plan-lists {
+    display: flex;
+    padding: 0 30px;
+    gap: 30px;
+    height: 85%;
+
+    .plan-list {
+      flex-grow: 1;
+      flex-basis: 0;
+      background-color: var(--secondary);
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+
+      .plan {
+        background-color: var(--tertiary);
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        padding: 15px;
+        border-radius: 20px;
+        font-size: 18px;
+
+        .name {
+          font-size: 23px;
+          margin-bottom: 7px;
+          font-weight: 600;
+        }
+
+        &:hover {
+          cursor: pointer;
+        }
+      }
+    }
+
+    .nav-buttons {
+      width: 100%;
+      display: flex;
+      justify-content: space-around;
+
+      p {
+        margin: 0;
+        font-size: 15px;
+      }
+    }
+  }
+}

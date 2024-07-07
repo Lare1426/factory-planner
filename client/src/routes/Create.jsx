@@ -11,7 +11,7 @@ const ProductSelection = ({ inputProduct, setInputProduct, products }) => {
     <div className={styles.productSelection}>
       {isInputInProducts && (
         <div className={styles.buttonContainer}>
-          <Button size="small" color={"primary"}>
+          <Button size="medium" color={"primary"}>
             {inputProduct}
           </Button>
         </div>
@@ -32,7 +32,7 @@ const ProductSelection = ({ inputProduct, setInputProduct, products }) => {
         return (
           <div className={styles.buttonContainer} key={`${product}${index}`}>
             <Button
-              size="small"
+              size="medium"
               color={inputProduct === product ? "primary" : "tertiary"}
               onClick={() => {
                 setInputProduct(product);
@@ -78,7 +78,7 @@ export const Create = () => {
           />
           <label>Enter the desired production amount</label>
           <Input
-            size="small"
+            size="medium"
             type="number"
             placeholder={1}
             min={1}

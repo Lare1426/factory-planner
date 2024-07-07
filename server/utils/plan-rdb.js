@@ -1,6 +1,6 @@
 import { executeQuery, updateSpecificFields } from "./rdb.js";
 
-export const insert = async ({
+export const upsert = async ({
   id,
   name,
   description = null,
@@ -19,7 +19,7 @@ export const insert = async ({
       isPublic, 
       creator
     ) VALUES (?, ?, ?, ?, ?, ?, ?) 
-     ON DUPLICATE KEY UPDATE name=?, description=?, product=?, amount=?, isPublic=?;`,
+      ON DUPLICATE KEY UPDATE name=?, description=?, product=?, amount=?, isPublic=?;`,
     [
       id,
       name,
@@ -38,12 +38,19 @@ export const insert = async ({
   return result;
 };
 
-export const select = async ({ id }) => {
+export const select = async (id) => {
   const [[plan]] = await executeQuery(`SELECT * FROM plan WHERE id = ?`, [id]);
   if (plan) {
     plan.isPublic = !!plan.isPublic;
   }
   return plan;
+};
+
+export const selectWhere = async ({ field, value }) => {
+  const [rows] = await executeQuery(`SELECT * FROM plan WHERE ${field} = ?`, [
+    value,
+  ]);
+  return rows;
 };
 
 export const selectAll = async () => {
@@ -65,4 +72,4 @@ export const del = async ({ id }) => {
   return result;
 };
 
-export default { insert, select, selectAll, update, del };
+export default { upsert, select, selectWhere, selectAll, update, del };

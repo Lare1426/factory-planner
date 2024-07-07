@@ -1,17 +1,17 @@
 import { executeQuery } from "./rdb.js";
 
-export const insert = async ({
+export const upsert = async ({
   accountId,
   planId,
-  sharedTo = 0,
+  shared = 0,
   favourited = 0,
   created = 0,
 }) => {
   const [result] = await executeQuery(
-    `INSERT INTO account_plan (accountId, planId, sharedTo, favourited, created) 
+    `INSERT INTO account_plan (accountId, planId, shared, favourited, created) 
     VALUES (?, ?, ?, ?, ?) 
-    ON DUPLICATE KEY UPDATE sharedTo=?, favourited=?;`,
-    [accountId, planId, sharedTo, favourited, created, sharedTo, favourited]
+    ON DUPLICATE KEY UPDATE shared=?, favourited=?;`,
+    [accountId, planId, shared, favourited, created, shared, favourited]
   );
   return result;
 };
@@ -35,11 +35,29 @@ export const select = async ({ accountId, planId }) => {
     );
   }
   return result.map((row) => {
-    row.sharedTo = !!row.sharedTo;
+    row.shared = !!row.shared;
     row.favourited = !!row.favourited;
     row.created = !!row.created;
     return row;
   });
+};
+
+export const selectUsersSharedTo = async ({ planId }) => {
+  const [result] = await executeQuery(
+    `
+    SELECT account.username
+    FROM account
+    INNER JOIN account_plan
+      ON account_plan.accountId=account.id
+    WHERE account_plan.planId=? AND account_plan.shared=1
+    `,
+    [planId]
+  );
+
+  return result.reduce((acc, { username }) => {
+    acc.push(username);
+    return acc;
+  }, []);
 };
 
 export const del = async ({ accountId, planId }) => {
@@ -63,4 +81,4 @@ export const del = async ({ accountId, planId }) => {
   return result;
 };
 
-export default { insert, select, del };
+export default { upsert, select, selectUsersSharedTo, del };

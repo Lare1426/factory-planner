@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Button, Input } from "@/components";
+import { useNavigate } from "react-router-dom";
+import { Button, Input, EditAndShareModal } from "@/components";
 import { useAuthContext } from "@/utils/AuthContext";
 import {
   postToggleFavouritePlan,
@@ -10,7 +11,6 @@ import {
   putPlan,
 } from "@/utils/api";
 import styles from "./LeftSidePanel.module.scss";
-import { ShareModal } from "./ShareModal";
 
 export const LeftSidePanel = ({
   fetchPlan,
@@ -41,6 +41,8 @@ export const LeftSidePanel = ({
   const [isShareModalShow, setIsShareModalShow] = useState(false);
   const [isPlanFavourited, setIsPlanFavourited] = useState(false);
   const [originalPlan, setOriginalPlan] = useState({});
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     (async () => {
@@ -106,6 +108,7 @@ export const LeftSidePanel = ({
         );
         setPlanId(planId);
         !creator && setCreator(loggedInUsername);
+        setHasEditAccess(true);
         navigate(`/plan/${planId}`, { replace: true });
       } else {
         await putPlan(plan, planId, inputName, description, isPublic);
@@ -162,8 +165,8 @@ export const LeftSidePanel = ({
     );
 
   return (
-    <aside className={styles.sidePanel}>
-      <>
+    <>
+      <aside className={styles.sidePanel}>
         <div>
           <Input
             size="large"
@@ -199,7 +202,7 @@ export const LeftSidePanel = ({
         <div>
           <label>Production amount</label>
           <Input
-            size="small"
+            size="medium"
             type="number"
             placeholder="0"
             min={1}
@@ -228,7 +231,7 @@ export const LeftSidePanel = ({
         </div>
         <div className={styles.buttons}>
           <Button
-            size="small"
+            size="medium"
             color="primary"
             disabled={isApplyDisabled}
             onClick={() => {
@@ -252,7 +255,7 @@ export const LeftSidePanel = ({
             Export
           </a>
           <Button
-            size="small"
+            size="medium"
             color="primary"
             onClick={savePlan}
             disabled={isSaveDisabled}
@@ -260,7 +263,7 @@ export const LeftSidePanel = ({
             Save
           </Button>
           <Button
-            size="small"
+            size="medium"
             color="primary"
             disabled={
               isNewPlan ||
@@ -272,7 +275,7 @@ export const LeftSidePanel = ({
             {isPlanFavourited ? "Unfavourite" : "Favourite"}
           </Button>
           <Button
-            size="small"
+            size="medium"
             color="primary"
             disabled={isNewPlan || loggedInUsername !== creator}
             onClick={() => setIsShareModalShow(true)}
@@ -280,7 +283,7 @@ export const LeftSidePanel = ({
             Share
           </Button>
           <Button
-            size="small"
+            size="medium"
             color="red"
             disabled={isNewPlan || loggedInUsername !== creator}
             onClick={deletePlan}
@@ -288,15 +291,15 @@ export const LeftSidePanel = ({
             Delete
           </Button>
         </div>
-      </>
+      </aside>
       {plan && loggedInUsername === creator && (
-        <ShareModal
-          isShareModalShow={isShareModalShow}
-          setIsShareModalShow={setIsShareModalShow}
-          planId={planId}
-          creator={creator}
+        <EditAndShareModal
+          isModalShow={isShareModalShow}
+          setIsModalShow={setIsShareModalShow}
+          plan={{ id: planId, creator }}
+          share={true}
         />
       )}
-    </aside>
+    </>
   );
 };

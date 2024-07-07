@@ -41,7 +41,7 @@ const getRevision = async (name) => {
     method: "HEAD",
     headers: authHeaders,
   });
-  return response.headers.get("Etag").slice(1, -1);
+  return response.headers.get("Etag").slice(1, -1); // once errored, fix if happens
 };
 
 export default { get, put, del, getRevision };

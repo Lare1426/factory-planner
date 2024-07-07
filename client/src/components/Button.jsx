@@ -10,7 +10,7 @@ export const Button = ({
 }) => {
   let classNames = styles.customButton;
 
-  if (["small", "large"].includes(size)) {
+  if (["small", "medium", "large"].includes(size)) {
     classNames += ` ${styles[size]}`;
   }
 

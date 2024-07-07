@@ -59,7 +59,7 @@ export const Home = () => {
           <Input
             type="number"
             placeholder={1}
-            size="small"
+            size="medium"
             min={1}
             max={50000}
             setValue={setInputAmount}
@@ -67,7 +67,7 @@ export const Home = () => {
           />
           <Link to="/plan/new" state={{ inputProduct, inputAmount }}>
             <Button
-              size="small"
+              size="medium"
               color="primary"
               disabled={isGeneratePlanDisabled}
             >
