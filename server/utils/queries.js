@@ -3,7 +3,7 @@ import { executeQuery } from "./rdb.js";
 export const selectAccountPlans = async (accountId) => {
   let [rdbResult] = await executeQuery(
     `
-    SELECT plan.name, plan.description, plan.id, plan.product, plan.amount, plan.isPublic, plan.creator, account_plan.sharedTo, account_plan.favourited, account_plan.created
+    SELECT plan.name, plan.description, plan.id, plan.product, plan.amount, plan.isPublic, plan.creator, account_plan.shared, account_plan.favourited, account_plan.created
     FROM account_plan 
     INNER JOIN plan
     ON account_plan.planId=plan.id
@@ -12,7 +12,7 @@ export const selectAccountPlans = async (accountId) => {
   );
 
   rdbResult = rdbResult.map((row) => {
-    row.sharedTo = !!row.sharedTo;
+    row.shared = !!row.shared;
     row.favourited = !!row.favourited;
     row.created = !!row.created;
     return row;
@@ -28,7 +28,7 @@ export const selectSharedPlans = async (accountId) => {
     FROM account_plan A, account_plan B
     INNER JOIN account
     ON B.accountId=account.id
-    WHERE A.accountId=? AND A.created=1 AND B.planId=A.planId AND B.sharedTo=1 AND B.created=0
+    WHERE A.accountId=? AND A.created=1 AND B.planId=A.planId AND B.shared=1 AND B.created=0
     ORDER BY B.planId;
     `,
     [accountId]
@@ -47,7 +47,7 @@ export const selectSharedPlans = async (accountId) => {
 export const selectPlanMetadata = async (accountId, planId) => {
   const [[rdbResult]] = await executeQuery(
     `
-    SELECT account_plan.sharedTo, account_plan.created, account_plan.favourited, plan.isPublic
+    SELECT account_plan.shared, account_plan.created, account_plan.favourited, plan.isPublic
     FROM plan
     INNER JOIN account_plan
     ON plan.id=account_plan.planId
@@ -55,7 +55,7 @@ export const selectPlanMetadata = async (accountId, planId) => {
     [accountId, planId]
   );
 
-  rdbResult.sharedTo = !!rdbResult.sharedTo;
+  rdbResult.shared = !!rdbResult.shared;
   rdbResult.created = !!rdbResult.created;
   rdbResult.isPublic = !!rdbResult.isPublic;
 

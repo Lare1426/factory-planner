@@ -81,11 +81,11 @@ apiRouter.get("/plan/:id", async (req, res) => {
     if (
       !planMetadata.isPublic &&
       !planMetadata?.created &&
-      !planMetadata?.sharedTo
+      !planMetadata?.shared
     ) {
       return res.sendStatus(req.user?.name ? 403 : 401);
     }
-    if (planMetadata?.sharedTo || planMetadata.created) {
+    if (planMetadata?.shared || planMetadata.created) {
       hasEditAccess = true;
     }
     if (planMetadata?.favourited) {
@@ -138,8 +138,8 @@ apiRouter.get("/plan/favourite/:id", async (req, res) => {
 
   if (
     !planMetadata.isPublic &&
-    !planMetadata?.sharedTo.created &&
-    !planMetadata?.sharedTo
+    !planMetadata?.shared.created &&
+    !planMetadata?.shared
   ) {
     return res.sendStatus(403);
   }
@@ -161,13 +161,13 @@ apiRouter.post("/plan/toggle-favourite/:planId", async (req, res) => {
   if (
     !planMetadata.isPublic &&
     !planMetadata.created &&
-    !planMetadata?.sharedTo
+    !planMetadata?.shared
   ) {
     return res.sendStatus(403);
   }
 
   if (
-    !planMetadata?.sharedTo &&
+    !planMetadata?.shared &&
     planMetadata?.favourited &&
     !planMetadata?.created
   ) {
@@ -176,7 +176,7 @@ apiRouter.post("/plan/toggle-favourite/:planId", async (req, res) => {
     const result = await accountPlanRdb.insert({
       accountId: req.user.id,
       planId,
-      sharedTo: planMetadata?.sharedTo,
+      shared: planMetadata?.shared,
       favourited: !planMetadata?.favourited,
     });
   }
@@ -197,7 +197,7 @@ apiRouter.get("/plan/shared/:id", async (req, res) => {
   const accountPlanRdbResult = await accountPlanRdb.select({ planId: id });
   const sharedTo = await Promise.all(
     accountPlanRdbResult
-      .filter((entry) => entry.sharedTo)
+      .filter((entry) => entry.shared)
       .map(async (entry) => {
         const { username } = await accountRdb.select({ id: entry.accountId });
         return username;
@@ -219,7 +219,7 @@ apiRouter.post("/plan/toggle-shared/:planId?", async (req, res) => {
   });
 
   if (
-    accountPlanRdbResult?.sharedTo &&
+    accountPlanRdbResult?.shared &&
     !accountPlanRdbResult?.favourited &&
     !accountPlanRdbResult?.created
   ) {
@@ -228,7 +228,7 @@ apiRouter.post("/plan/toggle-shared/:planId?", async (req, res) => {
     await accountPlanRdb.insert({
       accountId,
       planId,
-      sharedTo: !accountPlanRdbResult?.sharedTo,
+      shared: !accountPlanRdbResult?.shared,
       favourited: accountPlanRdbResult?.favourited,
     });
   }
@@ -242,7 +242,7 @@ apiRouter.post("/plan/toggle-isPublic/:planId", async (req, res) => {
 
   const planMetadata = await selectPlanMetadata(req.user.id, planId);
 
-  if (planMetadata.sharedTo || planMetadata.created) {
+  if (planMetadata.shared || planMetadata.created) {
     await plansRdb.update({
       id: planId,
       values: { isPublic: !planMetadata.isPublic },
@@ -290,7 +290,7 @@ apiRouter.put("/plan/:id", async (req, res) => {
     planId: id,
   });
 
-  if (!accountPlanRdbResult?.created && !accountPlanRdbResult?.sharedTo) {
+  if (!accountPlanRdbResult?.created && !accountPlanRdbResult?.shared) {
     return res.sendStatus(403);
   }
 
@@ -340,7 +340,7 @@ apiRouter.get("/account/plan", async (req, res) => {
   const SharedPlans = await selectSharedPlans(req.user.id);
 
   accountPlans.map((plan) => {
-    plan.shared = SharedPlans[plan.id] ?? [];
+    plan.sharedTo = SharedPlans[plan.id] ?? [];
     return plan;
   });
   7;
@@ -348,7 +348,7 @@ apiRouter.get("/account/plan", async (req, res) => {
     public: accountPlans.filter((plan) => plan.created && plan.isPublic),
     private: accountPlans.filter((plan) => plan.created && !plan.isPublic),
     favourited: accountPlans.filter((plan) => plan.favourited),
-    sharedTo: accountPlans.filter((plan) => plan.sharedTo),
+    shared: accountPlans.filter((plan) => plan.shared),
   });
 });
 

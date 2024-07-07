@@ -49,7 +49,7 @@ export const EditAndShareModal = ({
       setIsPlanFavourited(plan.favourited);
 
       if (share) {
-        setSharedTo(plan.shared);
+        setSharedTo(plan.sharedTo);
       }
     }
   }, [plan]);
@@ -100,9 +100,9 @@ export const EditAndShareModal = ({
     }
 
     // check if there are elements that don't appear in both arrays
-    const hasShareListChanged = !!plan.shared
+    const hasShareListChanged = !!plan.sharedTo
       .filter((user) => !sharedTo.includes(user))
-      .concat(sharedTo.filter((user) => !plan.shared.includes(user))).length;
+      .concat(sharedTo.filter((user) => !plan.sharedTo.includes(user))).length;
 
     if (
       edit &&
@@ -184,7 +184,7 @@ export const EditAndShareModal = ({
               <div key={index} className={styles.sharedTo}>
                 {username}
                 <Button
-                  size={"small"}
+                  size={"medium"}
                   color={"red"}
                   onClick={() => removeShare(username)}
                 >

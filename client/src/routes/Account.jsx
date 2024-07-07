@@ -140,7 +140,7 @@ export const Account = () => {
             />
             <PlanList
               name={"Shared"}
-              list={accountPlans.sharedTo}
+              list={accountPlans.shared}
               setPlanForModal={setPlanForModal}
               setIsPlanModalShow={setIsPlanModalShow}
             />
