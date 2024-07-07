@@ -24,7 +24,7 @@ const PlanList = ({ name, list, setPlanForModal, setIsPlanModalShow }) => {
             >
               {"<"}
             </Button>
-            {pageIndex + 1}
+            <p>page {pageIndex + 1}</p>
             <Button
               size="small"
               color="primary"

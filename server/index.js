@@ -78,8 +78,12 @@ apiRouter.get("/plan/:id", async (req, res) => {
   const user = auhtenticateToken(req);
   if (user) {
     const planMetadata = await selectPlanMetadata(user.id, id);
-    if (!planMetadata?.created && !planMetadata?.sharedTo) {
-      return res.sendStatus(username ? 403 : 401);
+    if (
+      !planMetadata.isPublic &&
+      !planMetadata?.created &&
+      !planMetadata?.sharedTo
+    ) {
+      return res.sendStatus(req.user?.name ? 403 : 401);
     }
     if (planMetadata?.sharedTo || planMetadata.created) {
       hasEditAccess = true;

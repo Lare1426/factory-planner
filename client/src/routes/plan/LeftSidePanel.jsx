@@ -202,7 +202,7 @@ export const LeftSidePanel = ({
         <div>
           <label>Production amount</label>
           <Input
-            size="small"
+            size="medium"
             type="number"
             placeholder="0"
             min={1}
@@ -231,7 +231,7 @@ export const LeftSidePanel = ({
         </div>
         <div className={styles.buttons}>
           <Button
-            size="small"
+            size="medium"
             color="primary"
             disabled={isApplyDisabled}
             onClick={() => {
@@ -255,7 +255,7 @@ export const LeftSidePanel = ({
             Export
           </a>
           <Button
-            size="small"
+            size="medium"
             color="primary"
             onClick={savePlan}
             disabled={isSaveDisabled}
@@ -263,7 +263,7 @@ export const LeftSidePanel = ({
             Save
           </Button>
           <Button
-            size="small"
+            size="medium"
             color="primary"
             disabled={
               isNewPlan ||
@@ -275,7 +275,7 @@ export const LeftSidePanel = ({
             {isPlanFavourited ? "Unfavourite" : "Favourite"}
           </Button>
           <Button
-            size="small"
+            size="medium"
             color="primary"
             disabled={isNewPlan || loggedInUsername !== creator}
             onClick={() => setIsShareModalShow(true)}
@@ -283,7 +283,7 @@ export const LeftSidePanel = ({
             Share
           </Button>
           <Button
-            size="small"
+            size="medium"
             color="red"
             disabled={isNewPlan || loggedInUsername !== creator}
             onClick={deletePlan}

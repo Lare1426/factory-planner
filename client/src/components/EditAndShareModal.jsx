@@ -99,6 +99,7 @@ export const EditAndShareModal = ({
       setShareError("");
     }
 
+    // check if there are elements that don't appear in both arrays
     const hasShareListChanged = !!plan.shared
       .filter((user) => !sharedTo.includes(user))
       .concat(sharedTo.filter((user) => !plan.shared.includes(user))).length;
@@ -153,13 +154,13 @@ export const EditAndShareModal = ({
               </>
             )}
             <Button
-              size="small"
+              size="medium"
               color="tertiary"
               onClick={() => navigate(`/plan/${plan.id}`)}
             >
               View
             </Button>
-            <Button size="small" color="tertiary" onClick={favouritePlan}>
+            <Button size="medium" color="tertiary" onClick={favouritePlan}>
               {isPlanFavourited ? "Unfavourite" : "Favourite"}
             </Button>
           </>
@@ -175,7 +176,7 @@ export const EditAndShareModal = ({
               value={inputAccount}
               setValue={setInputAccount}
             />
-            <Button size={"small"} color={"tertiary"} onClick={sharePlan}>
+            <Button size={"medium"} color={"tertiary"} onClick={sharePlan}>
               Share
             </Button>
             <div>Shared to users:</div>
@@ -193,7 +194,7 @@ export const EditAndShareModal = ({
             ))}
           </>
         )}
-        <Button size="small" color="tertiary" onClick={hide}>
+        <Button size="medium" color="tertiary" onClick={hide}>
           Close
         </Button>
       </div>

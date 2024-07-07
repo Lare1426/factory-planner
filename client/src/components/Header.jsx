@@ -29,7 +29,7 @@ export const Header = () => {
             value={searchValue}
           />
           <Button
-            size="small"
+            size="medium"
             color="tertiary"
             onClick={() =>
               isLoggedIn ? navigate("/account") : setIsLoginModalShow(true)
