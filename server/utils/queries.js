@@ -51,28 +51,3 @@ export const selectSharedPlans = async (accountId) => {
     return acc;
   }, {});
 };
-
-export const selectPlanUserMetadata = async (accountId, planId) => {
-  const [[rdbResult]] = await executeQuery(
-    `
-    SELECT 
-      account_plan.shared, 
-      account_plan.created, 
-      account_plan.favourited, 
-      plan.isPublic
-    FROM plan
-    INNER JOIN account_plan
-      ON plan.id=account_plan.planId
-    WHERE account_plan.accountId=? AND account_plan.planId=?;
-    `,
-    [accountId, planId]
-  );
-
-  if (rdbResult) {
-    rdbResult.shared = !!rdbResult.shared;
-    rdbResult.created = !!rdbResult.created;
-    rdbResult.isPublic = !!rdbResult.isPublic;
-  }
-
-  return rdbResult;
-};

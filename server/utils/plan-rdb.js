@@ -19,7 +19,7 @@ export const upsert = async ({
       isPublic, 
       creator
     ) VALUES (?, ?, ?, ?, ?, ?, ?) 
-     ON DUPLICATE KEY UPDATE name=?, description=?, product=?, amount=?, isPublic=?;`,
+      ON DUPLICATE KEY UPDATE name=?, description=?, product=?, amount=?, isPublic=?;`,
     [
       id,
       name,

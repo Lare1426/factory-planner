@@ -42,6 +42,24 @@ export const select = async ({ accountId, planId }) => {
   });
 };
 
+export const selectUsersSharedTo = async ({ planId }) => {
+  const [result] = await executeQuery(
+    `
+    SELECT account.username
+    FROM account
+    INNER JOIN account_plan
+      ON account_plan.accountId=account.id
+    WHERE account_plan.planId=? AND account_plan.shared=1
+    `,
+    [planId]
+  );
+
+  return result.reduce((acc, { username }) => {
+    acc.push(username);
+    return acc;
+  }, []);
+};
+
 export const del = async ({ accountId, planId }) => {
   let result;
   if (accountId && planId) {
@@ -63,4 +81,4 @@ export const del = async ({ accountId, planId }) => {
   return result;
 };
 
-export default { upsert, select, del };
+export default { upsert, select, selectUsersSharedTo, del };
