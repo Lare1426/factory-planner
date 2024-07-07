@@ -116,20 +116,6 @@ export const postToggleFavouritePlan = async (planId) => {
   }
 };
 
-export const getPlanFavourite = async (planId) => {
-  const response = await authenticationRequiredApi(
-    `/api/plan/favourite/${planId}`,
-    { method: "GET" }
-  );
-  if (response.status === 403) {
-    throw new Error("Wrong account");
-  } else if (response.status === 404) {
-    return;
-  } else {
-    return response.json();
-  }
-};
-
 export const postToggleSharedPlan = async (planId, username) => {
   const response = await authenticationRequiredApi(
     `/api/plan/toggle-shared/${planId}?username=${username}`,

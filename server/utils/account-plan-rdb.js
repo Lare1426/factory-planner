@@ -1,6 +1,6 @@
 import { executeQuery } from "./rdb.js";
 
-export const insert = async ({
+export const upsert = async ({
   accountId,
   planId,
   shared = 0,
@@ -63,4 +63,4 @@ export const del = async ({ accountId, planId }) => {
   return result;
 };
 
-export default { insert, select, del };
+export default { upsert, select, del };

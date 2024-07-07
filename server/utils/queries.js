@@ -52,7 +52,7 @@ export const selectSharedPlans = async (accountId) => {
   }, {});
 };
 
-export const selectPlanMetadata = async (accountId, planId) => {
+export const selectPlanUserMetadata = async (accountId, planId) => {
   const [[rdbResult]] = await executeQuery(
     `
     SELECT 
@@ -68,9 +68,11 @@ export const selectPlanMetadata = async (accountId, planId) => {
     [accountId, planId]
   );
 
-  rdbResult.shared = !!rdbResult.shared;
-  rdbResult.created = !!rdbResult.created;
-  rdbResult.isPublic = !!rdbResult.isPublic;
+  if (rdbResult) {
+    rdbResult.shared = !!rdbResult.shared;
+    rdbResult.created = !!rdbResult.created;
+    rdbResult.isPublic = !!rdbResult.isPublic;
+  }
 
   return rdbResult;
 };

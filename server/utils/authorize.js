@@ -10,7 +10,7 @@ export const generateToken = (name, id) => {
  * extract username from token else return null
  * @returns {null | string}
  */
-export const auhtenticateToken = (req) => {
+export const authenticateToken = (req) => {
   const token = req.headers.cookie?.slice(10);
   if (token == null) {
     return null;
@@ -24,7 +24,7 @@ export const auhtenticateToken = (req) => {
 };
 
 export const authenticateTokenMiddleware = (req, res, next) => {
-  const user = auhtenticateToken(req);
+  const user = authenticateToken(req);
 
   if (!user) {
     return res.sendStatus(401);
