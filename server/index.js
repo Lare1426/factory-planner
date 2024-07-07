@@ -16,6 +16,7 @@ import planRdb from "./utils/plan-rdb.js";
 import accountPlanRdb from "./utils/account-plan-rdb.js";
 import accountRdb from "./utils/account-rdb.js";
 import { selectAccountPlans, selectSharedPlans } from "./utils/queries.js";
+import { loggerMiddleware } from "./utils/logger.js";
 
 const PORT = process.env.PORT ?? 3000;
 const IP = process.env.IP;
@@ -25,11 +26,10 @@ const __dirname = path.dirname(__filename);
 
 const server = express();
 server.use(express.json());
+server.use(loggerMiddleware);
 const apiRouter = express.Router();
 
 apiRouter.post("/authorise", async (req, res) => {
-  console.log("post/authorize");
-
   const { username, password } = req.body;
   const account = await accountRdb.select({ username });
 
@@ -47,16 +47,12 @@ apiRouter.post("/authorise", async (req, res) => {
 });
 
 apiRouter.get("/plan/new/:product/:recipe?", async (req, res) => {
-  console.log("get/plan/new");
-
   const { product, recipe } = req.params;
   const { amount } = req.query;
   res.json(await generate(product, Number(amount), recipe));
 });
 
 apiRouter.get("/plan/:planId", async (req, res) => {
-  console.log("get/plan/id");
-
   const { planId } = req.params;
 
   const plan = await planRdb.select(planId);
@@ -107,8 +103,6 @@ apiRouter.get("/plan/:planId", async (req, res) => {
 });
 
 apiRouter.get("/products", async (req, res) => {
-  console.log("get/products");
-
   res.json(Object.keys(await getProducts()));
 });
 
@@ -120,14 +114,10 @@ apiRouter.delete("/deauthorise", async (req, res) => {
 });
 
 apiRouter.get("/authenticate", async (req, res) => {
-  console.log("get/authenticate");
-
   res.json(req.user.name).status(200);
 });
 
 apiRouter.post("/plan/toggle-favourite/:planId", async (req, res) => {
-  console.log("post/plan/toggle-favourite");
-
   const { planId } = req.params;
 
   const plan = await planRdb.select(planId);
@@ -161,8 +151,6 @@ apiRouter.post("/plan/toggle-favourite/:planId", async (req, res) => {
 });
 
 apiRouter.get("/plan/shared/:planId", async (req, res) => {
-  console.log("get/plan/shared");
-
   const { planId } = req.params;
 
   const { creator } = await planRdb.select(planId);
@@ -176,8 +164,6 @@ apiRouter.get("/plan/shared/:planId", async (req, res) => {
 });
 
 apiRouter.post("/plan/toggle-shared/:planId?", async (req, res) => {
-  console.log("post/plan/toggle-shared");
-
   const { planId } = req.params;
   const { username } = req.query;
 
@@ -220,8 +206,6 @@ apiRouter.post("/plan/toggle-shared/:planId?", async (req, res) => {
 });
 
 apiRouter.post("/plan/toggle-isPublic/:planId", async (req, res) => {
-  console.log("/post/plan/toggle-isPublic");
-
   const { planId } = req.params;
 
   const plan = await planRdb.select(planId);
@@ -246,8 +230,6 @@ apiRouter.post("/plan/toggle-isPublic/:planId", async (req, res) => {
 });
 
 apiRouter.post("/plan", async (req, res) => {
-  console.log("post/plan");
-
   const { name, description, plan, isPublic } = req.body;
 
   const planId = uuidv4();
@@ -272,8 +254,6 @@ apiRouter.post("/plan", async (req, res) => {
 });
 
 apiRouter.put("/plan/:planId", async (req, res) => {
-  console.log("put/plan");
-
   const { name, description, plan: newPlan, isPublic } = req.body;
   const { planId } = req.params;
 
@@ -311,8 +291,6 @@ apiRouter.put("/plan/:planId", async (req, res) => {
 });
 
 apiRouter.delete("/plan/:planId", async (req, res) => {
-  console.log("delete/plan");
-
   const { planId } = req.params;
 
   const plan = await planRdb.select(planId);
@@ -337,8 +315,6 @@ apiRouter.delete("/plan/:planId", async (req, res) => {
 });
 
 apiRouter.get("/account/plan", async (req, res) => {
-  console.log("get/account/plan");
-
   const accountPlans = await selectAccountPlans(req.user.id);
   const sharedPlans = await selectSharedPlans(req.user.id);
 
