@@ -24,7 +24,7 @@ export const selectAccountPlans = async (accountId) => {
 export const selectPlanMetadata = async (accountId, planId) => {
   const [[rdbResult]] = await executeQuery(
     `
-    SELECT account_plan.sharedTo, account_plan.created, plan.isPublic
+    SELECT account_plan.sharedTo, account_plan.created, account_plan.favourited, plan.isPublic
     FROM plan
     INNER JOIN account_plan
     ON plan.id=account_plan.planId
