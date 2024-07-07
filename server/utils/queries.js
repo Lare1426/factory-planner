@@ -25,11 +25,10 @@ export const selectSharedPlans = async (accountId) => {
   const [rdbResult] = await executeQuery(
     `
     SELECT B.planId, account.username
-    FROM account_plan A, account_plan B
+    FROM account_plan AS A, account_plan AS B
     INNER JOIN account
     ON B.accountId=account.id
-    WHERE A.accountId=? AND A.created=1 AND B.planId=A.planId AND B.shared=1 AND B.created=0
-    ORDER BY B.planId;
+    WHERE A.accountId=? AND A.created=1 AND B.planId=A.planId AND B.shared=1;
     `,
     [accountId]
   );

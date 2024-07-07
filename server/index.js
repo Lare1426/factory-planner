@@ -20,7 +20,6 @@ import {
   selectPlanMetadata,
   selectSharedPlans,
 } from "./utils/queries.js";
-import { readdir } from "fs";
 
 const PORT = process.env.PORT ?? 3000;
 const IP = process.env.IP;
@@ -337,13 +336,15 @@ apiRouter.get("/account/plan", async (req, res) => {
   console.log("get/account/plan");
 
   const accountPlans = await selectAccountPlans(req.user.id);
-  const SharedPlans = await selectSharedPlans(req.user.id);
+  const sharedPlans = await selectSharedPlans(req.user.id);
 
-  accountPlans.map((plan) => {
-    plan.sharedTo = SharedPlans[plan.id] ?? [];
+  accountPlans.forEach((plan) => {
+    if (plan.created) {
+      plan.sharedTo = sharedPlans[plan.id] ?? [];
+    }
     return plan;
   });
-  7;
+
   res.json({
     public: accountPlans.filter((plan) => plan.created && plan.isPublic),
     private: accountPlans.filter((plan) => plan.created && !plan.isPublic),

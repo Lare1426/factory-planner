@@ -37,7 +37,7 @@ const PlanList = ({ name, list, setPlanForModal, setIsPlanModalShow }) => {
             </Button>
           </div>
         )}
-        {list.slice(0 + pageIndex * 5, 5 + pageIndex * 5).map((plan, index) => (
+        {list.slice(pageIndex * 5, 5 + pageIndex * 5).map((plan, index) => (
           <div
             className={styles.plan}
             onClick={() => {
@@ -121,8 +121,8 @@ export const Account = () => {
         <>
           <div className={styles.planLists}>
             <PlanList
-              name={"Public"}
-              list={accountPlans.public}
+              name={"Favourited"}
+              list={accountPlans.favourited}
               setPlanForModal={setPlanForModal}
               setIsPlanModalShow={setIsPlanModalShow}
             />
@@ -133,13 +133,13 @@ export const Account = () => {
               setIsPlanModalShow={setIsPlanModalShow}
             />
             <PlanList
-              name={"Favourited"}
-              list={accountPlans.favourited}
+              name={"Public"}
+              list={accountPlans.public}
               setPlanForModal={setPlanForModal}
               setIsPlanModalShow={setIsPlanModalShow}
             />
             <PlanList
-              name={"Shared"}
+              name={"Shared to me"}
               list={accountPlans.shared}
               setPlanForModal={setPlanForModal}
               setIsPlanModalShow={setIsPlanModalShow}

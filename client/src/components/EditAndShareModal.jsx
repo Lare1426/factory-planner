@@ -99,10 +99,12 @@ export const EditAndShareModal = ({
       setShareError("");
     }
 
-    // check if there are elements that don't appear in both arrays
-    const hasShareListChanged = !!plan.sharedTo
-      .filter((user) => !sharedTo.includes(user))
-      .concat(sharedTo.filter((user) => !plan.sharedTo.includes(user))).length;
+    // check if there are users that don't appear in both arrays
+    const removedUsers = plan.sharedTo.filter(
+      (user) => !sharedTo.includes(user)
+    );
+    const addedUsers = sharedTo.filter((user) => !plan.sharedTo.includes(user));
+    const hasShareListChanged = removedUsers.length || addedUsers.length;
 
     if (
       edit &&
