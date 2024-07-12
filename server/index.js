@@ -21,7 +21,7 @@ import {
   searchPlans,
 } from "./utils/queries.js";
 import { loggerMiddleware } from "./utils/logger.js";
-import { getCurrentTimeSeconds, getCurrentTimeDate } from "./utils/dates.js";
+import { getCurrentTimeSeconds } from "./utils/dates.js";
 
 const PORT = process.env.PORT ?? 3000;
 const IP = process.env.IP;
@@ -257,7 +257,7 @@ apiRouter.post("/plan", async (req, res) => {
     description,
     product: plan.item,
     amount: plan.amount,
-    creationDate: currentTimeSeconds,
+    creationTime: currentTimeSeconds,
     isPublic,
   });
   await accountPlanRdb.upsert({
@@ -295,7 +295,8 @@ apiRouter.put("/plan/:planId", async (req, res) => {
 
   await planRdb.upsert({
     id: planId,
-    creator: req.user.name,
+    creationTime: plan.creationTime,
+    creator: plan.creator,
     name,
     description,
     product: newPlan.item,

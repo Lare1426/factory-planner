@@ -36,17 +36,14 @@ export const Home = () => {
       </div>
       <div className={styles.rightContainer}>
         <div className={styles.buttons}>
-          <Button size="large" color="primary" shadow="drop">
-            View
-          </Button>
+          <Link to="/public">
+            <Button size="large" color="primary" shadow="drop">
+              View
+            </Button>
+          </Link>
           <Link to="/create">
             <Button size="large" color="primary" shadow="drop">
               Create
-            </Button>
-          </Link>
-          <Link to="/public">
-            <Button size="large" color="primary" shadow="drop">
-              Public
             </Button>
           </Link>
         </div>

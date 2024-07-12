@@ -1,9 +1,12 @@
 .public {
-  height: 100%;
+  width: 100%;
+  height: calc(100% - var(--header-height));
+  display: grid;
+  grid-template-columns: min-content 1fr;
 
   .side-panel {
+    box-sizing: border-box;
     height: 100%;
-    width: min-content;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -23,6 +26,54 @@
         padding: 5px;
         height: 30px;
         border-radius: 5px;
+      }
+    }
+  }
+
+  .plans {
+    padding: 20px;
+
+    .result {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background-color: var(--secondary);
+      padding: 10px;
+      border-radius: 10px;
+      max-height: 90%;
+      overflow-y: auto;
+
+      h2 {
+        font-size: 25px;
+        margin: 0;
+      }
+
+      .planList {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 20px;
+
+        .plan {
+          background-color: var(--tertiary);
+          width: 310px;
+          font-size: 18px;
+          padding: 5px;
+          border-radius: 10px;
+
+          &:hover {
+            cursor: pointer;
+            filter: brightness(0.95);
+          }
+
+          h3 {
+            font-size: 20px;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            margin: 0;
+            margin-bottom: 5px;
+          }
+        }
       }
     }
   }

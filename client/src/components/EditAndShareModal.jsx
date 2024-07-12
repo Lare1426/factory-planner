@@ -155,6 +155,7 @@ export const EditAndShareModal = ({
                 <label>Creator: {plan.creator}</label>
               </>
             )}
+            <label>Created: {plan.creationDate}</label>
             <Button
               size="medium"
               color="tertiary"

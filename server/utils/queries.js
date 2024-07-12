@@ -1,3 +1,4 @@
+import { getCurrentTimeDate } from "./dates.js";
 import { executeQuery } from "./rdb.js";
 
 export const selectAccountPlans = async (accountId) => {
@@ -10,6 +11,7 @@ export const selectAccountPlans = async (accountId) => {
       plan.product,
       plan.amount,
       plan.isPublic,
+      plan.creationTime,
       plan.creator,
       account_plan.shared,
       account_plan.favourited,
@@ -26,6 +28,7 @@ export const selectAccountPlans = async (accountId) => {
     row.shared = !!row.shared;
     row.favourited = !!row.favourited;
     row.created = !!row.created;
+    row.creationDate = getCurrentTimeDate(row.creationTime);
     return row;
   });
 };
@@ -62,9 +65,14 @@ export const searchPlans = async (
     SELECT *
     FROM plan
     WHERE isPublic=1
-    ORDER BY ? ${orderDirection}
+    ORDER BY ?
     `,
     [orderingValue]
   );
-  return rdbResult;
+
+  console.log("rdbResult:", rdbResult);
+  return rdbResult.map((plan) => {
+    plan.creationDate = getCurrentTimeDate(plan.creationTime);
+    return plan;
+  });
 };

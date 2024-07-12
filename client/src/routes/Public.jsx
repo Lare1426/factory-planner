@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Input, Button } from "@/components";
+import { Input, Button, EditAndShareModal } from "@/components";
 import styles from "./Public.module.scss";
 import { getSearch } from "@/utils/api";
 
@@ -7,9 +7,14 @@ export const Public = () => {
   const [searchValue, setSearchValue] = useState("");
   const [orderingValue, setOrderingValue] = useState("creationDate");
   const [orderDirection, setOrderDirection] = useState("ASC");
+  const [plans, setPlans] = useState([]);
+  const [isPlanModalShow, setIsPlanModalShow] = useState(false);
+  const [planForModal, setPlanForModal] = useState();
 
   const searchPlan = async () => {
+    setPlans([]);
     const plans = await getSearch(searchValue, orderingValue, orderDirection);
+    setPlans(plans);
   };
 
   return (
@@ -45,6 +50,34 @@ export const Public = () => {
           Search
         </Button>
       </div>
+      <div className={styles.plans}>
+        <div className={styles.result}>
+          <h2>Search result:</h2>
+          <div className={styles.planList}>
+            {plans.map((plan) => (
+              <div
+                className={styles.plan}
+                onClick={() => {
+                  setIsPlanModalShow(true);
+                  setPlanForModal(plan);
+                }}
+              >
+                <h3 className={styles.name}>{plan.name}</h3>
+                <div>{plan.product}</div>
+                <div>{plan.amount}/min</div>
+                <div>Creator: {plan.creator}</div>
+                <div>{plan.creationDate}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+      <EditAndShareModal
+        isModalShow={isPlanModalShow}
+        setIsModalShow={setIsPlanModalShow}
+        plan={planForModal}
+        edit={true}
+      />
     </main>
   );
 };

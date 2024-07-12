@@ -1,3 +1,4 @@
+import { getCurrentTimeDate } from "./dates.js";
 import { executeQuery, updateSpecificFields } from "./rdb.js";
 
 export const upsert = async ({
@@ -7,7 +8,7 @@ export const upsert = async ({
   product,
   amount,
   isPublic,
-  creationDate,
+  creationTime,
   creator,
 }) => {
   const [result] = await executeQuery(
@@ -18,7 +19,7 @@ export const upsert = async ({
       product, 
       amount,
       isPublic, 
-      creationDate,
+      creationTime,
       creator
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?) 
       ON DUPLICATE KEY UPDATE name=?, description=?, product=?, amount=?, isPublic=?;`,
@@ -29,7 +30,7 @@ export const upsert = async ({
       product,
       amount,
       isPublic,
-      creationDate,
+      creationTime,
       creator,
       name,
       description,
@@ -45,20 +46,9 @@ export const select = async (id) => {
   const [[plan]] = await executeQuery(`SELECT * FROM plan WHERE id = ?`, [id]);
   if (plan) {
     plan.isPublic = !!plan.isPublic;
+    plan.creationDate = getCurrentTimeDate(plan.creationTime);
   }
   return plan;
-};
-
-export const selectWhere = async ({ field, value }) => {
-  const [rows] = await executeQuery(`SELECT * FROM plan WHERE ${field} = ?`, [
-    value,
-  ]);
-  return rows;
-};
-
-export const selectAll = async () => {
-  const [rows] = await executeQuery("SELECT * FROM plan");
-  return rows;
 };
 
 export const update = ({ id, values }) => {
@@ -75,4 +65,4 @@ export const del = async ({ id }) => {
   return result;
 };
 
-export default { upsert, select, selectWhere, selectAll, update, del };
+export default { upsert, select, update, del };
