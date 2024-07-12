@@ -4,16 +4,18 @@
   .side-panel {
     height: 100%;
     width: min-content;
-    padding: 10px;
-    background-color: var(--secondary);
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    align-items: center;
+    padding: 10px;
+    background-color: var(--secondary);
+    gap: 30px;
 
     .order-by {
+      width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 15px;
 
       select {
         width: 250px;

@@ -15,8 +15,13 @@ import plansCdb from "./utils/plans-db.js";
 import planRdb from "./utils/plan-rdb.js";
 import accountPlanRdb from "./utils/account-plan-rdb.js";
 import accountRdb from "./utils/account-rdb.js";
-import { selectAccountPlans, selectSharedPlans } from "./utils/queries.js";
+import {
+  selectAccountPlans,
+  selectSharedPlans,
+  searchPlans,
+} from "./utils/queries.js";
 import { loggerMiddleware } from "./utils/logger.js";
+import { getCurrentTimeSeconds, getCurrentTimeDate } from "./utils/dates.js";
 
 const PORT = process.env.PORT ?? 3000;
 const IP = process.env.IP;
@@ -104,6 +109,14 @@ apiRouter.get("/plan/:planId", async (req, res) => {
 
 apiRouter.get("/products", async (req, res) => {
   res.json(Object.keys(await getProducts()));
+});
+
+apiRouter.get("/search?", async (req, res) => {
+  const { searchValue, orderingValue, orderDirection } = req.query;
+
+  const plans = await searchPlans(searchValue, orderingValue, orderDirection);
+
+  res.json(plans);
 });
 
 apiRouter.use(authenticateTokenMiddleware);
@@ -234,6 +247,8 @@ apiRouter.post("/plan", async (req, res) => {
 
   const planId = uuidv4();
 
+  const currentTimeSeconds = getCurrentTimeSeconds();
+
   await plansCdb.put(planId, plan);
   await planRdb.upsert({
     id: planId,
@@ -242,6 +257,7 @@ apiRouter.post("/plan", async (req, res) => {
     description,
     product: plan.item,
     amount: plan.amount,
+    creationDate: currentTimeSeconds,
     isPublic,
   });
   await accountPlanRdb.upsert({

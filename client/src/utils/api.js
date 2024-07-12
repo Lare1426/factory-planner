@@ -156,3 +156,13 @@ export const getAccountPlans = async () => {
   });
   return response.json();
 };
+
+export const getSearch = async (searchValue, orderingValue, orderDirection) => {
+  const response = await fetch(
+    `/api/search?searchValue=${searchValue}&orderingValue=${orderingValue}&orderDirection=${orderDirection}`,
+    {
+      method: "GET",
+    }
+  );
+  return response.json();
+};

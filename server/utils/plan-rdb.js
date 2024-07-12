@@ -7,6 +7,7 @@ export const upsert = async ({
   product,
   amount,
   isPublic,
+  creationDate,
   creator,
 }) => {
   const [result] = await executeQuery(
@@ -17,8 +18,9 @@ export const upsert = async ({
       product, 
       amount,
       isPublic, 
+      creationDate,
       creator
-    ) VALUES (?, ?, ?, ?, ?, ?, ?) 
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?) 
       ON DUPLICATE KEY UPDATE name=?, description=?, product=?, amount=?, isPublic=?;`,
     [
       id,
@@ -27,6 +29,7 @@ export const upsert = async ({
       product,
       amount,
       isPublic,
+      creationDate,
       creator,
       name,
       description,

@@ -1,11 +1,16 @@
 import { useState } from "react";
-import { Input } from "@/components";
+import { Input, Button } from "@/components";
 import styles from "./Public.module.scss";
+import { getSearch } from "@/utils/api";
 
 export const Public = () => {
   const [searchValue, setSearchValue] = useState("");
-  const [orderingValue, setOrderingValue] = useState("Creation date");
-  const [orderDirection, setOrderDirection] = useState("Ascending");
+  const [orderingValue, setOrderingValue] = useState("creationDate");
+  const [orderDirection, setOrderDirection] = useState("ASC");
+
+  const searchPlan = async () => {
+    const plans = await getSearch(searchValue, orderingValue, orderDirection);
+  };
 
   return (
     <main className={styles.public}>
@@ -24,18 +29,21 @@ export const Public = () => {
             value={orderingValue}
             onChange={(e) => setOrderingValue(e.target.value)}
           >
-            <option value="Creation date">Creation date</option>
-            <option value="Plan name">Plan name</option>
-            <option value="Final product">Final product</option>
+            <option value="creationDate">Creation date</option>
+            <option value="name">Plan name</option>
+            <option value="product">Final product</option>
           </select>
           <select
             value={orderDirection}
             onChange={(e) => setOrderDirection(e.target.value)}
           >
-            <option value="Ascending">Ascending</option>
-            <option value="Descending">Descending</option>
+            <option value="ASC">Ascending</option>
+            <option value="DESC">Descending</option>
           </select>
         </div>
+        <Button size="medium" color="primary" onClick={searchPlan}>
+          Search
+        </Button>
       </div>
     </main>
   );

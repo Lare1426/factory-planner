@@ -51,3 +51,20 @@ export const selectSharedPlans = async (accountId) => {
     return acc;
   }, {});
 };
+
+export const searchPlans = async (
+  searchValue,
+  orderingValue,
+  orderDirection
+) => {
+  const [rdbResult] = await executeQuery(
+    `
+    SELECT *
+    FROM plan
+    WHERE isPublic=1
+    ORDER BY ? ${orderDirection}
+    `,
+    [orderingValue]
+  );
+  return rdbResult;
+};
