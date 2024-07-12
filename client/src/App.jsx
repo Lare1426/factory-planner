@@ -7,7 +7,7 @@ import {
 } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Header } from "@/components";
-import { Home, Create, Plan, Account } from "@/routes";
+import { Home, Create, Plan, Account, Public } from "@/routes";
 import { AuthContext } from "./utils/AuthContext";
 import { authenticate } from "./utils/api";
 
@@ -19,6 +19,7 @@ const router = createBrowserRouter(
       <Route path="/plan/new" element={<Plan />} />
       <Route path="/plan/:id" element={<Plan />} />
       <Route path="/account" element={<Account />} />
+      <Route path="/public" element={<Public />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Route>
   )

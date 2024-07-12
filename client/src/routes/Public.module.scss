@@ -1,0 +1,27 @@
+.public {
+  height: 100%;
+
+  .side-panel {
+    height: 100%;
+    width: min-content;
+    padding: 10px;
+    background-color: var(--secondary);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    .order-by {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+
+      select {
+        width: 250px;
+        font-size: 15px;
+        padding: 5px;
+        height: 30px;
+        border-radius: 5px;
+      }
+    }
+  }
+}

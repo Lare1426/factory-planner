@@ -44,6 +44,11 @@ export const Home = () => {
               Create
             </Button>
           </Link>
+          <Link to="/public">
+            <Button size="large" color="primary" shadow="drop">
+              Public
+            </Button>
+          </Link>
         </div>
         <div className={styles.quickCreate}>
           <h2>Quick create</h2>
