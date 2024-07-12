@@ -174,7 +174,7 @@ export const LeftSidePanel = ({
             placeholder="Plan name"
             value={inputName}
             setValue={setInputName}
-            characterLimit={30}
+            characterLimit={23}
             disabled={!isNewPlan && !hasEditAccess}
           />
         </div>
@@ -268,7 +268,7 @@ export const LeftSidePanel = ({
             disabled={
               isNewPlan ||
               !isLoggedIn ||
-              !(loggedInUsername === creator || hasEditAccess)
+              !(loggedInUsername === creator || hasEditAccess || isPublic)
             }
             onClick={favouritePlan}
           >

@@ -9,6 +9,7 @@ export const LoginModal = () => {
     setIsLoggedIn,
     setLoggedInUsername,
     loginModalMessage,
+    setLoginModalMessage,
     isLoginModalShow,
     setIsLoginModalShow,
   } = useAuthContext();
@@ -31,6 +32,7 @@ export const LoginModal = () => {
     setUsername("");
     setPassword("");
     setIsCredentialError(false);
+    setLoginModalMessage("");
     setIsLoginModalShow(false);
   };
 
@@ -59,10 +61,10 @@ export const LoginModal = () => {
           <p className={styles.error}>Invalid credentials!</p>
         )}
         <div className={styles.buttons}>
-          <Button size={"small"} color={"tertiary"} onClick={authoriseUser}>
+          <Button size={"medium"} color={"tertiary"} onClick={authoriseUser}>
             Login
           </Button>
-          <Button size={"small"} color={"tertiary"} onClick={hide}>
+          <Button size={"medium"} color={"tertiary"} onClick={hide}>
             Close
           </Button>
         </div>
