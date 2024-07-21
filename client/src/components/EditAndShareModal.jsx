@@ -19,7 +19,8 @@ export const EditAndShareModal = ({
   edit = false,
   share = false,
 }) => {
-  const { setIsLoginModalShow, setLoginModalMessage } = useAuthContext();
+  const { setIsLoginModalShow, setLoginModalMessage, isLoggedIn } =
+    useAuthContext();
 
   const [isError, setIsError] = useState(false);
   const [inputAccount, setInputAccount] = useState("");
@@ -163,7 +164,12 @@ export const EditAndShareModal = ({
             >
               View
             </Button>
-            <Button size="medium" color="tertiary" onClick={favouritePlan}>
+            <Button
+              size="medium"
+              color="tertiary"
+              onClick={favouritePlan}
+              disabled={!isLoggedIn}
+            >
               {isPlanFavourited ? "Unfavourite" : "Favourite"}
             </Button>
           </>

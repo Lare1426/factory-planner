@@ -19,6 +19,7 @@ import {
   selectAccountPlans,
   selectSharedPlans,
   searchPlans,
+  selectMostViewedPlans,
 } from "./utils/queries.js";
 import { loggerMiddleware } from "./utils/logger.js";
 import { getCurrentTimeSeconds } from "./utils/dates.js";
@@ -96,6 +97,8 @@ apiRouter.get("/plan/:planId", async (req, res) => {
 
   const planJson = await plansCdb.get(planId);
 
+  planRdb.update({ id: planId, values: { views: plan.views + 1 } });
+
   res.json({
     name,
     description,
@@ -109,6 +112,12 @@ apiRouter.get("/plan/:planId", async (req, res) => {
 
 apiRouter.get("/products", async (req, res) => {
   res.json(Object.keys(await getProducts()));
+});
+
+apiRouter.get("/most-viewed-plans", async (req, res) => {
+  const plans = await selectMostViewedPlans();
+
+  res.json(plans);
 });
 
 apiRouter.get("/search?", async (req, res) => {

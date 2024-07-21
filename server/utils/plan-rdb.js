@@ -55,7 +55,7 @@ export const update = ({ id, values }) => {
   return updateSpecificFields(
     "plan",
     id,
-    ["name", "description", "product", "amount", "isPublic"],
+    ["name", "description", "product", "amount", "isPublic", "views"],
     values
   );
 };

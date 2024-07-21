@@ -38,7 +38,7 @@ export const updateSpecificFields = async (
   }
 
   const [result] = await executeQuery(
-    `UPDATE ${tableName} SET ${updateFields.join(",")} WHERE id = ?;`,
+    `UPDATE ${tableName} SET ${updateFields.join(",")} WHERE id=?;`,
     [...updateValues, id]
   );
   return result;

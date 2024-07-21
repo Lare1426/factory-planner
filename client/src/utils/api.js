@@ -166,3 +166,8 @@ export const getSearch = async (searchValue, orderingValue, orderDirection) => {
   );
   return response.json();
 };
+
+export const getMostViewedPlans = async () => {
+  const response = await fetch("/api/most-viewed-plans", { method: "GET" });
+  return response.json();
+};

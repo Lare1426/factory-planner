@@ -6,7 +6,7 @@
   .plan-list {
     background-color: var(--secondary);
     border-radius: 20px;
-    width: 750px;
+    width: 660px;
     height: 800px;
     margin-top: 30px;
     padding: 10px 40px;
@@ -22,6 +22,34 @@
       border: 1px solid var(--text);
       margin-top: 5px;
       margin-bottom: 40px;
+    }
+
+    .plans {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 20px;
+
+      .plan {
+        background-color: var(--tertiary);
+        width: 310px;
+        font-size: 18px;
+        padding: 5px;
+        border-radius: 10px;
+
+        &:hover {
+          cursor: pointer;
+          filter: brightness(0.95);
+        }
+
+        h3 {
+          font-size: 20px;
+          text-decoration: underline;
+          text-underline-offset: 3px;
+          margin: 0;
+          margin-bottom: 5px;
+        }
+      }
     }
   }
 

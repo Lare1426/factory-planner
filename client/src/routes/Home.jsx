@@ -1,26 +1,30 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "./Home.module.scss";
-import { Button, Input } from "@/components";
-import { getProducts } from "@/utils/api";
+import { Button, Input, EditAndShareModal } from "@/components";
+import { getProducts, getMostViewedPlans } from "@/utils/api";
 
 export const Home = () => {
   const [inputProduct, setInputProduct] = useState("");
   const [inputAmount, setInputAmount] = useState("");
   const [products, setProducts] = useState([]);
+  const [mostViewedPlans, setMostViewedPlans] = useState([]);
+  const [isPlanModalShow, setIsPlanModalShow] = useState(false);
+  const [planForModal, setPlanForModal] = useState();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    (async () => {
+      setMostViewedPlans(await getMostViewedPlans());
+      setProducts(await getProducts());
+    })();
+  }, []);
 
   let isGeneratePlanDisabled = !(
     products.includes(inputProduct) &&
     inputAmount > 0 &&
     inputAmount < 50001
   );
-
-  useEffect(() => {
-    (async () => {
-      setProducts(await getProducts());
-    })();
-  }, []);
 
   const navigatePlan = (plan) => {
     navigate("/plan/new", {
@@ -33,6 +37,25 @@ export const Home = () => {
       <div className={styles.planList}>
         <h2>Top 10 most viewed plans</h2>
         <hr />
+        <div className={styles.plans}>
+          {mostViewedPlans.map((plan) => (
+            <div
+              className={styles.plan}
+              onClick={() => {
+                setIsPlanModalShow(true);
+                setPlanForModal(plan);
+              }}
+            >
+              <h3 className={styles.name}>{plan.name}</h3>
+              <div>
+                {plan.product} {plan.amount}/min
+              </div>
+              <div>Views: {plan.views}</div>
+              <div>Creator: {plan.creator}</div>
+              <div>{plan.creationDate}</div>
+            </div>
+          ))}
+        </div>
       </div>
       <div className={styles.rightContainer}>
         <div className={styles.buttons}>
@@ -86,6 +109,12 @@ export const Home = () => {
           />
         </div>
       </div>
+      <EditAndShareModal
+        isModalShow={isPlanModalShow}
+        setIsModalShow={setIsPlanModalShow}
+        plan={planForModal}
+        edit={true}
+      />
     </main>
   );
 };

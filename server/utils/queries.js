@@ -78,7 +78,23 @@ export const searchPlans = async (
     [creator, `%${searchValue}%`, `%${searchValue}%`, `%${searchValue}%`]
   );
 
-  console.log("rdbResult:", rdbResult);
+  return rdbResult.map((plan) => {
+    plan.creationDate = getCurrentTimeDate(plan.creationTime);
+    return plan;
+  });
+};
+
+export const selectMostViewedPlans = async () => {
+  const [rdbResult] = await executeQuery(
+    `
+    SELECT *
+    FROM plan
+    WHERE isPublic=1
+    ORDER BY views DESC
+    LIMIT 10
+    `
+  );
+
   return rdbResult.map((plan) => {
     plan.creationDate = getCurrentTimeDate(plan.creationTime);
     return plan;
