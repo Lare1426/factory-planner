@@ -56,7 +56,7 @@ export const selectSharedPlans = async (accountId) => {
 };
 
 export const searchPlans = async (
-  searchValue,
+  searchValue = "",
   orderingValue,
   orderDirection
 ) => {
@@ -71,9 +71,10 @@ export const searchPlans = async (
     `
     SELECT *
     FROM plan
-    WHERE isPublic=1
+    WHERE isPublic=1 AND (name LIKE ? OR product LIKE ? OR creator LIKE ?)
     ORDER BY ${orderingValue} ${orderDirection}
-    `
+    `,
+    [`%${searchValue}%`, `%${searchValue}%`, `%${searchValue}%`]
   );
 
   console.log("rdbResult:", rdbResult);
