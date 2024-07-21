@@ -60,14 +60,20 @@ export const searchPlans = async (
   orderingValue,
   orderDirection
 ) => {
+  if (
+    !["creationTime", "name", "product"].includes(orderingValue) ||
+    !["ASC", "DESC"].includes(orderDirection)
+  ) {
+    return [];
+  }
+
   const [rdbResult] = await executeQuery(
     `
     SELECT *
     FROM plan
     WHERE isPublic=1
-    ORDER BY ?
-    `,
-    [orderingValue]
+    ORDER BY ${orderingValue} ${orderDirection}
+    `
   );
 
   console.log("rdbResult:", rdbResult);

@@ -5,7 +5,7 @@ import { getSearch } from "@/utils/api";
 
 export const Public = () => {
   const [searchValue, setSearchValue] = useState("");
-  const [orderingValue, setOrderingValue] = useState("creationDate");
+  const [orderingValue, setOrderingValue] = useState("creationTime");
   const [orderDirection, setOrderDirection] = useState("ASC");
   const [plans, setPlans] = useState([]);
   const [isPlanModalShow, setIsPlanModalShow] = useState(false);
@@ -34,7 +34,7 @@ export const Public = () => {
             value={orderingValue}
             onChange={(e) => setOrderingValue(e.target.value)}
           >
-            <option value="creationDate">Creation date</option>
+            <option value="creationTime">Creation date</option>
             <option value="name">Plan name</option>
             <option value="product">Final product</option>
           </select>
