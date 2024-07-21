@@ -58,7 +58,8 @@ export const selectSharedPlans = async (accountId) => {
 export const searchPlans = async (
   searchValue = "",
   orderingValue,
-  orderDirection
+  orderDirection,
+  creator = ""
 ) => {
   if (
     !["creationTime", "name", "product"].includes(orderingValue) ||
@@ -71,10 +72,10 @@ export const searchPlans = async (
     `
     SELECT *
     FROM plan
-    WHERE isPublic=1 AND (name LIKE ? OR product LIKE ? OR creator LIKE ?)
+    WHERE (isPublic=1 OR creator=?)AND (name LIKE ? OR product LIKE ? OR creator LIKE ?)
     ORDER BY ${orderingValue} ${orderDirection}
     `,
-    [`%${searchValue}%`, `%${searchValue}%`, `%${searchValue}%`]
+    [creator, `%${searchValue}%`, `%${searchValue}%`, `%${searchValue}%`]
   );
 
   console.log("rdbResult:", rdbResult);

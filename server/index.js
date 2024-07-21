@@ -114,7 +114,13 @@ apiRouter.get("/products", async (req, res) => {
 apiRouter.get("/search?", async (req, res) => {
   const { searchValue, orderingValue, orderDirection } = req.query;
 
-  const plans = await searchPlans(searchValue, orderingValue, orderDirection);
+  const user = authenticateToken(req);
+  const plans = await searchPlans(
+    searchValue,
+    orderingValue,
+    orderDirection,
+    user?.name
+  );
 
   res.json(plans);
 });

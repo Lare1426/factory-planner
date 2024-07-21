@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Input, Button, EditAndShareModal } from "@/components";
-import styles from "./Public.module.scss";
+import styles from "./Search.module.scss";
 import { getSearch } from "@/utils/api";
 
-export const Public = () => {
+export const Search = () => {
   const [searchValue, setSearchValue] = useState("");
   const [orderingValue, setOrderingValue] = useState("creationTime");
   const [orderDirection, setOrderDirection] = useState("ASC");
