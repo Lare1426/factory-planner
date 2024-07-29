@@ -7,8 +7,8 @@ header {
   div {
     display: flex;
     align-items: center;
-    flex-grow: 1;
-    flex-basis: 0;
+    justify-content: space;
+    flex-grow: 4;
     height: 100%;
 
     &.left-container {
@@ -22,21 +22,9 @@ header {
     }
 
     &.right-container {
+      display: flex;
+      flex-grow: 1;
       justify-content: space-around;
-
-      .search {
-        width: 350px;
-        height: 40px;
-        padding: 0 15px;
-        font-size: 22px;
-        border: none;
-        border-radius: 50px;
-        background-color: var(--tertiary);
-
-        &:focus {
-          outline: 2px solid var(--accent);
-        }
-      }
     }
   }
 }

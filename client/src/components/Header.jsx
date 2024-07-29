@@ -8,7 +8,6 @@ import styles from "./Header.module.scss";
 export const Header = () => {
   const { isLoggedIn, setIsLoginModalShow } = useAuthContext();
 
-  const [searchValue, setSearchValue] = useState("");
   const navigate = useNavigate();
 
   return (
@@ -20,14 +19,6 @@ export const Header = () => {
           </Link>
         </div>
         <div className={styles.rightContainer}>
-          <Input
-            type="text"
-            placeholder="Search"
-            className={styles.search}
-            size="large"
-            setValue={setSearchValue}
-            value={searchValue}
-          />
           <Button
             size="medium"
             color="tertiary"

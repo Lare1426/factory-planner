@@ -61,10 +61,12 @@ export const Search = () => {
                   setIsPlanModalShow(true);
                   setPlanForModal(plan);
                 }}
+                key={plan.id}
               >
                 <h3 className={styles.name}>{plan.name}</h3>
-                <div>{plan.product}</div>
-                <div>{plan.amount}/min</div>
+                <div>
+                  {plan.product} {plan.amount}/min
+                </div>
                 <div>Creator: {plan.creator}</div>
                 <div>{plan.creationDate}</div>
               </div>

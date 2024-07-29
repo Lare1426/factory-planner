@@ -41,6 +41,7 @@ export const Home = () => {
           {mostViewedPlans.map((plan) => (
             <div
               className={styles.plan}
+              key={plan.id}
               onClick={() => {
                 setIsPlanModalShow(true);
                 setPlanForModal(plan);
@@ -59,7 +60,7 @@ export const Home = () => {
       </div>
       <div className={styles.rightContainer}>
         <div className={styles.buttons}>
-          <Link to="/public">
+          <Link to="/search">
             <Button size="large" color="primary" shadow="drop">
               View
             </Button>
