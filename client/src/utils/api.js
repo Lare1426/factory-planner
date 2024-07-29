@@ -5,6 +5,11 @@ class ApiError extends Error {
   }
 }
 
+export const getProductNames = async () => {
+  const response = await fetch("/api/product-names");
+  return response.json();
+};
+
 export const getProducts = async () => {
   const response = await fetch("/api/products");
   return response.json();

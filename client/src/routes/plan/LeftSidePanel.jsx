@@ -5,11 +5,12 @@ import { useAuthContext } from "@/utils/AuthContext";
 import {
   postToggleFavouritePlan,
   deletePlanApi,
-  getProducts,
+  getProductNames,
   getPlanById,
   postPlan,
   putPlan,
 } from "@/utils/api";
+import { RecipesModal } from "./RecipesModal";
 import styles from "./LeftSidePanel.module.scss";
 
 export const LeftSidePanel = ({
@@ -41,12 +42,13 @@ export const LeftSidePanel = ({
   const [isShareModalShow, setIsShareModalShow] = useState(false);
   const [isPlanFavourited, setIsPlanFavourited] = useState(false);
   const [originalPlan, setOriginalPlan] = useState({});
+  const [isRecipesModalShow, setIsRecipesModalShow] = useState(false);
 
   const navigate = useNavigate();
 
   useEffect(() => {
     (async () => {
-      setProducts(await getProducts());
+      setProducts(await getProductNames());
     })();
   }, []);
 
@@ -240,20 +242,15 @@ export const LeftSidePanel = ({
           >
             Apply
           </Button>
-          <a
-            href={URL.createObjectURL(
-              new Blob([stringifiedPlan], {
-                type: "application/json",
-              })
-            )}
-            download={`${plan?.item}.json`}
-            onClick={() => {}}
-            className={`primary-button-style ${styles.exportLink} ${
-              plan ? "" : styles.disabled
-            }`}
+          <Button
+            size="medium"
+            color="primary"
+            onClick={() => {
+              setIsRecipesModalShow(true);
+            }}
           >
-            Export
-          </a>
+            Alternate Recipes
+          </Button>
           <Button
             size="medium"
             color="primary"
@@ -282,6 +279,20 @@ export const LeftSidePanel = ({
           >
             Share
           </Button>
+          <a
+            href={URL.createObjectURL(
+              new Blob([stringifiedPlan], {
+                type: "application/json",
+              })
+            )}
+            download={`${plan?.item}.json`}
+            onClick={() => {}}
+            className={`primary-button-style ${styles.exportLink} ${
+              plan ? "" : styles.disabled
+            }`}
+          >
+            Export
+          </a>
           <Button
             size="medium"
             color="red"
@@ -300,6 +311,10 @@ export const LeftSidePanel = ({
           share={true}
         />
       )}
+      <RecipesModal
+        isModalShow={isRecipesModalShow}
+        setIsModalShow={setIsRecipesModalShow}
+      />
     </>
   );
 };

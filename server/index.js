@@ -111,7 +111,7 @@ apiRouter.get("/plan/:planId", async (req, res) => {
   });
 });
 
-apiRouter.get("/products", async (req, res) => {
+apiRouter.get("/product-names", async (req, res) => {
   res.json(Object.keys(await getProducts()));
 });
 
@@ -140,6 +140,10 @@ apiRouter.get("/search?", async (req, res) => {
   );
 
   res.json(plans);
+});
+
+apiRouter.get("/products", async (req, res) => {
+  res.json(await getProducts());
 });
 
 apiRouter.use(authenticateTokenMiddleware);

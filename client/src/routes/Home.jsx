@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import styles from "./Home.module.scss";
 import { Button, Input, EditAndShareModal } from "@/components";
-import { getProducts, getMostViewedPlans } from "@/utils/api";
+import { getProductNames, getMostViewedPlans } from "@/utils/api";
 
 export const Home = () => {
   const [inputProduct, setInputProduct] = useState("");
@@ -16,7 +16,7 @@ export const Home = () => {
   useEffect(() => {
     (async () => {
       setMostViewedPlans(await getMostViewedPlans());
-      setProducts(await getProducts());
+      setProducts(await getProductNames());
     })();
   }, []);
 

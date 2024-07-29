@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { getProducts } from "@/utils/api";
+import { getProductNames } from "@/utils/api";
 import styles from "./Create.module.scss";
 import { Input, Button } from "@/components";
 
@@ -54,7 +54,7 @@ export const Create = () => {
 
   useEffect(() => {
     (async () => {
-      setProducts(await getProducts());
+      setProducts(await getProductNames());
     })();
   }, []);
 
