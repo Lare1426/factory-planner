@@ -17,9 +17,11 @@ const PlanList = ({ name, list, setPlanForModal, setIsPlanModalShow }) => {
             <Button
               size="small"
               color="primary"
+              disabled={
+                !(pageIndex > 0 && pageIndex <= Math.ceil(list.length / 5))
+              }
               onClick={() => {
-                if (pageIndex > 0 && pageIndex <= Math.ceil(list.length / 5))
-                  setPageIndex(pageIndex - 1);
+                setPageIndex(pageIndex - 1);
               }}
             >
               {"<"}
@@ -28,9 +30,11 @@ const PlanList = ({ name, list, setPlanForModal, setIsPlanModalShow }) => {
             <Button
               size="small"
               color="primary"
+              disabled={
+                !(pageIndex >= 0 && pageIndex < Math.floor(list.length / 5))
+              }
               onClick={() => {
-                if (pageIndex >= 0 && pageIndex < Math.floor(list.length / 5))
-                  setPageIndex(pageIndex + 1);
+                setPageIndex(pageIndex + 1);
               }}
             >
               {">"}

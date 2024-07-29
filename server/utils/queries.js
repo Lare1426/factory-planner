@@ -100,3 +100,28 @@ export const selectMostViewedPlans = async () => {
     return plan;
   });
 };
+
+export const selectMostViewedPlansWithUser = async (userId) => {
+  const plans = await selectMostViewedPlans();
+  const planIds = plans.reduce((acc, plan) => [...acc, plan.id], []);
+
+  const [rdbResult] = await executeQuery(
+    `
+    SELECT planId, favourited
+    FROM account_plan
+    WHERE accountId=? AND (planId=?${" OR planId=?".repeat(9)})
+    `,
+    [userId, ...planIds]
+  );
+  const favourited = rdbResult.reduce((acc, { planId, favourited }) => {
+    return {
+      ...acc,
+      [planId]: !!favourited,
+    };
+  }, {});
+
+  return plans.map((plan) => {
+    plan.favourited = favourited[plan.id];
+    return plan;
+  });
+};

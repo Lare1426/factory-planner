@@ -20,6 +20,7 @@ import {
   selectSharedPlans,
   searchPlans,
   selectMostViewedPlans,
+  selectMostViewedPlansWithUser,
 } from "./utils/queries.js";
 import { loggerMiddleware } from "./utils/logger.js";
 import { getCurrentTimeSeconds } from "./utils/dates.js";
@@ -115,7 +116,14 @@ apiRouter.get("/products", async (req, res) => {
 });
 
 apiRouter.get("/most-viewed-plans", async (req, res) => {
-  const plans = await selectMostViewedPlans();
+  const user = authenticateToken(req);
+
+  let plans;
+  if (user) {
+    plans = await selectMostViewedPlansWithUser(user.id);
+  } else {
+    plans = await selectMostViewedPlans();
+  }
 
   res.json(plans);
 });
