@@ -9,6 +9,7 @@ import {
   getPlanById,
   postPlan,
   putPlan,
+  getNewPlan,
 } from "@/utils/api";
 import { RecipesModal } from "./RecipesModal";
 import styles from "./LeftSidePanel.module.scss";
@@ -314,6 +315,9 @@ export const LeftSidePanel = ({
       <RecipesModal
         isModalShow={isRecipesModalShow}
         setIsModalShow={setIsRecipesModalShow}
+        refreshPlan={async (changedRecipes) => {
+          setPlan(await getNewPlan(plan.item, plan.amount, changedRecipes));
+        }}
       />
     </>
   );

@@ -4,12 +4,31 @@ import { Button, Modal } from "@/components";
 import { getProducts } from "@/utils/api";
 import { useLocalStorage } from "@/utils/useLocalStorage";
 
-export const RecipesModal = ({ isModalShow, setIsModalShow }) => {
+export const RecipesModal = ({ isModalShow, setIsModalShow, refreshPlan }) => {
   const [changedRecipesStorage, setChangedRecipesStorage] =
     useLocalStorage("changedRecipes");
   const [defaultRecipes, setDefaultRecipes] = useState();
   const [changedRecipes, setChangedRecipes] = useState(
     JSON.parse(changedRecipesStorage) ?? {}
+  );
+  const [previousChangedRecipes, setPreviousChangedRecipes] = useState(
+    JSON.parse(changedRecipesStorage) ?? {}
+  );
+
+  // check if something was changed
+  const addedItems = Object.keys(changedRecipes).filter(
+    (recipe) => !Object.keys(previousChangedRecipes).includes(recipe)
+  );
+  const removedItems = Object.keys(previousChangedRecipes).filter(
+    (recipe) => !Object.keys(changedRecipes).includes(recipe)
+  );
+  const recipesChanged = Object.entries(changedRecipes).filter(
+    ([item, recipe]) => previousChangedRecipes[item] !== recipe
+  );
+  const isApplyDisabled = !(
+    addedItems.length ||
+    removedItems.length ||
+    recipesChanged.length
   );
 
   useEffect(() => {
@@ -19,6 +38,7 @@ export const RecipesModal = ({ isModalShow, setIsModalShow }) => {
   }, []);
 
   const hide = () => {
+    setPreviousChangedRecipes({ ...changedRecipes });
     setIsModalShow(false);
   };
 
@@ -48,6 +68,17 @@ export const RecipesModal = ({ isModalShow, setIsModalShow }) => {
         <div className={styles.topBar}>
           <h2>Edit default recipe for these items</h2>
           <div className={styles.buttons}>
+            <Button
+              size={"medium"}
+              color={"tertiary"}
+              disabled={isApplyDisabled}
+              onClick={() => {
+                refreshPlan(JSON.stringify(changedRecipes));
+                hide();
+              }}
+            >
+              Apply
+            </Button>
             <Button
               size={"medium"}
               color={"tertiary"}
