@@ -25,18 +25,14 @@ export const Plan = () => {
   const [plan, setPlan] = useState();
   const [hasEditAccess, setHasEditAccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [changedRecipesStorage] = useLocalStorage("changedRecipes");
+  const [changedRecipes] = useLocalStorage("changedRecipes");
 
   const navigate = useNavigate();
 
   const fetchPlan = (product, amount) => {
     (async () => {
       if (!plan || product !== plan.item) {
-        const newPlan = await getNewPlan(
-          product,
-          amount,
-          JSON.parse(changedRecipesStorage)
-        );
+        const newPlan = await getNewPlan(product, amount, changedRecipes);
         setPlan(newPlan);
       } else {
         const newPlan = { ...plan };
@@ -116,6 +112,7 @@ export const Plan = () => {
                   layer={1}
                   isNewPlan={!id}
                   hasEditAccess={hasEditAccess}
+                  changedRecipes={changedRecipes}
                 />
               </div>
               <RightSidePanel plan={plan} />

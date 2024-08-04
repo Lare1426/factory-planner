@@ -9,13 +9,19 @@ export const PlanSection = ({
   path = [],
   isNewPlan,
   hasEditAccess,
+  changedRecipes,
 }) => {
   const layerColor = `layer${layer}`;
 
   const onChange = async (e) => {
     const recipe = e.target.value;
     if (recipe !== plan.recipe) {
-      const newPlan = await getItemRecipe(plan.item, recipe, plan.amount);
+      const newPlan = await getItemRecipe(
+        plan.item,
+        recipe,
+        plan.amount,
+        changedRecipes
+      );
       updatePlan(path, newPlan);
     }
   };
@@ -56,6 +62,7 @@ export const PlanSection = ({
             key={`${plan.recipe}-${ingredient.item}-${index}`}
             isNewPlan={isNewPlan}
             hasEditAccess={hasEditAccess}
+            changedRecipes={changedRecipes}
           />
         ))}
       </div>
