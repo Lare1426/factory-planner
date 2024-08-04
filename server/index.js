@@ -55,8 +55,10 @@ apiRouter.post("/authorise", async (req, res) => {
 
 apiRouter.get("/plan/new/:product/:recipe?", async (req, res) => {
   const { product, recipe } = req.params;
-  const { amount } = req.query;
-  res.json(await generate(product, Number(amount), recipe));
+  const { amount, changedRecipes } = req.query;
+  res.json(
+    await generate(product, Number(amount), JSON.parse(changedRecipes), recipe)
+  );
 });
 
 apiRouter.get("/plan/:planId", async (req, res) => {

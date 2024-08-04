@@ -13,12 +13,27 @@ const findDesiredProduct = (products, desiredProductName) => {
   }
 };
 
-export const generate = async (item, amount, recipeToUse = null) => {
+export const generate = async (
+  item,
+  amount,
+  changedRecipes,
+  recipeToUse = null
+) => {
   let recipe;
   let alternateRecipes;
 
   if (productsWithRecipes[item]) {
-    ({ base: recipe, alternate: alternateRecipes } = productsWithRecipes[item]);
+    const { base, alternate } = productsWithRecipes[item];
+
+    if (changedRecipes[item]) {
+      recipe = changedRecipes[item];
+      alternateRecipes = [base, ...alternate].filter(
+        (recipe) => recipe !== changedRecipes[item]
+      );
+    } else {
+      recipe = base;
+      alternateRecipes = alternate;
+    }
 
     if (ores.includes(item) && (recipeToUse ?? recipe) === item) {
       // raw material can be made as byproduct but not right now
@@ -67,7 +82,11 @@ export const generate = async (item, amount, recipeToUse = null) => {
     recipeData.ingredients.map(async (ingredient) => {
       const recipeAmount = ingredient.amount / recipeProductionAmount;
       const ingredientAmount = round(amount * recipeAmount, 5);
-      const plan = await generate(ingredient.item, ingredientAmount);
+      const plan = await generate(
+        ingredient.item,
+        ingredientAmount,
+        changedRecipes
+      );
       return plan;
     })
   );

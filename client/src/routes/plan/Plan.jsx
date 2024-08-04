@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
 import styles from "./Plan.module.scss";
 import { getNewPlan } from "@/utils/api";
+import { useLocalStorage } from "@/utils/useLocalStorage";
 import { Button } from "@/components";
 import { round } from "../../../../shared/round";
 import { LeftSidePanel } from "./LeftSidePanel";
@@ -24,13 +25,18 @@ export const Plan = () => {
   const [plan, setPlan] = useState();
   const [hasEditAccess, setHasEditAccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [changedRecipesStorage] = useLocalStorage("changedRecipes");
 
   const navigate = useNavigate();
 
   const fetchPlan = (product, amount) => {
     (async () => {
       if (!plan || product !== plan.item) {
-        const newPlan = await getNewPlan(product, amount);
+        const newPlan = await getNewPlan(
+          product,
+          amount,
+          JSON.parse(changedRecipesStorage)
+        );
         setPlan(newPlan);
       } else {
         const newPlan = { ...plan };

@@ -2,10 +2,15 @@ import { useEffect, useState } from "react";
 import styles from "./RecipesModal.module.scss";
 import { Button, Modal } from "@/components";
 import { getProducts } from "@/utils/api";
+import { useLocalStorage } from "@/utils/useLocalStorage";
 
 export const RecipesModal = ({ isModalShow, setIsModalShow }) => {
+  const [changedRecipesStorage, setChangedRecipesStorage] =
+    useLocalStorage("changedRecipes");
   const [defaultRecipes, setDefaultRecipes] = useState();
-  const [changedRecipes, setChangedRecipes] = useState({});
+  const [changedRecipes, setChangedRecipes] = useState(
+    JSON.parse(changedRecipesStorage) ?? {}
+  );
 
   useEffect(() => {
     (async () => {
@@ -22,15 +27,19 @@ export const RecipesModal = ({ isModalShow, setIsModalShow }) => {
       if (Object.keys(changedRecipes).includes(item)) {
         const changedRecipesCopy = { ...changedRecipes };
         delete changedRecipesCopy[item];
-        setChangedRecipes({ ...changedRecipesCopy });
+        const newChangedRecipes = { ...changedRecipesCopy };
+        setChangedRecipes(newChangedRecipes);
+        setChangedRecipesStorage(JSON.stringify(newChangedRecipes));
       }
       return;
     }
 
-    setChangedRecipes({
+    const newChangedRecipes = {
       ...changedRecipes,
       [item]: recipe,
-    });
+    };
+    setChangedRecipes(newChangedRecipes);
+    setChangedRecipesStorage(JSON.stringify(newChangedRecipes));
   };
 
   return (

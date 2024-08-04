@@ -6,29 +6,37 @@ class ApiError extends Error {
 }
 
 export const getProductNames = async () => {
-  const response = await fetch("/api/product-names");
+  const response = await fetch("/api/product-names", { method: "GET" });
   return response.json();
 };
 
 export const getProducts = async () => {
-  const response = await fetch("/api/products");
+  const response = await fetch("/api/products", { method: "GET" });
   return response.json();
 };
 
-export const getNewPlan = async (product, amount) => {
-  const response = await fetch(`/api/plan/new/${product}?amount=${amount}`);
+export const getNewPlan = async (product, amount, changedRecipes) => {
+  const response = await fetch(
+    `/api/plan/new/${product}?amount=${amount}&changedRecipes=${JSON.stringify(
+      changedRecipes
+    )}`,
+    {
+      method: "GET",
+    }
+  );
   return response.json();
 };
 
 export const getItemRecipe = async (item, recipe, amount) => {
   const response = await fetch(
-    `/api/plan/new/${item}/${recipe}?amount=${amount}`
+    `/api/plan/new/${item}/${recipe}?amount=${amount}`,
+    { method: "GET" }
   );
   return response.json();
 };
 
 export const getPlanById = async (id) => {
-  const response = await fetch(`/api/plan/${id}`);
+  const response = await fetch(`/api/plan/${id}`, { method: "GET" });
 
   switch (response.status) {
     case 401:
