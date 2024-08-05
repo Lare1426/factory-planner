@@ -9,10 +9,10 @@ export const RecipesModal = ({ isModalShow, setIsModalShow, refreshPlan }) => {
     useLocalStorage("changedRecipes");
   const [defaultRecipes, setDefaultRecipes] = useState();
   const [changedRecipes, setChangedRecipes] = useState(
-    JSON.parse(changedRecipesStorage) ?? {}
+    changedRecipesStorage ?? {}
   );
   const [previousChangedRecipes, setPreviousChangedRecipes] = useState(
-    JSON.parse(changedRecipesStorage) ?? {}
+    changedRecipesStorage ?? {}
   );
 
   // check if something was changed
@@ -49,7 +49,7 @@ export const RecipesModal = ({ isModalShow, setIsModalShow, refreshPlan }) => {
         delete changedRecipesCopy[item];
         const newChangedRecipes = { ...changedRecipesCopy };
         setChangedRecipes(newChangedRecipes);
-        setChangedRecipesStorage(JSON.stringify(newChangedRecipes));
+        setChangedRecipesStorage(newChangedRecipes);
       }
       return;
     }
@@ -59,7 +59,7 @@ export const RecipesModal = ({ isModalShow, setIsModalShow, refreshPlan }) => {
       [item]: recipe,
     };
     setChangedRecipes(newChangedRecipes);
-    setChangedRecipesStorage(JSON.stringify(newChangedRecipes));
+    setChangedRecipesStorage(newChangedRecipes);
   };
 
   return (
@@ -73,7 +73,7 @@ export const RecipesModal = ({ isModalShow, setIsModalShow, refreshPlan }) => {
               color={"tertiary"}
               disabled={isApplyDisabled}
               onClick={() => {
-                refreshPlan(JSON.stringify(changedRecipes));
+                refreshPlan(changedRecipes);
                 hide();
               }}
             >

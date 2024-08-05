@@ -304,7 +304,7 @@ export const LeftSidePanel = ({
           </Button>
         </div>
       </aside>
-      {plan && loggedInUsername === creator && (
+      {plan && loggedInUsername && loggedInUsername === creator && (
         <EditAndShareModal
           isModalShow={isShareModalShow}
           setIsModalShow={setIsShareModalShow}

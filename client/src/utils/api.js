@@ -17,7 +17,9 @@ export const getProducts = async () => {
 
 export const getNewPlan = async (product, amount, changedRecipes) => {
   const response = await fetch(
-    `/api/plan/new/${product}?amount=${amount}&changedRecipes=${changedRecipes}`,
+    `/api/plan/new/${product}?amount=${amount}&changedRecipes=${JSON.stringify(
+      changedRecipes
+    )}`,
     {
       method: "GET",
     }
@@ -26,9 +28,10 @@ export const getNewPlan = async (product, amount, changedRecipes) => {
 };
 
 export const getItemRecipe = async (item, recipe, amount, changedRecipes) => {
-  console.log("changedRecipes:", changedRecipes);
   const response = await fetch(
-    `/api/plan/new/${item}/${recipe}?amount=${amount}&changedRecipes=${changedRecipes}`,
+    `/api/plan/new/${item}/${recipe}?amount=${amount}&changedRecipes=${JSON.stringify(
+      changedRecipes
+    )}`,
     { method: "GET" }
   );
   return response.json();

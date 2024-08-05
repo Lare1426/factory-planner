@@ -25,7 +25,7 @@ export const Plan = () => {
   const [plan, setPlan] = useState();
   const [hasEditAccess, setHasEditAccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [changedRecipes] = useLocalStorage("changedRecipes");
+  const [changedRecipes, setChangedRecipes] = useLocalStorage("changedRecipes");
 
   const navigate = useNavigate();
 
