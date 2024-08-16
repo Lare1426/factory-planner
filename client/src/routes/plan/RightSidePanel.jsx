@@ -15,7 +15,7 @@ const findTotalAmounts = (plan) => {
   };
 
   if (plan.producedIn) {
-    totalAmounts.buildings[plan.producedIn] = plan.buildingCount;
+    totalAmounts.buildings[plan.producedIn] = Math.ceil(plan.buildingCount);
   }
 
   if (plan.ingredients) {
