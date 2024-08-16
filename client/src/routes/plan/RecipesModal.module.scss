@@ -35,6 +35,10 @@
           background-color: #42f532;
         }
       }
+
+      &.filtered {
+        background-color: var(--accent);
+      }
     }
   }
 }

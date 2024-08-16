@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import styles from "./RecipesModal.module.scss";
-import { Button, Modal } from "@/components";
+import { Button, Modal, Input } from "@/components";
 import { getProducts } from "@/utils/api";
 import { useLocalStorage } from "@/utils/useLocalStorage";
 
@@ -14,6 +14,7 @@ export const RecipesModal = ({ isModalShow, setIsModalShow, refreshPlan }) => {
   const [previousChangedRecipes, setPreviousChangedRecipes] = useState(
     changedRecipesStorage ?? {}
   );
+  const [searchValue, setSearchValue] = useState("");
 
   // check if something was changed
   const addedItems = Object.keys(changedRecipes).filter(
@@ -68,6 +69,13 @@ export const RecipesModal = ({ isModalShow, setIsModalShow, refreshPlan }) => {
         <div className={styles.topBar}>
           <h2>Edit default recipe for these items</h2>
           <div className={styles.buttons}>
+            <Input
+              size="large"
+              type="text"
+              placeholder="Item"
+              value={searchValue}
+              setValue={setSearchValue}
+            />
             <Button
               size={"medium"}
               color={"tertiary"}
@@ -104,7 +112,14 @@ export const RecipesModal = ({ isModalShow, setIsModalShow, refreshPlan }) => {
               const allRecipes = [recipes.base, ...recipes.alternate];
 
               return (
-                <div className={styles.recipe} key={index}>
+                <div
+                  className={`${styles.recipe} ${
+                    searchValue &&
+                    item.toLowerCase().includes(searchValue.toLowerCase()) &&
+                    styles.filtered
+                  }`}
+                  key={index}
+                >
                   {item}
                   {changedRecipes[item] && "*"}
                   <select
