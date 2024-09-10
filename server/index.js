@@ -24,6 +24,7 @@ import {
 } from "./utils/queries.js";
 import { loggerMiddleware } from "./utils/logger.js";
 import { getCurrentTimeSeconds } from "./utils/dates.js";
+import { addUsageEvent } from "./utils/usage-db.js";
 
 const PORT = process.env.PORT ?? 3000;
 const IP = process.env.IP;
@@ -111,6 +112,7 @@ apiRouter.get("/plan/:planId", async (req, res) => {
     hasEditAccess,
     isFavourite,
   });
+  addUsageEvent(user ?? "not logged in", `Viewed plan ${name}`);
 });
 
 apiRouter.get("/product-names", async (req, res) => {
