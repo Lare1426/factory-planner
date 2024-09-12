@@ -112,7 +112,7 @@ apiRouter.get("/plan/:planId", async (req, res) => {
     hasEditAccess,
     isFavourite,
   });
-  addUsageEvent(user ?? "not logged in", `Viewed plan ${name}`);
+  addUsageEvent(user ?? "not logged in", `Viewed plan: ${name}`);
 });
 
 apiRouter.get("/product-names", async (req, res) => {

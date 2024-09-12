@@ -24,12 +24,13 @@ const put = async (newEntry) => {
   const revString = rev ? `?rev=${rev}` : "";
 
   const previousData = await get(date);
-  console.log("previousData:", previousData);
-  const newData = [];
-  if (!previousData.error) {
-    newData = previousData;
+  const newData = {
+    entries: [],
+  };
+  if (previousData?.entries) {
+    newData.entries = previousData.entries;
   }
-  newData.push(newEntry);
+  newData.entries.push(newEntry);
 
   const response = await fetch(`${baseUrl}/${date}${revString}`, {
     method: "PUT",
@@ -37,7 +38,7 @@ const put = async (newEntry) => {
       "Content-Type": "application/json",
       ...authHeaders,
     },
-    body: JSON.stringify(previousData),
+    body: JSON.stringify(newData),
   });
 };
 
@@ -49,10 +50,10 @@ const getRevision = async (name) => {
   return response.headers.get("Etag")?.slice(1, -1);
 };
 
-export const addUsageEvent = (username, event) => {
+export const addUsageEvent = (user, event) => {
   const entry = {
     time: getCurrentTimeString(),
-    username,
+    user,
     event,
   };
   put(entry);

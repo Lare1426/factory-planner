@@ -90,7 +90,7 @@ export const LeftSidePanel = ({
         }
       })();
     }
-  }, [loggedInUsername]);
+  }, []);
 
   useEffect(() => {
     if (plan) {
