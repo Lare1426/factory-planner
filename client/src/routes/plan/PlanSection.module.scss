@@ -1,3 +1,5 @@
+@use "sass:list";
+
 .plan-section {
   width: fit-content;
   height: max-content;
@@ -53,7 +55,7 @@
   // light
   @for $i from 1 through 10 {
     &.layer#{$i} {
-      background-color: nth($light-background-colors, $i);
+      background-color: list.nth($light-background-colors, $i);
     }
   }
 
@@ -61,7 +63,7 @@
   @media (prefers-color-scheme: dark) {
     @for $i from 1 through 10 {
       &.layer#{$i} {
-        background-color: nth($dark-background-colors, $i);
+        background-color: list.nth($dark-background-colors, $i);
       }
     }
   }
