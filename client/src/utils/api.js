@@ -17,9 +17,9 @@ export const getProducts = async () => {
 
 export const getNewPlan = async (product, amount, changedRecipes) => {
   const response = await fetch(
-    `/api/plan/new/${product}?amount=${amount}&changedRecipes=${JSON.stringify(
-      changedRecipes
-    )}`,
+    `/api/plan/new/${product}?amount=${amount}&changedRecipes=${
+      changedRecipes && JSON.stringify(changedRecipes)
+    }`,
     {
       method: "GET",
     }

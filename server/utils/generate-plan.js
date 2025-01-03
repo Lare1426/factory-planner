@@ -25,7 +25,7 @@ export const generate = async (
   if (productsWithRecipes[item]) {
     const { base, alternate } = productsWithRecipes[item];
 
-    if (changedRecipes[item]) {
+    if (changedRecipes && changedRecipes[item]) {
       recipe = changedRecipes[item];
       alternateRecipes = [base, ...alternate].filter(
         (recipe) => recipe !== changedRecipes[item]
