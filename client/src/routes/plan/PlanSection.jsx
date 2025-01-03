@@ -1,4 +1,6 @@
+import { useState } from "react";
 import styles from "./PlanSection.module.scss";
+import { TriangleSvg } from "@/components";
 import { getItemRecipe } from "@/utils/api";
 import { round } from "../../../../shared/round";
 
@@ -11,6 +13,8 @@ export const PlanSection = ({
   hasEditAccess,
   changedRecipes,
 }) => {
+  const [expanded, setExpanded] = useState(true);
+
   const layerColor = `layer${layer}`;
 
   const onChange = async (e) => {
@@ -28,7 +32,15 @@ export const PlanSection = ({
 
   return (
     <section className={`${styles.planSection} ${styles[layerColor]}`}>
-      <div>{plan.item}</div>
+      <div
+        onClick={() => {
+          setExpanded(!expanded);
+        }}
+      >
+        {plan.ingredients && <TriangleSvg rotated={!!expanded} />}
+        {plan.item}
+      </div>
+      <div>Amount: {round(plan.amount, 4)}/min</div>
       {plan.recipe && (
         <div>
           Recipe:
@@ -51,21 +63,22 @@ export const PlanSection = ({
           Buildings: {round(plan.buildingCount, 4)} {plan.producedIn}
         </div>
       )}
-      <div>Amount: {round(plan.amount, 4)}/min</div>
-      <div className={styles.ingredients}>
-        {plan.ingredients?.map((ingredient, index) => (
-          <PlanSection
-            plan={ingredient}
-            updatePlan={updatePlan}
-            layer={layer % 10 === 0 ? 1 : layer + 1}
-            path={[...path, index]}
-            key={`${plan.recipe}-${ingredient.item}-${index}`}
-            isNewPlan={isNewPlan}
-            hasEditAccess={hasEditAccess}
-            changedRecipes={changedRecipes}
-          />
-        ))}
-      </div>
+      {expanded && (
+        <div className={styles.ingredients}>
+          {plan.ingredients?.map((ingredient, index) => (
+            <PlanSection
+              plan={ingredient}
+              updatePlan={updatePlan}
+              layer={layer % 10 === 0 ? 1 : layer + 1}
+              path={[...path, index]}
+              key={`${plan.recipe}-${ingredient.item}-${index}`}
+              isNewPlan={isNewPlan}
+              hasEditAccess={hasEditAccess}
+              changedRecipes={changedRecipes}
+            />
+          ))}
+        </div>
+      )}
     </section>
   );
 };

@@ -1,0 +1,7 @@
+.triangle-svg {
+  margin-right: 10px;
+  transition: transform 0.2s ease-out;
+  &.rotated {
+    transform: rotate(90deg);
+  }
+}
