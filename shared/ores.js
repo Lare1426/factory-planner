@@ -11,4 +11,12 @@ export const ores = [
   "Water",
   "Nitrogen Gas",
   "Crude Oil",
+  "SAM",
+  "Leaves",
+  "Wood",
+  "Mycelia",
+  "Stinger Remains",
+  "Hatcher Remains",
+  "Hog Remains",
+  "Spitter Remains",
 ];

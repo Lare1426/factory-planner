@@ -24,6 +24,24 @@ export const put = async (id, document) => {
   return response.json();
 };
 
+export const del = async (name) => {
+  const rev = await getRevision(name);
+
+  const response = await fetch(`${baseUrl}/${name}?rev=${rev}`, {
+    method: "DELETE",
+    headers: authHeaders,
+  });
+  return await response.json();
+};
+
+const getRevision = async (name) => {
+  const response = await fetch(`${baseUrl}/${name}`, {
+    method: "HEAD",
+    headers: authHeaders,
+  });
+  return response.headers.get("Etag").slice(1, -1); // once errored, fix if happens
+};
+
 export const map = async () => {
   const response = await fetch(`${baseUrl}/_design/views/_view/products`, {
     method: "GET",
