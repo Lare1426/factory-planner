@@ -103,6 +103,10 @@ export const selectMostViewedPlans = async () => {
 
 export const selectMostViewedPlansWithUser = async (userId) => {
   const plans = await selectMostViewedPlans();
+  if (!plans.length) {
+    return [];
+  }
+
   const planIds = plans.reduce((acc, plan) => [...acc, plan.id], []);
 
   const [rdbResult] = await executeQuery(
