@@ -109,7 +109,7 @@ export const selectMostViewedPlansWithUser = async (userId) => {
     `
     SELECT planId, favourited
     FROM account_plan
-    WHERE accountId=? AND (planId=?${" OR planId=?".repeat(9)})
+    WHERE accountId=? AND (planId=?${" OR planId=?".repeat(planIds.length - 1)})
     `,
     [userId, ...planIds]
   );

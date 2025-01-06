@@ -356,7 +356,7 @@ apiRouter.delete("/plan/:planId", async (req, res) => {
   }
 
   await accountPlanRdb.del({ planId });
-  await planRdb.del({ planId });
+  await planRdb.del({ id: planId });
   await plansCdb.del(planId);
 
   res.sendStatus(200);
