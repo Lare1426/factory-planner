@@ -43,21 +43,19 @@ const sortRecipes = async () => {
       continue;
     }
 
-    console.log("ingredients:", ingredients);
-
     const products = recipe.products.map((product) => ({
       item: itemsSource[product.item][0].name,
       amount: product.amount,
     }));
 
-    // const response = await recipesDB.put(recipeName, {
-    //   time: recipe.duration,
-    //   producedIn,
-    //   ingredients,
-    //   products,
-    // });
+    const response = await recipesDB.put(recipeName, {
+      time: recipe.duration,
+      producedIn,
+      ingredients,
+      products,
+    });
 
-    // console.log(response);
+    console.log(response);
   }
 };
 
