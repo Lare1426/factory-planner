@@ -11,12 +11,12 @@ const emailTransporter = nodemailer.createTransport({
   },
 });
 
-const sendErrorEmail = async (error) => {
+const sendErrorEmail = async (error, url) => {
   const res = await emailTransporter.sendMail({
     from: process.env.EMAIL,
     to: process.env.ERROR_EMAIL,
     subject: `Server error: ${error.message}`,
-    text: error.stack,
+    text: `URL: ${url}\nError:\n${error.stack}`,
   });
 };
 
@@ -55,7 +55,7 @@ export const loggerMiddleware = morgan(
 );
 
 export const errorMiddleWare = (error, req, res, next) => {
-  sendErrorEmail(error);
+  sendErrorEmail(error, req.url);
   logger.error(error);
   res.sendStatus(500);
 };
