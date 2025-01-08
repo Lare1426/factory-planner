@@ -460,7 +460,7 @@ server.use("/api", apiRouter);
 server.use(errorMiddleWare);
 
 if (process.env.NODE_ENV === "production") {
-  server.use(express.static(path.join(__dirname, "../client")));
+  server.use(express.static(path.join(__dirname, "../client/dist")));
 }
 
 server.listen(PORT, IP, () => {
