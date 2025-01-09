@@ -69,7 +69,7 @@ export const PlanSection = ({
             <PlanSection
               plan={ingredient}
               updatePlan={updatePlan}
-              layer={layer % 10 === 0 ? 1 : layer + 1}
+              layer={layer % 2 === 0 ? 1 : layer + 1}
               path={[...path, index]}
               key={`${plan.recipe}-${ingredient.item}-${index}`}
               isNewPlan={isNewPlan}
