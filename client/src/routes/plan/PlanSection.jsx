@@ -67,6 +67,11 @@ export const PlanSection = ({
           Buildings: {round(plan.buildingCount, 4)} {plan.producedIn}
         </div>
       )}
+      {plan.byProduct && (
+        <div>
+          Byproduct: {plan.byProduct.item} {plan.byProduct.amount}/min
+        </div>
+      )}
       {expanded && (
         <div className={styles.ingredients}>
           {plan.ingredients?.map((ingredient, index) => (

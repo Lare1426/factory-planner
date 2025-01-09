@@ -55,7 +55,11 @@ export const loggerMiddleware = morgan(
 );
 
 export const errorMiddleWare = (error, req, res, next) => {
-  sendErrorEmail(error, req.url);
-  logger.error(error);
+  if (process.env.NODE_ENV === "production") {
+    sendErrorEmail(error, req.url);
+    logger.error(error);
+  } else {
+    logger.error(error.stack);
+  }
   res.sendStatus(500);
 };

@@ -6,11 +6,17 @@ import { ores } from "../../shared/ores.js";
 const productsWithRecipes = await getProducts();
 
 const findDesiredProduct = (products, desiredProductName) => {
+  let byProduct;
+  let desiredProduct;
+
   for (const product of products) {
     if (product.item === desiredProductName) {
-      return product;
+      desiredProduct = product;
+    } else {
+      byProduct = product;
     }
   }
+  return { byProduct, desiredProduct };
 };
 
 export const generate = async (
@@ -71,12 +77,21 @@ export const generate = async (
 
   const producedIn = recipeData.producedIn;
 
-  const desiredProduct = findDesiredProduct(recipeData.products, item);
+  const { desiredProduct, byProduct } = findDesiredProduct(
+    recipeData.products,
+    item
+  );
+
   const recipeProductionAmount = desiredProduct.amount;
 
   const recipeProductsPerMinute =
     (60 / recipeData.time) * recipeProductionAmount;
   const buildingCount = round(amount / recipeProductsPerMinute, 4);
+
+  if (byProduct) {
+    byProduct.amount =
+      (60 / recipeData.time) * byProduct.amount * buildingCount;
+  }
 
   const ingredients = await Promise.all(
     recipeData.ingredients.map(async (ingredient) => {
@@ -99,5 +114,6 @@ export const generate = async (
     recipe,
     alternateRecipes,
     ingredients,
+    byProduct,
   };
 };
