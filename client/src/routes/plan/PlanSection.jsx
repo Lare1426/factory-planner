@@ -32,12 +32,16 @@ export const PlanSection = ({
 
   return (
     <section className={`${styles.planSection} ${styles[layerColor]}`}>
-      <div
-        onClick={() => {
-          setExpanded(!expanded);
-        }}
-      >
-        {plan.ingredients && <TriangleSvg rotated={!!expanded} />}
+      <div className={styles.name}>
+        {plan.ingredients && (
+          <div
+            onClick={() => {
+              setExpanded(!expanded);
+            }}
+          >
+            <TriangleSvg rotated={!!expanded} />
+          </div>
+        )}
         {plan.item}
       </div>
       <div>Amount: {round(plan.amount, 4)}/min</div>
